@@ -49,7 +49,7 @@ public class XMLParser {
                 trafficItem.setDesc1(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(2).getTextContent());
             }
 
-            // Annahme: Jedes Traffic Item enthält OpenLR Code 
+            // Annahme: Jedes Traffic Item enthält OpenLR Code
             Node node1 = location.item(temp);
             if (node1.getNodeType() == Node.ELEMENT_NODE)
             {
