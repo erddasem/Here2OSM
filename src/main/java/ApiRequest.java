@@ -1,20 +1,35 @@
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ApiRequest {
-    public static String MyGETRequest() throws IOException, ParserConfigurationException, SAXException {
+
+    public static URL getURL (String requestType) throws MalformedURLException {
+        URL url;
         String baseUrl = "https://traffic.ls.hereapi.com";
         String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
         String bbox = "&bbox=51.057,13.744;51.053,13.751";
         String criticality = "&criticality=minor";
-        String path = "/traffic/6.3/";
-        String resource = "incidents";
+        String incidents = "/traffic/6.3/";
+        String flow = "/traffic/6.2/";
+        String resource;
         String format = ".xml";
-        URL request = new URL(baseUrl+path+resource+format+apiKey+bbox+criticality);
+        if (requestType.equals("incident") )
+        {
+            resource = "incidents";
+            URL requestIncidents = new URL(baseUrl+incidents+resource+format+apiKey+bbox+criticality);
+            return requestIncidents;
+        }
+        else {
+            resource = "flow";
+            URL requestFlow = new URL(baseUrl+flow+resource+format+apiKey+bbox+criticality);
+            return requestFlow;
+        }
+    }
+    public static String request(String requestType) throws IOException {
+
+        URL request = getURL(requestType);
         System.out.println(request);
         String readLine = null;
         HttpURLConnection con = (HttpURLConnection) request.openConnection();
@@ -24,7 +39,7 @@ public class ApiRequest {
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
             while ((readLine = in .readLine()) != null) {
                 response.append(readLine);
             } in .close();

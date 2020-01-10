@@ -14,17 +14,17 @@ import java.util.List;
 public class XMLParser {
 
     public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
-        List<TrafficItem> items = XMLParser.parseXML();
+        List<TrafficItem> items = XMLParser.parseXML("incident");
         System.out.println(items);
-        // Anmerkung: Liefert Liste mit Objekten TrafficItem. Jedes Objekt liefert (siehe Klasse Traffic Item)
+        // Anmerkung: Liefert Liste mit Objekten TrafficItem. Jedes Objekt liefert (siehe Klasse TrafficItem)
     }
 
-    public static List<TrafficItem> parseXML() throws ParserConfigurationException, SAXException, IOException {
+    public static List<TrafficItem> parseXML(String requestType) throws ParserConfigurationException, SAXException, IOException {
 
-        List<TrafficItem> trafficItems = new ArrayList<TrafficItem>();
+        List<TrafficItem> trafficItems = new ArrayList<>();
         TrafficItem trafficItem = null;
 
-        String xml = ApiRequest.MyGETRequest();
+        String xml = ApiRequest.request(requestType);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
 
@@ -54,7 +54,9 @@ public class XMLParser {
             if (node1.getNodeType() == Node.ELEMENT_NODE)
             {
                 Element loc = (Element) node1;
-                trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
+                if (trafficItem != null) {
+                    trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
+                }
             }
 
             trafficItems.add(trafficItem);
