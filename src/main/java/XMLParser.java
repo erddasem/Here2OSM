@@ -13,13 +13,62 @@ import java.util.List;
 
 public class XMLParser {
 
-    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
+    private static List<TrafficItem> trafficItems = new ArrayList<>();
+
+    public void parseXml(String requestAnswer) throws ParserConfigurationException, IOException, SAXException {
+        //List<TrafficItem> trafficItems = new ArrayList<>();
+        TrafficItem trafficItem = null;
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        Document doc = builder.parse(new InputSource( new StringReader(requestAnswer)));
+        doc.getDocumentElement().normalize();
+
+        NodeList trfItem = doc.getElementsByTagName("TRAFFIC_ITEM");
+        System.out.println(trfItem.getLength());
+        NodeList location = doc.getElementsByTagName("LOCATION");
+
+        for (int temp = 0; temp < trfItem.getLength(); temp++)
+        {
+            Node node = trfItem.item(temp);
+            if (node.getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element eElement = (Element) node;
+                trafficItem = new TrafficItem();
+                trafficItem.setMid(eElement.getAttribute("mid"));
+                trafficItem.setId(eElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent());
+                trafficItem.setType(eElement.getElementsByTagName("TRAFFIC_ITEM_TYPE_DESC").item(0).getTextContent());
+                trafficItem.setDesc1(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
+                trafficItem.setDesc1(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(1).getTextContent());
+                trafficItem.setDesc1(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(2).getTextContent());
+            }
+
+            // Annahme: Jedes Traffic Item enthält OpenLR Code
+            Node node1 = location.item(temp);
+            if (node1.getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element loc = (Element) node1;
+                if (trafficItem != null) {
+                    trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
+                }
+            }
+            trafficItems.add(trafficItem);
+        }
+    }
+
+    public void printTrafficItemsList() {
+        System.out.println(trafficItems);
+    }
+
+
+    /*public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
         List<TrafficItem> items = XMLParser.parseXML("incident");
         System.out.println(items);
         // Anmerkung: Liefert Liste mit Objekten TrafficItem. Jedes Objekt liefert (siehe Klasse TrafficItem)
-    }
+    }*/
 
-    public static List<TrafficItem> parseXML(String requestType) throws ParserConfigurationException, SAXException, IOException {
+    /*public static List<TrafficItem> parseXML(String requestType) throws ParserConfigurationException, SAXException, IOException {
 
         List<TrafficItem> trafficItems = new ArrayList<>();
         TrafficItem trafficItem = null;
@@ -63,5 +112,5 @@ public class XMLParser {
         }
         return trafficItems;
 
-    }
+    }*/
 }

@@ -3,7 +3,8 @@ public class TrafficItem {
     private String id;
     private String type;
     private String openLR;
-    private String desc1;
+    private String shortDesc;
+    private String longDesc;
 
     public String getOpenLR() {
         return openLR;
@@ -12,9 +13,6 @@ public class TrafficItem {
     public void setOpenLR(String openLR) {
         this.openLR = openLR;
     }
-
-    private String desc2;
-    private String desc3;
 
     public String getMid() {
         return mid;
@@ -41,33 +39,25 @@ public class TrafficItem {
     }
 
     public String getDesc1() {
-        return desc1;
+        return shortDesc;
     }
 
     public void setDesc1(String desc1) {
-        this.desc1 = desc1;
+        this.shortDesc = desc1;
     }
 
-    public String getDesc2() {
-        return desc2;
+    public String getLongDesc() {
+        return longDesc;
     }
 
-    public void setDesc2(String desc2) {
-        this.desc2 = desc2;
-    }
-
-    public String getDesc3() {
-        return desc3;
-    }
-
-    public void setDesc3(String desc3) {
-        this.desc3 = desc3;
+    public void setLongDesc(String longDesc) {
+        this.longDesc = longDesc;
     }
 
     @Override
     public String toString()
     {
         return "TrafficItem [mid = " + mid + ", id = " + id +", type = " + type + ", OpenLR = " + openLR
-                + ", desc1 = " + desc1 + ", desc2 = " + desc2 + ", desc3 = " + desc3 +"]";
+                + ", shortDesc = " + shortDesc + ", longDesc = " + longDesc  + "]";
     }
 }
