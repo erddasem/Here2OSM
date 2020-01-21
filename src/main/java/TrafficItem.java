@@ -42,7 +42,7 @@ public class TrafficItem {
         return shortDesc;
     }
 
-    public void setDesc1(String desc1) {
+    public void setShortDesc(String desc1) {
         this.shortDesc = desc1;
     }
 

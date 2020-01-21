@@ -11,7 +11,7 @@ public class Here2Osm {
         request.sendRequest("incidents");
         String answer = request.getAnswer();
         XMLParser parser = new XMLParser();
-        parser.parseXml(answer);
+        parser.parseIncidents(answer);
         parser.printTrafficItemsList();
 
         }

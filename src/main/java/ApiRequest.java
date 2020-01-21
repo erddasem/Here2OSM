@@ -17,12 +17,20 @@ public class ApiRequest {
     private static URL requestUrl;
     private static String answer;
 
-
+    /**
+     * Sets request type. Possible types are "incidents" to get traffic incidents ord "flow" to get traffic flow
+     * information.
+     * @param requestType type of request either incidents or flow
+     */
     public void setRequestType(String requestType) {
         if (requestType.equals("incidents") || requestType.equals("flow"))
             resource = requestType;
     }
 
+    /**
+     * Sets URL depending on the given request type.
+     * @throws MalformedURLException
+     */
     private void setUrl() throws MalformedURLException {
         if (resource.equals("incidents"))
             requestUrl = new URL (baseUrl+incidents+resource+format+apiKey+bbox+criticality);
@@ -30,14 +38,27 @@ public class ApiRequest {
             requestUrl = new URL (baseUrl+flow+resource+format+apiKey+bbox+criticality);
     }
 
+    /**
+     * Returns request URL.
+     * @return request URL
+     */
     public URL getUrl () {
         return requestUrl;
     }
 
+    /**
+     * Prints generated request URL to console.
+     */
     public void printUrl() {
         System.out.println(requestUrl);
     }
 
+    /**
+     * Sends request to HERE API.
+     * API returns xml, xml is converted to String.
+     * @param requestType can be "incidents" or "flow"
+     * @throws IOException
+     */
     public void sendRequest(String requestType) throws IOException {
         setRequestType(requestType);
         setUrl();
@@ -63,10 +84,17 @@ public class ApiRequest {
         }
     }
 
+    /**
+     * Returns XML as String.
+     * @return
+     */
     public String getAnswer() {
         return answer;
     }
 
+    /**
+     * Prints API answer to console.
+     */
     public void printAnswer() {
         System.out.println(answer);
     }
