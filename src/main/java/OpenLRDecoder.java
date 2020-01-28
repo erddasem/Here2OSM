@@ -4,33 +4,31 @@ import openlr.binary.decoder.*;
 import openlr.*;
 import openlr.binary.impl.LocationReferenceBinaryImpl;
 import openlr.decoder.OpenLRDecoderParameter;
+import openlr.location.Location;
+import openlr.map.loader.MapLoadParameter;
 import openlr.properties.OpenLRPropertiesReader;
+import openlr.rawLocRef.RawLineLocRef;
 import openlr.rawLocRef.RawLocationReference;
-
+import openlr.decoder.LocationDatabase;
+import openlr.map.Line;
 import java.io.File;
 import java.lang.module.Configuration;
 import java.util.Base64;
 
+
 public class OpenLRDecoder {
-    /*String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYQRAAB+/i4ACQUEAQIJADBdHg==";
 
-    OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
-    ByteArray byteArray = new ByteArray(Base64.getDecoder().decode(openLRString));
-    LocationReferenceBinaryImpl locationReferenceBinary;
+    String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYQRAAB+/i4ACQUEAQIJADBdHg==";
 
-    {
-        try {
-            locationReferenceBinary = new LocationReferenceBinaryImpl("Test location", byteArray);
-            RawLocationReference rawLocationReference = binaryDecoder.decodeData(locationReferenceBinary);
-            Configuration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File(TestMapStubTest.class.getClassLoader().getResource("OpenLR-Decoder-Properties.xml").getFile()));
-            OpenLRDecoderParameter params = new OpenLRDecoderParameter.Builder().with(map).with(decoderConfig).buildParameter();
+    public void binary2array() throws PhysicalFormatException {
+        OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
+        ByteArray byteArray = new ByteArray(Base64.getDecoder().decode(openLRString));
 
-            OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
-            Locatoin location = decoder.decodeRaw(params, rawLocationReference);
-        } catch (PhysicalFormatException e) {
-            e.printStackTrace();
-        }
-    }*/
+    }
+
+
+
+
 
 }

@@ -42,8 +42,8 @@ public class TrafficItem {
         return shortDesc;
     }
 
-    public void setShortDesc(String desc1) {
-        this.shortDesc = desc1;
+    public void setShortDesc(String shortDesc) {
+        this.shortDesc = shortDesc;
     }
 
     public String getLongDesc() {

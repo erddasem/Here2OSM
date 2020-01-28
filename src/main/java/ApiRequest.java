@@ -8,6 +8,7 @@ public class ApiRequest {
     // Klassenattribute:
     private static String baseUrl = "https://traffic.ls.hereapi.com";
     private static String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
+    // Bounding Box: Carola Brücke DD
     private static String bbox = "&bbox=51.057,13.744;51.053,13.751";
     private static String criticality = "&criticality=minor";
     private static String incidents = "/traffic/6.3/";
