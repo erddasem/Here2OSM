@@ -1,6 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DatabaseConnection {
   private final String url = "jdbc:postgresql://localhost/routing_db";
@@ -22,6 +20,37 @@ public class DatabaseConnection {
     }
 
     return conn;
+  }
+
+
+  /**
+   * Get actors count
+   * @return
+   */
+  public int getActorCount() {
+    String SQL = "SELECT count(*) FROM nodes";
+    int count = 0;
+
+    try (Connection conn = connectDB();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(SQL)) {
+      rs.next();
+      count = rs.getInt(1);
+    } catch (SQLException ex) {
+      System.out.println(ex.getMessage());
+    }
+  System.out.println(count);
+    return count;
+  }
+
+
+  public void endDBConnection(Connection conn) {
+    try {
+      conn.close();
+      System.out.println("Closed Connection to PostgreSQL server successfully.");
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
 }

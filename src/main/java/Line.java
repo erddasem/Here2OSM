@@ -7,14 +7,31 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class OpenLRLine implements openlr.map.Line {
+
+public class Line implements openlr.map.Line {
+    int line_id;
+    int start_node;
+    int end_node;
+    int frc;
+    int fow;
+    int line_length;
+
+    public Line(int line_id, int start_node, int end_node, int frc, int fow, int line_length) {
+        this.line_id = line_id;
+        this.start_node = start_node;
+        this.end_node = end_node;
+        this.frc = frc;
+        this.fow = fow;
+        this.line_length = line_length;
+    }
+
     @Override
-    public Node getStartNode() {
+    public NodeOLR getStartNode() {
         return null;
     }
 
     @Override
-    public Node getEndNode() {
+    public NodeOLR getEndNode() {
         return null;
     }
 
@@ -49,12 +66,12 @@ public class OpenLRLine implements openlr.map.Line {
     }
 
     @Override
-    public Iterator<Line> getPrevLines() {
+    public Iterator<openlr.map.Line> getPrevLines() {
         return null;
     }
 
     @Override
-    public Iterator<Line> getNextLines() {
+    public Iterator<openlr.map.Line> getNextLines() {
         return null;
     }
 

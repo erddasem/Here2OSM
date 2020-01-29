@@ -1,5 +1,6 @@
 import openlr.PhysicalFormatException;
 import org.xml.sax.SAXException;
+import java.sql.Connection;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -14,10 +15,9 @@ public class Here2Osm {
         XMLParser parser = new XMLParser();
         parser.parseIncidents(answer);
         parser.printTrafficItemsList();
-        OpenLRDecoder decoder = new OpenLRDecoder();
-        decoder.binary2array();
-        DatabaseConnection dbConn = new DatabaseConnection();
-        dbConn.connectDB();
+
+        testGetData test = new testGetData();
+        test.getData();
 
         }
 }
