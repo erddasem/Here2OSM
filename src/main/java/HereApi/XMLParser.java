@@ -1,3 +1,7 @@
+package HereApi;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -7,11 +11,16 @@ import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class XMLParser {
+
+    private static final Logger logger = LoggerFactory
+            .getLogger(MethodHandles.lookup().lookupClass());
+
 
     // Klassenattribut List of TrafficItems
     private static List<TrafficItem> trafficItems = new ArrayList<>();
@@ -24,7 +33,7 @@ public class XMLParser {
      * @throws SAXException
      */
     public void parseIncidents(String requestAnswer) throws ParserConfigurationException, IOException, SAXException {
-        //List<TrafficItem> trafficItems = new ArrayList<>();
+        //List<HereApi.TrafficItem> trafficItems = new ArrayList<>();
         TrafficItem trafficItem = null;
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -68,6 +77,9 @@ public class XMLParser {
      * Prints list of traffic items to console.
      */
     public void printTrafficItemsList() {
+
+        logger.info("trafficItems", trafficItems);
+
         System.out.println(trafficItems);
     }
 

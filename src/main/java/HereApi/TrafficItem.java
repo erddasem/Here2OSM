@@ -1,3 +1,5 @@
+package HereApi;
+
 public class TrafficItem {
     private String mid;
     private String id;
@@ -57,7 +59,7 @@ public class TrafficItem {
     @Override
     public String toString()
     {
-        return "TrafficItem [mid = " + mid + ", id = " + id +", type = " + type + ", OpenLR = " + openLR
+        return "HereApi.TrafficItem [mid = " + mid + ", id = " + id +", type = " + type + ", OpenLR = " + openLR
                 + ", shortDesc = " + shortDesc + ", longDesc = " + longDesc  + "]";
     }
 }

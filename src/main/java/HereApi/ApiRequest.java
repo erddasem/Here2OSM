@@ -1,3 +1,5 @@
+package HereApi;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -10,6 +12,9 @@ public class ApiRequest {
     private static String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
     // Bounding Box: Carola Brücke DD
     private static String bbox = "&bbox=51.057,13.744;51.053,13.751";
+    // Bounding Box: Theodor Heuss Brücke
+    //private static String bbox = "&bbox=50.01,8.272;51.004,8.283";
+
     private static String criticality = "&criticality=minor";
     private static String incidents = "/traffic/6.3/";
     private static String flow = "/traffic/6.2/";

@@ -1,3 +1,7 @@
+import HereApi.ApiRequest;
+import HereApi.XMLParser;
+import OpenLR.OpenLRDecoder;
+import OpenLR.TestGetData;
 import openlr.PhysicalFormatException;
 import org.xml.sax.SAXException;
 
@@ -8,16 +12,20 @@ public class Here2Osm {
     // mainMethode
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, PhysicalFormatException {
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
-        ApiRequest request = new ApiRequest();
+        HereApi.ApiRequest request = new ApiRequest();
         request.sendRequest("incidents");
         String answer = request.getAnswer();
         XMLParser parser = new XMLParser();
         parser.parseIncidents(answer);
         parser.printTrafficItemsList();
-        OpenLRDecoder decoder = new OpenLRDecoder();
-        decoder.binary2array();
-        DatabaseConnection dbConn = new DatabaseConnection();
-        dbConn.connectDB();
+
+        TestGetData test = new TestGetData();
+        test.getData();
+
+        //OpenLRDecoder decoder = new OpenLRDecoder();
+        //decoder.binary2array();
+        //OpenLRDecoder decoder = new OpenLRDecoder();
+        //decoder.binary2array();
 
         }
 }
