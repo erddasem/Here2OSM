@@ -1,13 +1,19 @@
+package OpenLR;
+
 import openlr.map.Line;
 import openlr.map.Node;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
+
+import static OpenLR.SQLCommands.getKnoten;
+import static OpenLR.SQLCommands.getLinie;
+import static org.jooq.sources.tables.Kanten.KANTEN;
+import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 public class MapDatabase implements openlr.map.MapDatabase{
     DataSource conn = DatasourceConfig.createDataSource();
@@ -19,36 +25,40 @@ public class MapDatabase implements openlr.map.MapDatabase{
 
     @Override
     public Line getLine(long id) {
-        // select * from kanten where id = id;
-        return null;
+
+        return getLinie(id);
     }
 
     @Override
     public Node getNode(long id) {
-        // select * from knoten where id = id;
-        // SQL Anfrage nach lat und long mit Hilfe der ID
-        // als Variablen, über Konstruktor (Impl. Interface Node) für Node,
-        return null;
+
+        return getKnoten(id);
     }
 
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
+
+        // Bedarf geometrischer Abfrage...
         return null;
     }
 
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
+
+        // Bedarf geometrischer Abfrage...
         return null;
     }
 
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
+
+        // Annahme, wenn oneway = true durfte turn restriction = true sein.
         return false;
     }
 
     @Override
     public Iterator<Node> getAllNodes() {
-        // select * from knoten;
+        Result<Record> getNodes = ctx.select().from(KNOTEN).fetch();
 
         return null;
     }
@@ -57,6 +67,8 @@ public class MapDatabase implements openlr.map.MapDatabase{
     public Iterator<Line> getAllLines() {
 
         // select * from lines,
+        Result<Record> getLines = ctx.select().from(KANTEN).fetch();
+        // erstellen Linien Objekte aus erhaltenen IDs, Linien Objekte dann in Iterator packen
 
         return null;
     }
@@ -70,13 +82,15 @@ public class MapDatabase implements openlr.map.MapDatabase{
 
     @Override
     public int getNumberOfNodes() {
-        // select count(node_id) from knoten;
-        return 0;
+
+        int numberOfNodes  = ctx.selectCount().from(KNOTEN).fetchOne().value1();
+        return numberOfNodes;
     }
 
     @Override
     public int getNumberOfLines() {
-        // select count(id) from kanten;
-        return 0;
+
+        int numberOfLines  = ctx.selectCount().from(KANTEN).fetchOne().value1();
+        return numberOfLines;
     }
 }
