@@ -34,23 +34,7 @@ public class SQLCommands {
         return node;
     }
 
-    static Line getLinie(long linien_id) {
-        Result<Record> getLine = ctx.select().from(KANTEN).where(KANTEN.LINE_ID.eq(linien_id)).fetch();
-        Line line = null;
-        for (Record r : getLine) {
-            long l_id = r.getValue(KANTEN.LINE_ID);
-            long start_node = r.getValue(KANTEN.START_NODE);
-            long end_node = r.getValue(KANTEN.END_NODE);
-            String name = r.getValue(KANTEN.NAME);
-            int fow = r.getValue(KANTEN.FOW);
-            int frc = r.getValue(KANTEN.FOW);
-            int length = r.getValue(KANTEN.LENGTH_METER).intValue();
 
-            line = new OpenLRLine(l_id, start_node, end_node, frc, fow, length, name);
-
-        }
-        return line;
-    }
 
 
 }

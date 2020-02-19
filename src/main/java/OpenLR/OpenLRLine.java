@@ -4,30 +4,39 @@ import openlr.map.*;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 
-public class OpenLRLine implements Line {
+public class OpenLRLine implements Line{
 
     long line_id;
     long start_node;
     long end_node;
     int frc;
     int fow;
-    int line_length;
+    int length_meter;
     String name;
+    boolean oneway;
 
-    public OpenLRLine(long line_id, long start_node, long end_node, int frc, int fow, int line_length, String name) {
+    public OpenLRLine(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
         this.line_id = line_id;
         this.start_node = start_node;
         this.end_node = end_node;
         this.frc = frc;
         this.fow = fow;
-        this.line_length = line_length;
+        this.length_meter = length_meter;
         this.name = name;
+        this.oneway = oneway;
+    }
+
+    private Line[] lineList;
+    private int currentSize;
+
+    public OpenLRLine(Line[] newArray) {
+        this.lineList = newArray;
+        this.currentSize = lineList.length;
+
     }
 
     @Override
@@ -71,7 +80,7 @@ public class OpenLRLine implements Line {
     @Override
     public int getLineLength() {
 
-        return line_length;
+        return length_meter;
     }
 
     @Override
@@ -127,4 +136,6 @@ public class OpenLRLine implements Line {
         // return name, irgendwas in Verbindung mit locale
         return null;
     }
+
+
 }

@@ -11,11 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import static OpenLR.SQLCommands.getKnoten;
-import static OpenLR.SQLCommands.getLinie;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
+import static org.jooq.sources.tables.Metadata.METADATA;
 
-public class MapDatabase implements openlr.map.MapDatabase{
+public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     DataSource conn = DatasourceConfig.createDataSource();
     DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
     @Override
@@ -26,7 +26,11 @@ public class MapDatabase implements openlr.map.MapDatabase{
     @Override
     public Line getLine(long id) {
 
-        return getLinie(id);
+        return ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.LINE_ID.eq(id))
+                .fetchAny().into(OpenLRLine.class);
     }
 
     @Override
@@ -66,31 +70,33 @@ public class MapDatabase implements openlr.map.MapDatabase{
     @Override
     public Iterator<Line> getAllLines() {
 
-        // select * from lines,
-        Result<Record> getLines = ctx.select().from(KANTEN).fetch();
-        // erstellen Linien Objekte aus erhaltenen IDs, Linien Objekte dann in Iterator packen
+        List<Line> alllines = ctx.select().from(KANTEN).fetchInto(Line.class);
+        OpenLRLineIterable li = new OpenLRLineIterable(alllines);
 
-        return null;
+        return li.iterator();
     }
 
     @Override
     public Rectangle2D.Double getMapBoundingBox() {
 
         // select * from mapdata;
-        return null;
+        double x  = ctx.select(METADATA.LEFT_LAT).from(METADATA).fetchOne().value1();
+        double y  = ctx.select(METADATA.LEFT_LON).from(METADATA).fetchOne().value1();
+        double width  = ctx.select(METADATA.BBOX_WIDTH).from(METADATA).fetchOne().value1();
+        double height  = ctx.select(METADATA.BBOX_HEIGHT).from(METADATA).fetchOne().value1();
+
+        return new Rectangle2D.Double(x, y, width, height);
     }
 
     @Override
     public int getNumberOfNodes() {
 
-        int numberOfNodes  = ctx.selectCount().from(KNOTEN).fetchOne().value1();
-        return numberOfNodes;
+        return ctx.selectCount().from(KNOTEN).fetchOne().value1();
     }
 
     @Override
     public int getNumberOfLines() {
 
-        int numberOfLines  = ctx.selectCount().from(KANTEN).fetchOne().value1();
-        return numberOfLines;
+        return ctx.selectCount().from(KANTEN).fetchOne().value1();
     }
 }
