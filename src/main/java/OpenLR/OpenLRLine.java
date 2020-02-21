@@ -1,11 +1,19 @@
 package OpenLR;
 
 import openlr.map.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
+import javax.sql.DataSource;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.function.Consumer;
+
+import static org.jooq.sources.tables.Kanten.KANTEN;
+import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 
 public class OpenLRLine implements Line{
@@ -30,37 +38,39 @@ public class OpenLRLine implements Line{
         this.oneway = oneway;
     }
 
-    private Line[] lineList;
-    private int currentSize;
-
-    public OpenLRLine(Line[] newArray) {
-        this.lineList = newArray;
-        this.currentSize = lineList.length;
-
-    }
+    static DataSource conn = DatasourceConfig.createDataSource();
+    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
     @Override
     public Node getStartNode() {
 
-        return SQLCommands.getKnoten(start_node);
+        return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(KNOTEN.NODE_ID.eq(start_node))
+                .fetchAny()
+                .into(OpenLRNode.class);
     }
 
     @Override
     public Node getEndNode() {
 
-        return SQLCommands.getKnoten(end_node);
+        return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(KNOTEN.NODE_ID.eq(end_node))
+                .fetchAny()
+                .into(OpenLRNode.class);
     }
 
     @Override
     public FormOfWay getFOW() {
 
-        return FormOfWay.getFOWs().get(fow); // weil Enum
+        return FormOfWay.getFOWs().get(fow);
     }
 
     @Override
     public FunctionalRoadClass getFRC() {
 
-        return FunctionalRoadClass.getFRCs().get(frc); // weil Enum
+        return FunctionalRoadClass.getFRCs().get(frc);
     }
 
     @Override
@@ -92,16 +102,47 @@ public class OpenLRLine implements Line{
     @Override
     public Iterator<Line> getPrevLines() {
 
-        // slect line_id from kanten where kanten.end_node = start_node or (kanten.end_node = start_node and oneway = false);
-        // create iterator
-        return null;
+        if (oneway = true) {
+            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
+            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
+
+            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                    .from(KANTEN)
+                    .where(finalCon)
+                    .fetchInto(Line.class);
+
+            return prevLines.iterator();
+        }
+        else {
+            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
+            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
+
+            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                    .from(KANTEN)
+                    .where(finalCon)
+                    .fetchInto(Line.class);
+
+            return prevLines.iterator();
+        }
+
     }
 
     @Override
     public Iterator<Line> getNextLines() {
 
         // select line_id from kanten where kanten.start_node = end_node or (kanten.start_node = end_node and oneway = false);
-        return null;
+        Condition andCon = (KANTEN.END_NODE.eq(start_node)).and(KANTEN.ONEWAY.eq(false));
+        Condition finalCon = (KANTEN.START_NODE.eq(end_node)).or(andCon);
+
+        List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(finalCon)
+                .fetchInto(Line.class);
+
+        return nextLines.iterator();
     }
 
     @Override

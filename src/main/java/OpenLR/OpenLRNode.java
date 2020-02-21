@@ -6,26 +6,20 @@ import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
-import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 public class OpenLRNode implements Node {
 
-    // Attribtute Knoten
     long node_id;
-    double lon;
     double lat;
-    int cnt_in;
-    int cnt_out;
+    double lon;
 
-    // Konstruktor
-    public OpenLRNode(long id, double lon, double lat, int cnt_in, int cnt_out) {
+    public OpenLRNode(long id, double lat, double lon) {
         this.node_id = id;
         this.lon = lon;
         this.lat = lat;
-        this.cnt_in = cnt_in;
-        this.cnt_out = cnt_out;
     }
 
     static DataSource conn = DatasourceConfig.createDataSource();
@@ -33,11 +27,13 @@ public class OpenLRNode implements Node {
 
     @Override
     public double getLatitudeDeg() {
+
         return lat;
     }
 
     @Override
     public double getLongitudeDeg() {
+
         return lon;
     }
 
@@ -55,63 +51,53 @@ public class OpenLRNode implements Node {
     @Override
     public Iterator<Line> getConnectedLines() {
 
-        Result<Record1<Long>> connectedLines = ctx.select(KANTEN.LINE_ID).from(KANTEN)
+        List<Line> connectedLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .or(KANTEN.END_NODE.eq(node_id))
-                .fetch();
+                .fetchInto(OpenLRLine.class);
 
-        // select line_id from kanten where start_node = node_id or end_node = node_id;
-        return null;
+        return connectedLines.iterator();
     }
 
     @Override
     public int getNumberConnectedLines() {
 
-        // select count(*) from kanten where start_node = node_id or end_node = node_id;
-        int numberConnectedLines  = ctx.selectCount().from(KANTEN)
+        return ctx.selectCount().from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .or(KANTEN.END_NODE.eq(node_id))
                 .fetchOne().value1();
-        return numberConnectedLines;
     }
 
     @Override
     public Iterator<Line> getOutgoingLines() {
 
-        Condition a = KANTEN.START_NODE.eq(node_id);
-        Condition b = KANTEN.END_NODE.eq(node_id);
-        Condition c = KANTEN.ONEWAY.eq(false);
+        Condition andCon = (KANTEN.END_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
+        Condition finalCon = (KANTEN.START_NODE.eq(node_id)).or(andCon);
 
-        Condition andCon = b.and(c);             // These OR-connected conditions form a new condition, wrapped in parentheses
-        Condition finalCon = a.or(andCon);
-
-        Result<Record1<Long>> outgoingLines = ctx.select(KANTEN.LINE_ID).from(KANTEN)
+        List<Line> linesOut = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
                 .where(finalCon)
-                .fetch();
+                .fetchInto(Line.class);
 
-        // select line_id from kanten where start_node = node_id or (end_node = node_id and oneway = false);
-        // array mit jeweiligen line_ids, dann Objekte erstellen und als Iterator zurückgeben
-        return null;
+        return linesOut.iterator();
     }
 
     @Override
     public Iterator<Line> getIncomingLines() {
 
-        Condition a = KANTEN.START_NODE.eq(node_id);
-        Condition b = KANTEN.END_NODE.eq(node_id);
-        Condition c = KANTEN.ONEWAY.eq(false);
+        Condition andCon = (KANTEN.START_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
+        Condition finalCon = (KANTEN.END_NODE.eq(node_id)).or(andCon);
 
-        Condition andCon = a.and(c);             // These OR-connected conditions form a new condition, wrapped in parentheses
-        Condition finalCon = b.or(andCon);
-
-        Result<Record1<Long>> ingoingLines = ctx.select(KANTEN.LINE_ID).from(KANTEN)
+        List<Line> linesIn = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
                 .where(finalCon)
-                .fetch();
+                .fetchInto(Line.class);
 
-        // select line_id from kanten where end_node = 28 or (start_node = 28 and oneway = false);
-        // ausgabe der line_id's als Aaray, Linien Objekte erstellen und als Iterator zurück geben.
-        // for each line_id in array {getLine(id) add Line to lineIterator} return lineIterator
-        return null;
+        return linesIn.iterator();
     }
 
     @Override

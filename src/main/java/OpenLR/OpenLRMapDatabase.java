@@ -10,7 +10,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
-import static OpenLR.SQLCommands.getKnoten;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
@@ -18,6 +17,7 @@ import static org.jooq.sources.tables.Metadata.METADATA;
 public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     DataSource conn = DatasourceConfig.createDataSource();
     DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
+
     @Override
     public boolean hasTurnRestrictions() {
         return false;
@@ -36,7 +36,11 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Node getNode(long id) {
 
-        return getKnoten(id);
+       return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(KNOTEN.NODE_ID.eq(id))
+                .fetchAny()
+                .into(OpenLRNode.class);
     }
 
     @Override
@@ -62,18 +66,21 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
 
     @Override
     public Iterator<Node> getAllNodes() {
-        Result<Record> getNodes = ctx.select().from(KNOTEN).fetch();
 
-        return null;
+        List<Node> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN).fetchInto(Node.class);
+
+        return allNodes.iterator();
     }
 
     @Override
     public Iterator<Line> getAllLines() {
 
-        List<Line> alllines = ctx.select().from(KANTEN).fetchInto(Line.class);
-        OpenLRLineIterable li = new OpenLRLineIterable(alllines);
+        List<Line> allLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN).fetchInto(Line.class);
 
-        return li.iterator();
+        return allLines.iterator();
     }
 
     @Override
