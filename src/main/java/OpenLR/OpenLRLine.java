@@ -102,7 +102,6 @@ public class OpenLRLine implements Line{
     @Override
     public Iterator<Line> getPrevLines() {
 
-        if (oneway = true) {
             Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
             Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
 
@@ -113,20 +112,6 @@ public class OpenLRLine implements Line{
                     .fetchInto(Line.class);
 
             return prevLines.iterator();
-        }
-        else {
-            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
-            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
-
-            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
-                    .from(KANTEN)
-                    .where(finalCon)
-                    .fetchInto(Line.class);
-
-            return prevLines.iterator();
-        }
-
     }
 
     @Override
