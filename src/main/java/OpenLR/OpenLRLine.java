@@ -1,11 +1,16 @@
 package OpenLR;
 
 import openlr.map.*;
+import org.slf4j.ILoggerFactory;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
+
+// assumes the current class is called MyLogger
+
 
 
 public class OpenLRLine implements Line{
@@ -18,6 +23,8 @@ public class OpenLRLine implements Line{
     int length_meter;
     String name;
     boolean oneway;
+
+    private final static Logger logger = Logger.getLogger(OpenLRLine.class.getName());
 
     public OpenLRLine(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
         this.line_id = line_id;
@@ -42,6 +49,7 @@ public class OpenLRLine implements Line{
     @Override
     public Node getStartNode() {
 
+        logger.info("Anuahl Start Knoten");
         return SQLCommands.getKnoten(start_node);
     }
 

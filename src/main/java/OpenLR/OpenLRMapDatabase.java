@@ -36,6 +36,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Node getNode(long id) {
 
+        //TODO: Muss noch geändert werden
         return getKnoten(id);
     }
 
@@ -55,6 +56,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
 
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
+        // TODO: Muss noch ausgefüllt werden
 
         // Annahme, wenn oneway = true durfte turn restriction = true sein.
         return false;
