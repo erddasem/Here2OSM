@@ -12,12 +12,12 @@ public class Here2Osm {
     // mainMethode
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, PhysicalFormatException {
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
-        HereApi.ApiRequest request = new ApiRequest();
+        /*HereApi.ApiRequest request = new ApiRequest();
         request.sendRequest("incidents");
         String answer = request.getAnswer();
         XMLParser parser = new XMLParser();
         parser.parseIncidents(answer);
-        parser.printTrafficItemsList();
+        parser.printTrafficItemsList();*/
 
         TestGetData test = new TestGetData();
         test.getData();

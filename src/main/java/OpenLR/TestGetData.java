@@ -1,5 +1,6 @@
 package OpenLR;
 
+import openlr.map.Line;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.sources.tables.Kanten;
@@ -10,26 +11,32 @@ import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 
 import javax.sql.DataSource;
+import java.util.List;
 
 public class TestGetData {
     public void getData() {
     DataSource conn = DatasourceConfig.createDataSource();
     DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
-    long node_id = 28;
 
-        Condition a = KANTEN.START_NODE.eq(node_id);
-        Condition b = KANTEN.END_NODE.eq(node_id);
-        Condition c = KANTEN.ONEWAY.eq(false);
+        double longitude = 13.749407;
+        double latitude = 51.054077;
+        int distance = 50;
 
-        Condition andCon = a.and(c);             // These OR-connected conditions form a new condition, wrapped in parentheses
-        Condition finalCon = b.or(andCon);
+        double distance_deg = distance / (111.32 * 1000 * Math.cos(latitude * (Math.PI / 180)));
+        System.out.println(distance_deg);
 
-        Result<Record1<Long>> countIncomming = ctx.select(KANTEN.LINE_ID).from(KANTEN)
-                .where(finalCon)
+        String whereCon = "ST_DWithin(geom, ST_PointFromText('POINT("+ longitude + " " +
+                latitude + ")', 4326)," + distance_deg + ")=true";
+        String whereCon1 = "ST_DWithin(geom::geography, ST_PointFromText('POINT("+ longitude + " " +
+                latitude + ")', 4326)::geography," + distance + ")=true";
+
+        Result<Record1<Long>> nodes = ctx.select(KNOTEN.NODE_ID)
+                .from(KNOTEN)
+                .where(whereCon)
                 .fetch();
 
-        System.out.println(countIncomming);
+        System.out.println(nodes);
 
 
 
