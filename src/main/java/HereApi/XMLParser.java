@@ -50,10 +50,10 @@ public class XMLParser {
 
         for (int temp = 0; temp < trfItem.getLength(); temp++)
         {
-            Node node = trfItem.item(temp);
-            if (node.getNodeType() == Node.ELEMENT_NODE)
+            Node nodeTrfItem = trfItem.item(temp);
+            if (nodeTrfItem.getNodeType() == Node.ELEMENT_NODE)
             {
-                Element eElement = (Element) node;
+                Element eElement = (Element) nodeTrfItem;
                 trafficItem = new TrafficItem();
                 trafficItem.setMid(eElement.getAttribute("mid"));
                 trafficItem.setId(eElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent());
@@ -61,10 +61,13 @@ public class XMLParser {
                 trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
             }
 
-            Node node1 = location.item(temp);
-            if (node1.getNodeType() == Node.ELEMENT_NODE)
+            //TODO: Nicht jedes Trafic Item hat OpenLRBase64 Code, muss abgefangen werden.
+            // Erst überprüfen, ob der entsprechende Knoten vorhanden ist, ist er es nicht, wird die Information nicht
+            // in das entsprechende Objekt geschrieben!
+            Node nodeLoc = location.item(temp);
+            if (nodeLoc.getNodeType() == Node.ELEMENT_NODE)
             {
-                Element loc = (Element) node1;
+                Element loc = (Element) nodeLoc;
                 if (trafficItem != null) {
                     trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
                 }

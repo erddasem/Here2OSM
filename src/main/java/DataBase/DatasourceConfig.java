@@ -1,4 +1,4 @@
-package OpenLR;
+package DataBase;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

@@ -1,5 +1,7 @@
 package OpenLR;
 
+import DataBase.DatasourceConfig;
+import DataBase.SpatialQueries;
 import openlr.map.Line;
 import openlr.map.Node;
 import org.jooq.*;
@@ -10,7 +12,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
-import static OpenLR.SQLCommands.getKnoten;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
@@ -18,6 +19,7 @@ import static org.jooq.sources.tables.Metadata.METADATA;
 public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     DataSource conn = DatasourceConfig.createDataSource();
     DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
+
     @Override
     public boolean hasTurnRestrictions() {
         return false;
@@ -36,46 +38,62 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Node getNode(long id) {
 
-        //TODO: Muss noch geändert werden
-        return getKnoten(id);
+       return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(KNOTEN.NODE_ID.eq(id))
+                .fetchAny()
+                .into(OpenLRNode.class);
     }
 
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        // Bedarf geometrischer Abfrage...
-        return null;
+        List<Node> nodesCloseBy = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
+                .fetchInto(Node.class);
+
+        return nodesCloseBy.iterator();
     }
 
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        // Bedarf geometrischer Abfrage...
-        return null;
+        List<Line> linesCloseBy = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
+                .fetchInto(Line.class);
+
+        return linesCloseBy.iterator();
     }
 
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
-        // TODO: Muss noch ausgefüllt werden
 
-        // Annahme, wenn oneway = true durfte turn restriction = true sein.
+        // Annahme, wenn oneway = true dürfte turn restriction = true sein.
+        // belassen bei false
+        //TODO: Is optional, if it returns false it is not implemented
         return false;
     }
 
     @Override
     public Iterator<Node> getAllNodes() {
-        Result<Record> getNodes = ctx.select().from(KNOTEN).fetch();
 
-        return null;
+        List<Node> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN).fetchInto(Node.class);
+
+        return allNodes.iterator();
     }
 
     @Override
     public Iterator<Line> getAllLines() {
 
-        List<Line> alllines = ctx.select().from(KANTEN).fetchInto(Line.class);
-        OpenLRLineIterable li = new OpenLRLineIterable(alllines);
+        List<Line> allLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN).fetchInto(Line.class);
 
-        return li.iterator();
+        return allLines.iterator();
     }
 
     @Override

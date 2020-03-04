@@ -94,64 +94,38 @@
             <artifactId>jooq-codegen</artifactId>
             <version>3.12.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.16.1</version>
+        </dependency>
+
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>locationtech-releases</id>
+            <url>https://repo.locationtech.org/content/groups/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jts-snapshots</id>
+            <url>https://repo.locationtech.org/content/repositories/jts-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- Specify the maven code generator plugin -->
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.12.3</version>
-                <!-- The plugin should hook into the generate goal -->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <!-- Manage the plugin's dependency. In this example, we'll use a PostgreSQL database -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>42.2.9</version>
-                    </dependency>
-                </dependencies>
-                <!-- Specify the plugin configuration.
-                     The configuration format is the same as for the standalone code generator -->
-                <configuration>
-                    <!-- JDBC connection parameters -->
-                    <jdbc>
-                        <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/test_carola</url>
-                        <user>emilykast</user>
-                        <password></password>
-                    </jdbc>
-                    <!-- Generator parameters -->
-                    <generator>
-                        <database>
-                            <includes>.*</includes>
-                            <excludes>
-                            </excludes>
-                            <inputSchema>openlr</inputSchema>
-                        </database>
-                        <target>
-                            <packageName>org.jooq.sources</packageName>
-                            <directory>target/generated-sources/jooq</directory>
-                        </target>
-                    </generator>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
