@@ -1,7 +1,4 @@
-import HereApi.ApiRequest;
-import HereApi.XMLParser;
-import OpenLR.OpenLRDecoder;
-import OpenLR.TestGetData;
+import DataBase.TestGetData;
 import openlr.PhysicalFormatException;
 import org.xml.sax.SAXException;
 
@@ -22,8 +19,6 @@ public class Here2Osm {
         TestGetData test = new TestGetData();
         test.getData();
 
-        //OpenLRDecoder decoder = new OpenLRDecoder();
-        //decoder.binary2array();
         //OpenLRDecoder decoder = new OpenLRDecoder();
         //decoder.binary2array();
 

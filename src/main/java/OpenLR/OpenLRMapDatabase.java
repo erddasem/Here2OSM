@@ -1,5 +1,7 @@
 package OpenLR;
 
+import DataBase.DatasourceConfig;
+import DataBase.SpatialQueries;
 import openlr.map.Line;
 import openlr.map.Node;
 import org.jooq.*;
@@ -46,17 +48,9 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        double distance_deg = distance / (111.32 * 1000 * Math.cos(latitude * (Math.PI / 180)));
-        System.out.println(distance_deg);
-
-        String whereCon = "ST_DWithin(geom, ST_PointFromText('POINT("+ longitude + " " +
-                latitude + ")', 4326)," + distance_deg + ")=true";
-        String whereCon1 = "ST_DWithin(geom::geography, ST_PointFromText('POINT("+ longitude + " " +
-                latitude + ")', 4326)::geography," + distance + ")=true";
-
         List<Node> nodesCloseBy = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN)
-                .where(whereCon)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
                 .fetchInto(Node.class);
 
         return nodesCloseBy.iterator();
@@ -65,18 +59,10 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        double distance_deg = distance / (111.32 * 1000 * Math.cos(latitude * (Math.PI / 180)));
-        System.out.println(distance_deg);
-
-        String whereCon = "ST_DWithin(geom, ST_PointFromText('POINT("+ longitude + " " +
-                latitude + ")', 4326)," + distance_deg + ")=true";
-        String whereCon1 = "ST_DWithin(geom::geography, ST_PointFromText('POINT("+ longitude + " " +
-                latitude + ")', 4326)::geography," + distance + ")=true";
-
         List<Line> linesCloseBy = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
-                .where(whereCon)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
                 .fetchInto(Line.class);
 
         return linesCloseBy.iterator();
@@ -87,7 +73,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
 
         // Annahme, wenn oneway = true dürfte turn restriction = true sein.
         // belassen bei false
-        //TODO: Is optional, if it returns false it is not imolemented
+        //TODO: Is optional, if it returns false it is not implemented
         return false;
     }
 
