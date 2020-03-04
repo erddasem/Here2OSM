@@ -132,6 +132,8 @@ public class OpenLRLine implements Line{
     @Override
     public Iterator<Line> getNextLines() {
 
+        /*Selects next lines depending on given line id. Next lines can be all lines using the end node of the given
+        line as start node and all lines where oneway = true and the end node is the same.*/
         // select line_id from kanten where kanten.start_node = end_node or (kanten.start_node = end_node and oneway = false);
         Condition andCon = (KANTEN.END_NODE.eq(start_node)).and(KANTEN.ONEWAY.eq(false));
         Condition finalCon = (KANTEN.START_NODE.eq(end_node)).or(andCon);

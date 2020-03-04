@@ -13,6 +13,7 @@ import DataBase.SpatialQueries;
 import javax.sql.DataSource;
 
 public class TestGetData {
+    // class to test JOOQ queries before implementing into openLR interfaces
 
     private DSLContext ctx;
 
