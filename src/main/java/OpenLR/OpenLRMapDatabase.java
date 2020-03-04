@@ -1,5 +1,7 @@
 package OpenLR;
 
+import DataBase.DatasourceConfig;
+import DataBase.SpatialQueries;
 import openlr.map.Line;
 import openlr.map.Node;
 import org.jooq.*;
@@ -46,21 +48,32 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        // Bedarf geometrischer Abfrage...
-        return null;
+        List<Node> nodesCloseBy = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+                .from(KNOTEN)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
+                .fetchInto(Node.class);
+
+        return nodesCloseBy.iterator();
     }
 
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
 
-        // Bedarf geometrischer Abfrage...
-        return null;
+        List<Line> linesCloseBy = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(SpatialQueries.stDWithin(longitude, latitude, distance))
+                .fetchInto(Line.class);
+
+        return linesCloseBy.iterator();
     }
 
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
 
-        // Annahme, wenn oneway = true durfte turn restriction = true sein.
+        // Annahme, wenn oneway = true dürfte turn restriction = true sein.
+        // belassen bei false
+        //TODO: Is optional, if it returns false it is not implemented
         return false;
     }
 

@@ -23,8 +23,8 @@ public class OpenLRDecoder {
 
     public static void binary2array() throws PhysicalFormatException {
         OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
-        String openLRString = "CwnGsiRN4Qo/H/+ZAWAKbywr";
-        //String openLRString = "CCkBEAAlJAnGriRNtAAJBQQBAgcACgUEAYRVAP+hAhEACQUEAQKAADBmVw";
+        //String openLRString = "CwnGsiRN4Qo/H/+ZAWAKbywr";
+        String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYUVAAA7/b8ACQUEAQITADAAAA==";
         ByteArray byteArray = new ByteArray(openLRString);
 
         LocationReference lr = new LocationReferenceBinaryImpl("test", byteArray);
