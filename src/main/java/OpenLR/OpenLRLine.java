@@ -80,12 +80,23 @@ public class OpenLRLine implements Line{
 
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
-        } else {
-            // return end node coordinates as Point2D.Double ( java.awt.geom)
-        }
+            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
+                    .from(KANTEN)
+                    .where(KANTEN.LINE_ID.eq(line_id))
+                    .fetchOne();
 
-        // errechnen der Punktkoordinaten entlang der Linie basierend auf der Entfernung zum Startpunkt
-        return null;
+            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong, length_meter))
+                    .from(KANTEN)
+                    .where(KANTEN.LINE_ID.eq(line_id))
+                    .fetchOne();
+
+            return new Point2D.Double((double) xCoord.getValue(0), (double) yCoord.getValue(0));
+        } else {
+
+            Double xEndPoint = ctx.select(KNOTEN.LON).from(KNOTEN).where(KNOTEN.NODE_ID.eq(end_node)).fetchOne().value1();
+            Double yEndPoint = ctx.select(KNOTEN.LAT).from(KNOTEN).where(KNOTEN.NODE_ID.eq(end_node)).fetchOne().value1();
+            return new Point2D.Double(xEndPoint, yEndPoint);
+        }
     }
 
     @Override
@@ -94,12 +105,36 @@ public class OpenLRLine implements Line{
         // berechnen der Geokoodinaten basierend auf der Entfernung zum Startpunkt der Linie
         //TODO: Gets point along line witch is distance (meter) away form start point of the line. Function returns Geocoord.
         // If distance exceeds length of the line end point is returnd
+        GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
-            //return Geoocoord. of point alon line
+            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
+                    .from(KANTEN)
+                    .where(KANTEN.LINE_ID.eq(line_id))
+                    .fetchOne();
+
+            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong, length_meter))
+                    .from(KANTEN)
+                    .where(KANTEN.LINE_ID.eq(line_id))
+                    .fetchOne();
+            try {
+                coordinatesAlongLine = new GeoCoordinatesImpl((double) xCoord.getValue(0), (double) yCoord.getValue(0));
+            } catch (InvalidMapDataException e) {
+                e.printStackTrace();
+            }
+            return coordinatesAlongLine;
+
         } else {
-            //return end node, use select query for Knoten getting Coordinates using where clause node_id = end_node;
+            Double xEndPoint = ctx.select(KNOTEN.LON).from(KNOTEN).where(KNOTEN.NODE_ID.eq(end_node)).fetchOne().value1();
+            Double yEndPoint = ctx.select(KNOTEN.LAT).from(KNOTEN).where(KNOTEN.NODE_ID.eq(end_node)).fetchOne().value1();
+
+            try {
+                coordinatesAlongLine = new GeoCoordinatesImpl(yEndPoint, xEndPoint);
+
+            } catch (InvalidMapDataException e) {
+                e.printStackTrace();
+            }
+            return coordinatesAlongLine;
         }
-        return null;
     }
 
     @Override
@@ -150,41 +185,35 @@ public class OpenLRLine implements Line{
     @Override
     public int distanceToPoint(double longitude, double latitude) {
 
-
-        //TODO: Rückgabe als INT ist noch nicht möglich, Lösung finden
-        Record1<Integer> dist = ctx.select(SpatialQueries.stDistance(latitude, longitude).cast(Integer.class))
+        //TODO: Fragen ob es eine bessere Möglichkeit für Integer Wert gibt
+        return ctx.select(SpatialQueries.stDistance(latitude, longitude).cast(Integer.class))
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(line_id))
-                .fetchOne();
-        return 0;
+                .fetchOne().value1();
     }
 
     @Override
     public int measureAlongLine(double longitude, double latitude) {
 
-        //TODO: Abfrage schreiben, soll Distanze zum Startpunkt als Int Wert liefern
+        //select Round(e.length_meter * ST_LineLocatePoint(e.geom,ST_ClosestPoint(e.geom, 'SRID=4326;POINT(13.748489 51.058306)'))) from kanten where line_id = line_id;
 
-        // Formel zur Berechnung des Abstands zwischen einem gegebenen Punkt auf der Linie und dem Startpunkt der Linie
-        // Verwenden ST_ClosestPoint um Punkt auf Linie zu projezieren, danach ST_Distance zur Berechnung Abstand zwischen
-        // Startpunkt der Linie und projeziertem Punkt.
-
-        // select Round(ST_Distance(n.geom::geography, ST_ClosestPoint(e.geom, 'SRID=4326;POINT(13.748489 51.058306)')::geography))
-        // from kanten e, knoten n where e.line_id = 5 and n.node_id = e.start_node ;
-        return 0;
+        return ctx.select(SpatialQueries.distAlongLine(latitude, longitude).cast(Integer.class))
+                .from(KANTEN)
+                .where(KANTEN.LINE_ID.eq(line_id))
+                .fetchOne().value1();
     }
 
     @Override
     public Path2D.Double getShape() {
 
-        // Geometrie als WKT, und dann als Path zurück geben. java.awt.geom
-        // ist optional und wird daher zunächst ignoriert
+        // TODO: Is optional and was not implemented
         return null;
     }
 
     @Override
     public List<GeoCoordinates> getShapeCoordinates() {
 
-        // optional, wird zunächst drauf verzchtet
+        // TODO: Is optional and was not implemented
         return null;
     }
 

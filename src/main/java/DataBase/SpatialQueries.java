@@ -50,4 +50,23 @@ public class SpatialQueries {
         String query = "Round(ST_Distance(geom::geography, 'SRID=4326;POINT(" + lon + " " + lat + ")'::geography))";
         return DSL.field(query);
     }
+
+    public static Field<?> distAlongLine(double lat, double lon) {
+        String query = " Round(length_meter * ST_LineLocatePoint(geom,ST_ClosestPoint(geom, 'SRID=4326;POINT(" + lon + " " + lat + ")')))";
+        return DSL.field(query);
+    }
+
+    public static double fraction(int distance, int length_meter) {
+        return distance / length_meter;
+    }
+
+    public static Field<?> st_LineInterpolatePointX(int dist, int length) {
+        double frac = fraction(dist, length);
+        return DSL.field("ST_X(ST_LineInterpolatePoint(geom, {0}))", fraction(dist, length));
+    }
+
+    public static Field<?> st_LineInterpolatePointY(int dist, int length) {
+        double frac = fraction(dist, length);
+        return DSL.field("ST_Y(ST_LineInterpolatePoint(geom, {0}))", fraction(dist, length));
+    }
 }
