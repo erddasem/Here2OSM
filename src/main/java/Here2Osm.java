@@ -16,11 +16,11 @@ public class Here2Osm {
         parser.parseIncidents(answer);
         parser.printTrafficItemsList();*/
 
-        TestGetData test = new TestGetData();
-        test.getData();
+        //TestGetData test = new TestGetData();
+        //test.getData();
 
         //OpenLRDecoder decoder = new OpenLRDecoder();
         //decoder.binary2array();
 
-        }
+    }
 }

@@ -73,7 +73,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
 
         // Annahme, wenn oneway = true dürfte turn restriction = true sein.
         // belassen bei false
-        //TODO: Is optional, if it returns false it is not implemented
+        //TODO: Is optional, is not implemented yet
         return false;
     }
 

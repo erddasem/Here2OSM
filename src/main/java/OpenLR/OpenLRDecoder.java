@@ -23,11 +23,18 @@ public class OpenLRDecoder {
 
     public static void binary2array() throws PhysicalFormatException {
         OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
+        // Itinero generierter Code
         //String openLRString = "CwnGsiRN4Qo/H/+ZAWAKbywr";
-        String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYUVAAA7/b8ACQUEAQITADAAAA==";
-        ByteArray byteArray = new ByteArray(openLRString);
+        // Code aus Here Api
+        //String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYUVAAA7/b8ACQUEAQITADAAAA==";
+        // Carola Brücke rechte Spur
+        String openLRString = "CwnGsiRN4Qo/H/+ZAWAKbywr";
 
-        LocationReference lr = new LocationReferenceBinaryImpl("test", byteArray);
+        ByteArray array = new ByteArray(Base64.getDecoder().decode(openLRString));
+        ByteArray byteArray = new ByteArray(openLRString);
+        System.out.print(array);
+
+        LocationReference lr = new LocationReferenceBinaryImpl("test", array);
         RawLocationReference rawLocationReference = binaryDecoder.decodeData(lr);
         System.out.println("rawLocationReference=" + rawLocationReference);
         if (rawLocationReference instanceof RawLineLocRef) {
@@ -45,6 +52,7 @@ public class OpenLRDecoder {
 
 
     }
+
 
     public static void main(String[] args) {
         try {

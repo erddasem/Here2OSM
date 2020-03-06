@@ -116,6 +116,7 @@ public class OpenLRLine implements Line{
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
+
             try {
                 coordinatesAlongLine = new GeoCoordinatesImpl((double) xCoord.getValue(0), (double) yCoord.getValue(0));
             } catch (InvalidMapDataException e) {
@@ -220,8 +221,7 @@ public class OpenLRLine implements Line{
     @Override
     public Map<Locale, List<String>> getNames() {
 
-        // Rückgabe des Namens der Linie
-        // return name, irgendwas in Verbindung mit locale
+        //TODO: Is optional and was not implemented
         return null;
     }
 
