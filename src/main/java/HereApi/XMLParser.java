@@ -86,4 +86,62 @@ public class XMLParser {
         System.out.println(trafficItems);
     }
 
+    public void parseFile() {
+        TrafficItem trafficItem = null;
+
+        File xmlFile = new File("/Users/emilykast/Desktop/CarolaTestXml.xml");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        try {
+            builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+
+
+        Document doc = null;
+        try {
+            doc = builder.parse(xmlFile);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        doc.getDocumentElement().normalize();
+
+        // TODO: trennen der parsing funktion und das einlesen
+        // Node TRAFFIC_ITEM, can be more than one traffic item in the answer
+        NodeList trfItem = doc.getElementsByTagName("TRAFFIC_ITEM");
+        System.out.println(trfItem.getLength());
+        // Node list LOCATION contains OpenLRBase64 Code
+        NodeList location = doc.getElementsByTagName("LOCATION");
+
+        // TODO: If-Bedingung einbauen, wenn location tag kein TPEGOpenLRBase64 Tag enthält knoten überspringen
+
+        for (int temp = 0; temp < trfItem.getLength(); temp++) {
+            Node nodeTrfItem = trfItem.item(temp);
+            if (nodeTrfItem.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nodeTrfItem;
+                trafficItem = new TrafficItem();
+                trafficItem.setMid(eElement.getAttribute("mid"));
+                trafficItem.setId(eElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent());
+                trafficItem.setType(eElement.getElementsByTagName("TRAFFIC_ITEM_TYPE_DESC").item(0).getTextContent());
+                trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
+            }
+
+            //TODO: Nicht jedes Trafic Item hat OpenLRBase64 Code, muss abgefangen werden.
+            // Erst überprüfen, ob der entsprechende Knoten vorhanden ist, ist er es nicht, wird die Information nicht
+            // in das entsprechende Objekt geschrieben!
+            Node nodeLoc = location.item(temp);
+            if (nodeLoc.getNodeType() == Node.ELEMENT_NODE) {
+                Element loc = (Element) nodeLoc;
+                if (trafficItem != null) {
+                    trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
+                }
+            }
+            trafficItems.add(trafficItem);
+        }
+
+    }
+
 }
