@@ -15,8 +15,10 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 
-public class OpenLRLine implements Line{
+public class OpenLRLine_h2o implements Line {
 
+    static DataSource conn = DatasourceConfig.createDataSource();
+    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
     long line_id;
     long start_node;
     long end_node;
@@ -26,7 +28,7 @@ public class OpenLRLine implements Line{
     String name;
     boolean oneway;
 
-    public OpenLRLine(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
+    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
         this.line_id = line_id;
         this.start_node = start_node;
         this.end_node = end_node;
@@ -37,9 +39,6 @@ public class OpenLRLine implements Line{
         this.oneway = oneway;
     }
 
-    static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
-
     @Override
     public Node getStartNode() {
 
@@ -47,7 +46,7 @@ public class OpenLRLine implements Line{
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(start_node))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class OpenLRLine implements Line{
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(end_node))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override
@@ -117,16 +116,16 @@ public class OpenLRLine implements Line{
     @Override
     public Iterator<Line> getPrevLines() {
 
-            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
-            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
+        Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
+        Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
 
-            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
-                    .from(KANTEN)
-                    .where(finalCon)
-                    .fetchInto(Line.class);
+        List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(finalCon)
+                .fetchInto(OpenLRLine_h2o.class);
 
-            return prevLines.iterator();
+        return prevLines.iterator();
     }
 
     @Override
@@ -142,7 +141,7 @@ public class OpenLRLine implements Line{
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return nextLines.iterator();
     }
