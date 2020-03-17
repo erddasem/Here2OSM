@@ -11,20 +11,19 @@ import java.util.List;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 
-public class OpenLRNode implements Node {
+public class OpenLRNode_h2o implements Node {
 
+    static DataSource conn = DatasourceConfig.createDataSource();
+    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
     long node_id;
     double lat;
     double lon;
 
-    public OpenLRNode(long id, double lat, double lon) {
+    public OpenLRNode_h2o(long id, double lat, double lon) {
         this.node_id = id;
         this.lon = lon;
         this.lat = lat;
     }
-
-    static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
     @Override
     public double getLatitudeDeg() {
@@ -57,7 +56,7 @@ public class OpenLRNode implements Node {
                 .from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .or(KANTEN.END_NODE.eq(node_id))
-                .fetchInto(OpenLRLine.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return connectedLines.iterator();
     }

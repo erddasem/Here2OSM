@@ -16,9 +16,14 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
-public class OpenLRMapDatabase implements openlr.map.MapDatabase{
-    DataSource conn = DatasourceConfig.createDataSource();
-    DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
+public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
+    DataSource conn;
+    DSLContext ctx;
+
+    public OpenLRMapDatabase_h2o() {
+        this.conn = DatasourceConfig.createDataSource();
+        this.ctx = DSL.using(conn, SQLDialect.POSTGRES);
+    }
 
     @Override
     public boolean hasTurnRestrictions() {
@@ -32,17 +37,17 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(id))
-                .fetchAny().into(OpenLRLine.class);
+                .fetchAny().into(OpenLRLine_h2o.class);
     }
 
     @Override
     public Node getNode(long id) {
 
-       return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+        return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(id))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override
@@ -51,7 +56,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
         List<Node> nodesCloseBy = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN)
                 .where(SpatialQueries.stDWithin(longitude, latitude, distance))
-                .fetchInto(Node.class);
+                .fetchInto(OpenLRNode_h2o.class);
 
         return nodesCloseBy.iterator();
     }
@@ -63,7 +68,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(SpatialQueries.stDWithin(longitude, latitude, distance))
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return linesCloseBy.iterator();
     }
@@ -81,7 +86,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     public Iterator<Node> getAllNodes() {
 
         List<Node> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
-                .from(KNOTEN).fetchInto(Node.class);
+                .from(KNOTEN).fetchInto(OpenLRNode_h2o.class);
 
         return allNodes.iterator();
     }
@@ -91,7 +96,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
 
         List<Line> allLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
-                .from(KANTEN).fetchInto(Line.class);
+                .from(KANTEN).fetchInto(OpenLRLine_h2o.class);
 
         return allLines.iterator();
     }
@@ -100,10 +105,10 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     public Rectangle2D.Double getMapBoundingBox() {
 
         // select * from mapdata;
-        double x  = ctx.select(METADATA.LEFT_LAT).from(METADATA).fetchOne().value1();
-        double y  = ctx.select(METADATA.LEFT_LON).from(METADATA).fetchOne().value1();
-        double width  = ctx.select(METADATA.BBOX_WIDTH).from(METADATA).fetchOne().value1();
-        double height  = ctx.select(METADATA.BBOX_HEIGHT).from(METADATA).fetchOne().value1();
+        double x = ctx.select(METADATA.LEFT_LAT).from(METADATA).fetchOne().value1();
+        double y = ctx.select(METADATA.LEFT_LON).from(METADATA).fetchOne().value1();
+        double width = ctx.select(METADATA.BBOX_WIDTH).from(METADATA).fetchOne().value1();
+        double height = ctx.select(METADATA.BBOX_HEIGHT).from(METADATA).fetchOne().value1();
 
         return new Rectangle2D.Double(x, y, width, height);
     }
