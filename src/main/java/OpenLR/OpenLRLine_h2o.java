@@ -158,7 +158,7 @@ public class OpenLRLine_h2o implements Line {
                     KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                     .from(KANTEN)
                     .where(finalCon)
-                    .fetchInto(Line.class);
+                    .fetchInto(OpenLRLine_h2o.class);
 
             return prevLines.iterator();
     }
@@ -188,8 +188,6 @@ public class OpenLRLine_h2o implements Line {
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(line_id))
                 .fetchOne().value1();
-
-
     }
 
     @Override
