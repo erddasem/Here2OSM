@@ -76,6 +76,7 @@ public class OpenLRLine_h2o implements Line {
     public Point2D.Double getPointAlongLine(int distanceAlong) {
 
 
+
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
             Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
@@ -95,6 +96,7 @@ public class OpenLRLine_h2o implements Line {
             Double yEndPoint = ctx.select(KNOTEN.LAT).from(KNOTEN).where(KNOTEN.NODE_ID.eq(end_node)).fetchOne().value1();
             return new Point2D.Double(xEndPoint, yEndPoint);
         }
+
     }
 
     @Override
@@ -131,6 +133,7 @@ public class OpenLRLine_h2o implements Line {
             }
             return coordinatesAlongLine;
         }
+
     }
 
     @Override
@@ -173,7 +176,7 @@ public class OpenLRLine_h2o implements Line {
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return nextLines.iterator();
     }
@@ -185,6 +188,8 @@ public class OpenLRLine_h2o implements Line {
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(line_id))
                 .fetchOne().value1();
+
+
     }
 
     @Override
@@ -202,6 +207,7 @@ public class OpenLRLine_h2o implements Line {
     public Path2D.Double getShape() {
 
         // TODO: Is optional and is not implemented
+
         return null;
     }
 
@@ -209,6 +215,7 @@ public class OpenLRLine_h2o implements Line {
     public List<GeoCoordinates> getShapeCoordinates() {
 
         // TODO: Is optional and is not implemented
+
         return null;
     }
 
@@ -216,6 +223,7 @@ public class OpenLRLine_h2o implements Line {
     public Map<Locale, List<String>> getNames() {
 
         //TODO: Is optional and is not implemented
+
         return null;
     }
 

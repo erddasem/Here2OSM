@@ -81,7 +81,7 @@ public class OpenLRNode_h2o implements Node {
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return linesOut.iterator();
     }
@@ -96,7 +96,7 @@ public class OpenLRNode_h2o implements Node {
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return linesIn.iterator();
     }

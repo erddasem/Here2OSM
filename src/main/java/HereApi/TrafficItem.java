@@ -16,6 +16,7 @@ public class TrafficItem {
     private String closure;
 
     public TrafficItem(String id, String status, String type, String start, String end, String openLR, String closure, String shortDesc, String longDesc) {
+
         this.id = id;
         this.status = status;
         this.type = type;
@@ -26,8 +27,8 @@ public class TrafficItem {
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
     }
-
-    @Override
+ 
+   @Override
     public String toString() {
         return "HereApi.TrafficItem [id = " + id + ", status = " + status + ", type = " + type + ", start = " + start +
                 ", end = " + end + ", OpenLR = " + openLR + ", closure = " + closure
@@ -39,6 +40,7 @@ public class TrafficItem {
      *
      * @return List of traffic items
      */
+
     public List<TrafficItem> getTrafficItemList() {
         return trafficItemList;
     }
