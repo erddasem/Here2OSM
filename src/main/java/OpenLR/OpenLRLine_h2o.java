@@ -15,7 +15,7 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 
 
-public class OpenLRLine implements Line{
+public class OpenLRLine_h2o implements Line {
 
     long line_id;
     long start_node;
@@ -26,7 +26,7 @@ public class OpenLRLine implements Line{
     String name;
     boolean oneway;
 
-    public OpenLRLine(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
+    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
         this.line_id = line_id;
         this.start_node = start_node;
         this.end_node = end_node;
@@ -47,7 +47,7 @@ public class OpenLRLine implements Line{
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(start_node))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class OpenLRLine implements Line{
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(end_node))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override

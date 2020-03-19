@@ -1,7 +1,5 @@
 package HereApi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -12,130 +10,157 @@ import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import java.io.StringReader;
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 
+import static HereApi.TrafficItem.trafficItemList;
 
 public class XMLParser {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(MethodHandles.lookup().lookupClass());
-
-
-    // Klassenattribut List of TrafficItems
-    private static List<TrafficItem> trafficItems = new ArrayList<>();
+    // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
 
     /**
-     * Parses incidents request XML
-     * @param requestAnswer XML as String
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
+     * Method to parse XML form given file path.
+     *
+     * @param path Filepath of the XML file as String
      */
-    public void parseIncidents(String requestAnswer) throws ParserConfigurationException, IOException, SAXException {
-        //List<HereApi.TrafficItem> trafficItems = new ArrayList<>();
-        TrafficItem trafficItem = null;
-
+    public void parseXMlFromFile(String path) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-
-        Document doc = builder.parse(new InputSource( new StringReader(requestAnswer)));
-        doc.getDocumentElement().normalize();
-
-        // Node TRAFFIC_ITEM, can be more than one traffic item in the answer
-        NodeList trfItem = doc.getElementsByTagName("TRAFFIC_ITEM");
-        System.out.println(trfItem.getLength());
-        // Node LOCATION contains OpenLRBase64 Code
-        NodeList location = doc.getElementsByTagName("LOCATION");
-
-        for (int temp = 0; temp < trfItem.getLength(); temp++)
-        {
-            Node nodeTrfItem = trfItem.item(temp);
-            if (nodeTrfItem.getNodeType() == Node.ELEMENT_NODE)
-            {
-                Element eElement = (Element) nodeTrfItem;
-                trafficItem = new TrafficItem();
-                trafficItem.setMid(eElement.getAttribute("mid"));
-                trafficItem.setId(eElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent());
-                trafficItem.setType(eElement.getElementsByTagName("TRAFFIC_ITEM_TYPE_DESC").item(0).getTextContent());
-                trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
-            }
-
-            Node nodeLoc = location.item(temp);
-            if (nodeLoc.getNodeType() == Node.ELEMENT_NODE)
-            {
-                Element loc = (Element) nodeLoc;
-                if (trafficItem != null) {
-                    trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
-                }
-            }
-            trafficItems.add(trafficItem);
-        }
-    }
-
-    /**
-     * Prints list of traffic items to console.
-     */
-    public void printTrafficItemsList() {
-
-        logger.info("trafficItems", trafficItems);
-
-        System.out.println(trafficItems);
-    }
-
-    public void parseFile() {
-        TrafficItem trafficItem = null;
-
-        File xmlFile = new File("/Users/emilykast/Desktop/CarolaTestXml.xml");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
         try {
-            builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            try {
+                Document document = builder.parse(new File(path));
+                parseXML(document);
+
+            } catch (SAXException | IOException e) {
+                e.printStackTrace();
+            }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
+    }
 
-
-        Document doc = null;
+    /**
+     * Method to parse answer from HereApi request.
+     *
+     * @param requestAnswer Request answer as String
+     */
+    public void parseXMLFromApi(String requestAnswer) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
-            doc = builder.parse(xmlFile);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            try {
+                Document document = builder.parse(new InputSource(new StringReader(requestAnswer)));
+                parseXML(document);
+            } catch (SAXException | IOException e) {
+                e.printStackTrace();
+            }
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-        doc.getDocumentElement().normalize();
+    }
 
-        // Node TRAFFIC_ITEM, can be more than one traffic item in the answer
-        NodeList trfItem = doc.getElementsByTagName("TRAFFIC_ITEM");
-        System.out.println(trfItem.getLength());
-        // Node list LOCATION contains OpenLRBase64 Code
-        NodeList location = doc.getElementsByTagName("LOCATION");
+    /**
+     * Method to parse given XML Document.
+     * Runs through each traffic item node and checks for OpenLR code, if available relevant information are
+     * extracted. Creates a traffic item object and adds it to the list of traffic items.
+     *
+     * @param document XML Document
+     */
+    public void parseXML(Document document) {
+        //normalize xml document
+        document.getDocumentElement().normalize();
 
+        // List containing TRAFFIC_ITEM nodes
+        NodeList trfItemList = document.getElementsByTagName("TRAFFIC_ITEM");
 
-        for (int temp = 0; temp < trfItem.getLength(); temp++) {
-            Node nodeTrfItem = trfItem.item(temp);
-            if (nodeTrfItem.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) nodeTrfItem;
-                trafficItem = new TrafficItem();
-                trafficItem.setMid(eElement.getAttribute("mid"));
-                trafficItem.setId(eElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent());
-                trafficItem.setType(eElement.getElementsByTagName("TRAFFIC_ITEM_TYPE_DESC").item(0).getTextContent());
-                trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
-            }
+        // Run through traffic item node
+        for (int node = 0; node < trfItemList.getLength(); node++) {
 
+            boolean hasOpenLRCode = false;
+            String tIId = null;
+            String tIStatus = null;
+            String tIType = null;
+            String tIStart = null;
+            String tIEnd = null;
+            String tIOpenLR = null;
+            String tIClosure = null;
+            String tIShortDesc = null;
+            String tILongDesc = null;
 
-            Node nodeLoc = location.item(temp);
-            if (nodeLoc.getNodeType() == Node.ELEMENT_NODE) {
-                Element loc = (Element) nodeLoc;
-                if (trafficItem != null) {
-                    trafficItem.setOpenLR(loc.getElementsByTagName("TPEGOpenLRBase64").item(0).getTextContent());
+            Node trfItemNode = trfItemList.item(node);
+
+            // Get children from specific traffic item (given by trfItemList.item(node)
+            NodeList trfItemChildNodesList = trfItemNode.getChildNodes();
+
+            //Find child node "LOCATION" to check for OpenLR Code
+            for (int i = 0; i < trfItemChildNodesList.getLength(); i++) {
+                if (trfItemChildNodesList.item(i).getNodeName().equals("LOCATION")) {
+                    // Create node location
+                    Node locationNode = trfItemChildNodesList.item(i);
+                    // Create list containing all child nodes of location
+                    NodeList locationChildNodesList = locationNode.getChildNodes();
+                    // Find child node "TPEGOpenLRBase64"
+                    for (int j = 0; j < locationChildNodesList.getLength(); j++) {
+                        //check for OpenLR code tag, if not available, no traffic item object will be created
+                        if (locationChildNodesList.item(j).getNodeName().equals("TPEGOpenLRBase64") && locationChildNodesList.item(j).getTextContent() != null) {
+                            hasOpenLRCode = true;
+                            // Get OpenLR Code
+                            tIOpenLR = locationChildNodesList.item(j).getTextContent();
+                            // get information from different nodes
+                            if (trfItemNode.getNodeType() == Node.ELEMENT_NODE) {
+                                // Cast Node to Element to get elements by tag name
+                                Element trfItemElement = (Element) trfItemNode;
+                                //Reading out information from trafficItem Node
+                                tIId = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_ID").item(0).getTextContent();
+                                tIStatus = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_STATUS_SHORT_DESC").item(0).getTextContent();
+                                tIType = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_TYPE_DESC").item(0).getTextContent();
+                                tIStart = trfItemElement.getElementsByTagName("START_TIME").item(0).getTextContent();
+                                tIEnd = trfItemElement.getElementsByTagName("END_TIME").item(0).getTextContent();
+                                // get different descriptions, same node name, different types
+                                NodeList trfItemDescList = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION");
+                                tIShortDesc = trfItemDescList.item(0).getTextContent();
+                                tILongDesc = trfItemDescList.item(1).getTextContent();
+                            }
+                        }
+                    }
+                }
+                // If OpenLR Code is available get node TRAFFIC_ITEM_DETAIL
+                if (hasOpenLRCode == true) {
+                    if (trfItemChildNodesList.item(i).getNodeName().equals("TRAFFIC_ITEM_DETAIL")) {
+                        Node trfItemDetailNode = trfItemChildNodesList.item(i);
+                        if (trfItemDetailNode.getNodeType() == Node.ELEMENT_NODE) {
+                            // Cast TRAFFIC_ITEM_DETAIL node to element
+                            Element trfItemDetailElement = (Element) trfItemDetailNode;
+                            //Get information if road is closed
+                            tIClosure = trfItemDetailElement.getElementsByTagName("ROAD_CLOSED").item(0).getTextContent();
+                        }
+                    }
                 }
             }
-            trafficItems.add(trafficItem);
+            // Generate traffic item object and add to list of traffic items
+            trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
+    }
 
+    /**
+     * Generates traffic item object and adds it to the list of traffic items.
+     *
+     * @param id        Traffic item id
+     * @param status    Status of the traffic item
+     * @param type      Type of traffic item
+     * @param start     Start time of the traffic item
+     * @param end       End time of the traffic item
+     * @param openLR    OpenLR Code of the traffic item
+     * @param closure   Information whether the street is closed
+     * @param shortDesc Brief description of the traffic item
+     * @param longDesc  Detailed description of the traffic item
+     */
+    private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
+                                   String closure, String shortDesc, String longDesc) {
+        // generate traffic Item
+        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
+
+        // add TrafficItem to TrafficItemList
+        trafficItemList.add(trafficItem);
     }
 
 }

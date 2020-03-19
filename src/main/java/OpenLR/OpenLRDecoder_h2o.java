@@ -7,18 +7,21 @@ import openlr.*;
 import openlr.binary.impl.LocationReferenceBinaryImpl;
 import openlr.decoder.OpenLRDecoderParameter;
 import openlr.location.Location;
+import openlr.map.MapDatabase;
 import openlr.map.loader.MapLoadParameter;
 import openlr.properties.OpenLRPropertiesReader;
 import openlr.rawLocRef.RawLineLocRef;
 import openlr.rawLocRef.RawLocationReference;
 import openlr.decoder.LocationDatabase;
 import openlr.map.Line;
+import org.apache.commons.configuration.FileConfiguration;
+
 import java.io.File;
 import java.lang.module.Configuration;
 import java.util.Base64;
 
 
-public class OpenLRDecoder {
+public class OpenLRDecoder_h2o {
 
 
     /*public static ByteArray binary2array(String base64OpenLRString) throws {

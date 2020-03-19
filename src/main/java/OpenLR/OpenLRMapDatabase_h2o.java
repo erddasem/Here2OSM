@@ -16,7 +16,7 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
-public class OpenLRMapDatabase implements openlr.map.MapDatabase{
+public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
     DataSource conn = DatasourceConfig.createDataSource();
     DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
@@ -32,17 +32,17 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(id))
-                .fetchAny().into(OpenLRLine.class);
+                .fetchAny().into(OpenLRLine_h2o.class);
     }
 
     @Override
     public Node getNode(long id) {
 
-       return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
+        return ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq(id))
                 .fetchAny()
-                .into(OpenLRNode.class);
+                .into(OpenLRNode_h2o.class);
     }
 
     @Override
