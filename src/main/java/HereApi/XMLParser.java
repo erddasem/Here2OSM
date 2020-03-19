@@ -1,9 +1,5 @@
 package HereApi;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -16,15 +12,14 @@ import java.io.StringReader;
 
 import static HereApi.TrafficItem.trafficItemList;
 
-
 public class XMLParser {
 
-    // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
+// File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
 
     /**
      * Method to parse XML form given file path.
      *
-     * @param path filepath
+     * @param path Filepath of the XML file as String
      */
     public void parseXMlFromFile(String path) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -43,7 +38,7 @@ public class XMLParser {
     }
 
     /**
-     * Method to parse answer from HereApi request
+     * Method to parse answer from HereApi request.
      *
      * @param requestAnswer Request answer as String
      */
@@ -64,10 +59,10 @@ public class XMLParser {
 
     /**
      * Method to parse given XML Document.
-     * Runs through each traffic item node, checks for OpenLR code, if available get information,
-     * create a traffic item object and add it to the list of traffic items.
+     * Runs through each traffic item node and checks for OpenLR code, if available relevant information are
+     * extracted. Creates a traffic item object and adds it to the list of traffic items.
      *
-     * @param document XML Document given as input string or file
+     * @param document XML Document
      */
     public void parseXML(Document document) {
         //normalize xml document
@@ -127,7 +122,7 @@ public class XMLParser {
                         }
                     }
                 }
-                // If OpenLR Code ist available for traffic item, get node TRAFFIC_ITEM_DETAIL
+                // If OpenLR Code is available get node TRAFFIC_ITEM_DETAIL
                 if (hasOpenLRCode == true) {
                     if (trfItemChildNodesList.item(i).getNodeName().equals("TRAFFIC_ITEM_DETAIL")) {
                         Node trfItemDetailNode = trfItemChildNodesList.item(i);
@@ -145,6 +140,19 @@ public class XMLParser {
         }
     }
 
+    /**
+     * Generates traffic item object and adds it to the list of traffic items.
+     *
+     * @param id        Traffic item id
+     * @param status    Status of the traffic item
+     * @param type      Type of traffic item
+     * @param start     Start time of the traffic item
+     * @param end       End time of the traffic item
+     * @param openLR    OpenLR Code of the traffic item
+     * @param closure   Information whether the street is closed
+     * @param shortDesc Brief description of the traffic item
+     * @param longDesc  Detailed description of the traffic item
+     */
     private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
                                    String closure, String shortDesc, String longDesc) {
         // generate traffic Item
