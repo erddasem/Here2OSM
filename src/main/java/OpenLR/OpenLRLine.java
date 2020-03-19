@@ -75,8 +75,6 @@ public class OpenLRLine implements Line{
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
 
-        //TODO: Returns point as Point2D.Double, depending on distance from start node. If distance exceeds line length
-        // returns coordinates of end node.
 
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
@@ -102,9 +100,6 @@ public class OpenLRLine implements Line{
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
 
-        // berechnen der Geokoodinaten basierend auf der Entfernung zum Startpunkt der Linie
-        //TODO: Gets point along line witch is distance (meter) away form start point of the line. Function returns Geocoord.
-        // If distance exceeds length of the line end point is returnd
         GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
             Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
@@ -186,7 +181,6 @@ public class OpenLRLine implements Line{
     @Override
     public int distanceToPoint(double longitude, double latitude) {
 
-        //TODO: Fragen ob es eine bessere Möglichkeit für Integer Wert gibt
         return ctx.select(SpatialQueries.stDistance(latitude, longitude).cast(Integer.class))
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(line_id))
@@ -207,21 +201,21 @@ public class OpenLRLine implements Line{
     @Override
     public Path2D.Double getShape() {
 
-        // TODO: Is optional and was not implemented
+        // TODO: Is optional and is not implemented
         return null;
     }
 
     @Override
     public List<GeoCoordinates> getShapeCoordinates() {
 
-        // TODO: Is optional and was not implemented
+        // TODO: Is optional and is not implemented
         return null;
     }
 
     @Override
     public Map<Locale, List<String>> getNames() {
 
-        //TODO: Is optional and was not implemented
+        //TODO: Is optional and is not implemented
         return null;
     }
 

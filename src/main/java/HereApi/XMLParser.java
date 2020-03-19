@@ -62,9 +62,6 @@ public class XMLParser {
                 trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
             }
 
-            //TODO: Nicht jedes Trafic Item hat OpenLRBase64 Code, muss abgefangen werden.
-            // Erst überprüfen, ob der entsprechende Knoten vorhanden ist, ist er es nicht, wird die Information nicht
-            // in das entsprechende Objekt geschrieben!
             Node nodeLoc = location.item(temp);
             if (nodeLoc.getNodeType() == Node.ELEMENT_NODE)
             {
@@ -110,14 +107,12 @@ public class XMLParser {
         }
         doc.getDocumentElement().normalize();
 
-        // TODO: trennen der parsing funktion und das einlesen
         // Node TRAFFIC_ITEM, can be more than one traffic item in the answer
         NodeList trfItem = doc.getElementsByTagName("TRAFFIC_ITEM");
         System.out.println(trfItem.getLength());
         // Node list LOCATION contains OpenLRBase64 Code
         NodeList location = doc.getElementsByTagName("LOCATION");
 
-        // TODO: If-Bedingung einbauen, wenn location tag kein TPEGOpenLRBase64 Tag enthält knoten überspringen
 
         for (int temp = 0; temp < trfItem.getLength(); temp++) {
             Node nodeTrfItem = trfItem.item(temp);
@@ -130,9 +125,7 @@ public class XMLParser {
                 trafficItem.setShortDesc(eElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION").item(0).getTextContent());
             }
 
-            //TODO: Nicht jedes Trafic Item hat OpenLRBase64 Code, muss abgefangen werden.
-            // Erst überprüfen, ob der entsprechende Knoten vorhanden ist, ist er es nicht, wird die Information nicht
-            // in das entsprechende Objekt geschrieben!
+
             Node nodeLoc = location.item(temp);
             if (nodeLoc.getNodeType() == Node.ELEMENT_NODE) {
                 Element loc = (Element) nodeLoc;

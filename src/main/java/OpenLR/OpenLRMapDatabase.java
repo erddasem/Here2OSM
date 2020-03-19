@@ -71,9 +71,7 @@ public class OpenLRMapDatabase implements openlr.map.MapDatabase{
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
 
-        // Annahme, wenn oneway = true dürfte turn restriction = true sein.
-        // belassen bei false
-        //TODO: Is optional, is not implemented yet
+        //TODO: Is optional and is not implemented
         return false;
     }
 
