@@ -78,7 +78,7 @@ public class OpenLRDecoder_h2o {
 
 
     public static void main(String[] args) throws Exception {
-        decode("CwnGZyROrQovCACF/kkKYAPM");
+        decode("CwnGsiRN4Qo/CP+VAbIKbzIY");
     }
 
 
