@@ -18,6 +18,9 @@ import static org.jooq.sources.tables.Metadata.METADATA;
 
 public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
 
+    DataSource conn;
+    DSLContext ctx;
+
     public OpenLRMapDatabase_h2o() {
         this.conn = DatasourceConfig.createDataSource();
         this.ctx = DSL.using(conn, SQLDialect.POSTGRES);

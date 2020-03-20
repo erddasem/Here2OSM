@@ -9,6 +9,7 @@ import openlr.location.Location;
 import openlr.map.MapDatabase;
 import openlr.properties.OpenLRPropertiesReader;
 import openlr.rawLocRef.RawLocationReference;
+import openlr.decoder.OpenLRDecoder;
 
 import org.apache.commons.configuration.FileConfiguration;
 
@@ -66,17 +67,19 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
+        Location loc = decoder.decodeRaw(params, rawLocationReference);
+        //Location location = decoder.decodeRaw(params, rawLocationReference);
 
-        // System.out.println(decoder.decodeRaw(params, rawLocationReference));
+        //System.out.println(decoder.decodeRaw(params, rawLocationReference));
+        System.out.println(loc);
 
 
     }
 
 
-    /*public static void main(String[] args) throws Exception {
-
-    }*/
+    public static void main(String[] args) throws Exception {
+        decode("CwnGZyROrQovCACF/kkKYAPM");
+    }
 
 
 }

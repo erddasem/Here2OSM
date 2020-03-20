@@ -1,4 +1,5 @@
 import DataBase.TestGetData;
+import HereApi.XMLParser;
 import openlr.PhysicalFormatException;
 import org.xml.sax.SAXException;
 
@@ -22,8 +23,6 @@ public class Here2Osm {
         XMLParser parser = new XMLParser();
         parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
 
-        //OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
-        //decoder.binary2array();
 
     }
 }
