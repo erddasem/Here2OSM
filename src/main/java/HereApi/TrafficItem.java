@@ -28,18 +28,48 @@ public class TrafficItem {
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
     }
- 
-   @Override
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public String getOpenLR() {
+        return openLR;
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
+    public String getShortDesc() {
+        return shortDesc;
+    }
+
+    public String getLongDesc() {
+        return longDesc;
+    }
+
+    public String getClosure() {
+        return closure;
+    }
+
+
+    @Override
     public String toString() {
         return "HereApi.TrafficItem [id = " + id + ", status = " + status + ", type = " + type + ", start = " + start +
                 ", end = " + end + ", OpenLR = " + openLR + ", closure = " + closure
                 + ", shortDesc = " + shortDesc + ", longDesc = " + longDesc + "]";
     }
-
-    /**
-     * Returns list of traffic items.
-     *
-     * @return List of traffic items
-     */
-
 }

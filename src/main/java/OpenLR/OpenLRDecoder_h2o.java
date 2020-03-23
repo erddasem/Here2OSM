@@ -40,6 +40,7 @@ public class OpenLRDecoder_h2o {
      */
     public String decode(ByteArray byteArray) throws Exception {
 
+        System.out.println(byteArray);
         // Byte array to location reference
         LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
@@ -61,8 +62,6 @@ public class OpenLRDecoder_h2o {
         Location location = decoder.decodeRaw(params, rawLocationReference);
         System.out.println("Negativ Offsent: " + location.getNegativeOffset());
         System.out.println("Positiv Offsent: " + location.getPositiveOffset());
-        System.out.println("ID " + location.getID());
-        System.out.println("Lines " + location.getAffectedLines());
         System.out.println(location.toString());
 
         return location.toString();

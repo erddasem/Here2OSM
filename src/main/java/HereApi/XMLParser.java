@@ -13,10 +13,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-
-import static HereApi.TrafficItem.trafficItemList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLParser {
+
 
 // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
 
@@ -129,7 +130,7 @@ public class XMLParser {
                     }
                 }
                 // If OpenLR Code is available get node TRAFFIC_ITEM_DETAIL
-                if (hasOpenLRCode == true) {
+                if (hasOpenLRCode) {
                     if (trfItemChildNodesList.item(i).getNodeName().equals("TRAFFIC_ITEM_DETAIL")) {
                         Node trfItemDetailNode = trfItemChildNodesList.item(i);
                         if (trfItemDetailNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -166,10 +167,9 @@ public class XMLParser {
                                    String closure, String shortDesc, String longDesc) {
         // generate traffic Item
         TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
-        System.out.println(trafficItem);
 
         // add TrafficItem to TrafficItemList
-        trafficItemList.add(trafficItem);
+        CollectData.trafficItemList.add(trafficItem);
     }
 
 }

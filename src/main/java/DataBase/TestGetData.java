@@ -17,11 +17,12 @@ import java.util.List;
 public class TestGetData {
     // class to test JOOQ queries before implementing into openLR interfaces
 
-    private DSLContext ctx;
+    /*private DSLContext ctx;
 
     public void getData() {
         DataSource conn = DatasourceConfig.createDataSource();
         ctx = DSL.using(conn, SQLDialect.POSTGRES);
+
 
 
         double longitude = 13.748489;
@@ -31,7 +32,7 @@ public class TestGetData {
         int length = 44;
 
 
-        /*Field<Integer> DIST = DSL.field("Round(ST_Distance(geom::geography, st_pointfromtext('POINT(" + longitude + " "
+        *//*Field<Integer> DIST = DSL.field("Round(ST_Distance(geom::geography, st_pointfromtext('POINT(" + longitude + " "
                 + latitude + ")', 4326)::geography))", Integer.class);
 
 
@@ -42,7 +43,7 @@ public class TestGetData {
         Result<Record1<Integer>> line = ctx.select(DIST)
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(id))
-                .fetch();*/
+                .fetch();*//*
 
         Record1<Integer> dist = ctx.select(SpatialQueries.stDistance(latitude, longitude).cast(Integer.class))
                 .from(KANTEN)
@@ -69,15 +70,16 @@ public class TestGetData {
         //double xCoord =  (double) pointX.getValues(0);
 
 
-        /*Field<?> WKT = DSL.field("ST_AsText(geom)");
+        *//*Field<?> WKT = DSL.field("ST_AsText(geom)");
 
         Result<? extends Record2<?, Long>> geom = ctx.select(SpatialQueries.geomAsText(KNOTEN.GEOM), KNOTEN.NODE_ID)
                 .from(KNOTEN)
                 .where(KNOTEN.NODE_ID.eq((long) 1))
-                .fetch();*/
+                .fetch();*//*
 
         System.out.println(coordX);
 
 
-    }
+    }*/
+
 }

@@ -9,6 +9,7 @@ import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.awt.geom.Rectangle2D;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,9 +22,9 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
     DataSource conn;
     DSLContext ctx;
 
-    public OpenLRMapDatabase_h2o() {
-        this.conn = DatasourceConfig.createDataSource();
-        this.ctx = DSL.using(conn, SQLDialect.POSTGRES);
+    public OpenLRMapDatabase_h2o() throws SQLException {
+        //this.conn = DatasourceConfig.createDataSource();
+        this.ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
     }
 
     @Override
