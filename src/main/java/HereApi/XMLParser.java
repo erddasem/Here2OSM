@@ -124,6 +124,8 @@ public class XMLParser {
                                 tIShortDesc = trfItemDescList.item(0).getTextContent();
                                 tILongDesc = trfItemDescList.item(1).getTextContent();
                             }
+                        } else {
+                            hasOpenLRCode = false;
                         }
                     }
                 }
