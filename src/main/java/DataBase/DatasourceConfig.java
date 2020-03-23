@@ -3,7 +3,6 @@ package DataBase;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -29,16 +28,6 @@ public class DatasourceConfig {
     private DatasourceConfig() {
 
     }
-
-    /*public static DataSource createDataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(dbUrl);
-        config.setUsername(user);
-        config.setPassword(password);
-        config.setAutoCommit(true);
-        config.setMaximumPoolSize(32);
-        return new HikariDataSource(config);
-    }*/
 
     public static Connection getConnection() throws SQLException {
         return ds.getConnection();

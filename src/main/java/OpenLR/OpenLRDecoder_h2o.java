@@ -13,7 +13,6 @@ import openlr.decoder.OpenLRDecoder;
 
 import org.apache.commons.configuration.FileConfiguration;
 
-import java.awt.*;
 import java.io.File;
 
 import java.util.Base64;
@@ -36,7 +35,7 @@ public class OpenLRDecoder_h2o {
      * Decodes byte array and outputs edges of the own routing network affected by the incident.
      *
      * @param byteArray Byte Array containing location references
-     * @throws Exception
+     * @throws Exception Byte Array not valid
      */
     public String decode(ByteArray byteArray) throws Exception {
 
@@ -67,11 +66,4 @@ public class OpenLRDecoder_h2o {
         return location.toString();
 
     }
-
-    /*public static void main(String[] args) throws Exception {
-        ByteArray byteArray = openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
-        decode(byteArray);
-    }*/
-
-
 }

@@ -21,7 +21,7 @@ public class CollectData {
         String shortDesc;
         String longDesc;
         boolean roadClosure;
-        String affectedLines;
+        String effectedLines;
         int posOff;
         int negOff;
 

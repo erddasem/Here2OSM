@@ -5,7 +5,6 @@ import openlr.map.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
