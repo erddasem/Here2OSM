@@ -13,8 +13,6 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 
 public class OpenLRNode_h2o implements Node {
 
-    static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
     long node_id;
     double lat;
     double lon;
@@ -24,6 +22,9 @@ public class OpenLRNode_h2o implements Node {
         this.lon = lon;
         this.lat = lat;
     }
+
+    static DataSource conn = DatasourceConfig.createDataSource();
+    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
     @Override
     public double getLatitudeDeg() {
@@ -80,7 +81,7 @@ public class OpenLRNode_h2o implements Node {
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return linesOut.iterator();
     }
@@ -95,7 +96,7 @@ public class OpenLRNode_h2o implements Node {
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
-                .fetchInto(Line.class);
+                .fetchInto(OpenLRLine_h2o.class);
 
         return linesIn.iterator();
     }

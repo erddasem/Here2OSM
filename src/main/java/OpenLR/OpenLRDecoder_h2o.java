@@ -8,56 +8,71 @@ import openlr.decoder.OpenLRDecoderParameter;
 import openlr.location.Location;
 import openlr.map.MapDatabase;
 import openlr.properties.OpenLRPropertiesReader;
-import openlr.rawLocRef.RawLineLocRef;
 import openlr.rawLocRef.RawLocationReference;
+import openlr.decoder.OpenLRDecoder;
+
 import org.apache.commons.configuration.FileConfiguration;
 
+import java.awt.*;
 import java.io.File;
+
 import java.util.Base64;
 
 
 public class OpenLRDecoder_h2o {
 
-    // TODO: Trennen Byte Array aus String und tatsächlicher Decode Vorgang
-    public static void binary2array() throws PhysicalFormatException {
+    /**
+     * Method to decode base64 String to Byte Array.
+     *
+     * @param base64OpenLRString OpenLR String containing location references
+     * @return Byte Array containing locations
+     */
+    public ByteArray openLR2byteArray(String base64OpenLRString) {
+        // Base64 String to Byte Array
+        return new ByteArray(Base64.getDecoder().decode(base64OpenLRString));
+    }
+
+    /**
+     * Decodes byte array and outputs edges of the own routing network affected by the incident.
+     *
+     * @param byteArray Byte Array containing location references
+     * @throws Exception
+     */
+    public String decode(ByteArray byteArray) throws Exception {
+
+        // Byte array to location reference
+        LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
+
+        // Decode Binary Array to rar location
         OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
-        //String openLRString = "CwnGsiRN4Qo/H/+ZAWAKbywr";
-        String openLRString = "CCkBEAAlJAnGZiROrAAJBQQBAnkACgUEAYUVAAA7/b8ACQUEAQITADAAAA==";
-        ByteArray byteArray = new ByteArray(openLRString);
-
-        LocationReference lr = new LocationReferenceBinaryImpl("test", byteArray);
         RawLocationReference rawLocationReference = binaryDecoder.decodeData(lr);
-        System.out.println("rawLocationReference=" + rawLocationReference);
-        if (rawLocationReference instanceof RawLineLocRef) {
-            RawLineLocRef rawLineLocRef = (RawLineLocRef) rawLocationReference;
-            System.out.println("OpenLRDecoderTest.binary2array(), centerPoint=" + rawLineLocRef.getCenterPoint());
-            for (LocationReferencePoint locationReferencePoint : rawLineLocRef.getLocationReferencePoints()) {
-                locationReferencePoint.getLatitudeDeg();
-                locationReferencePoint.getLongitudeDeg();
-                System.out.println("OpenLRDecoderTest.binary2array(), lat=" + locationReferencePoint.getLatitudeDeg() +
-                        ", lon=" + locationReferencePoint.getLongitudeDeg());
-            }
 
-        }
+        // Initialize database
+        MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
 
+        // Decoder parameter
+        FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File("src/main/java/OpenLR-Decoder-Properties.xml"));
+        OpenLRDecoderParameter params = new OpenLRDecoderParameter.Builder().with(mapDatabase).with(decoderConfig).buildParameter();
+
+        //Initialize the decoder
+        OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
+
+        //decode the location on own database
+        Location location = decoder.decodeRaw(params, rawLocationReference);
+        System.out.println("Negativ Offsent: " + location.getNegativeOffset());
+        System.out.println("Positiv Offsent: " + location.getPositiveOffset());
+        System.out.println("ID " + location.getID());
+        System.out.println("Lines " + location.getAffectedLines());
+        System.out.println(location.toString());
+
+        return location.toString();
 
     }
 
-    public void decodeLocation() {
-
-    }
-
-    public static void main(String[] args) {
-        try {
-            binary2array();
-        } catch (PhysicalFormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-
-
+    /*public static void main(String[] args) throws Exception {
+        ByteArray byteArray = openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
+        decode(byteArray);
+    }*/
 
 
 }

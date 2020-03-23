@@ -17,6 +17,7 @@ import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
 public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
+
     DataSource conn;
     DSLContext ctx;
 
@@ -76,9 +77,7 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
     @Override
     public boolean hasTurnRestrictionOnPath(List<? extends Line> path) {
 
-        // Annahme, wenn oneway = true dürfte turn restriction = true sein.
-        // belassen bei false
-        //TODO: Is optional, if it returns false it is not implemented
+        //TODO: Is optional and is not implemented
         return false;
     }
 
