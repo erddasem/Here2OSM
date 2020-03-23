@@ -123,6 +123,8 @@ public class XMLParser {
                                 tIShortDesc = trfItemDescList.item(0).getTextContent();
                                 tILongDesc = trfItemDescList.item(1).getTextContent();
                             }
+                        } else {
+                            hasOpenLRCode = false;
                         }
                     }
                 }
@@ -135,12 +137,15 @@ public class XMLParser {
                             Element trfItemDetailElement = (Element) trfItemDetailNode;
                             //Get information if road is closed
                             tIClosure = trfItemDetailElement.getElementsByTagName("ROAD_CLOSED").item(0).getTextContent();
+
                         }
                     }
                 }
             }
-            // Generate traffic item object and add to list of traffic items
-            trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
+
+            if (tIId != null)
+                // Generate traffic item object and add to list of traffic items
+                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
     }
 
@@ -161,6 +166,7 @@ public class XMLParser {
                                    String closure, String shortDesc, String longDesc) {
         // generate traffic Item
         TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
+        System.out.println(trafficItem);
 
         // add TrafficItem to TrafficItemList
         trafficItemList.add(trafficItem);
