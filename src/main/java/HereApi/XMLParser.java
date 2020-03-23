@@ -13,14 +13,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+
+import static HereApi.TrafficItem.trafficItemList;
 
 public class XMLParser {
 
 // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
-
-    public List<TrafficItem> trafficItemList = new ArrayList<>();
 
     /**
      * Method to parse XML form given file path.
@@ -125,6 +123,8 @@ public class XMLParser {
                                 tIShortDesc = trfItemDescList.item(0).getTextContent();
                                 tILongDesc = trfItemDescList.item(1).getTextContent();
                             }
+                        } else {
+                            hasOpenLRCode = false;
                         }
                     }
                 }
@@ -137,12 +137,15 @@ public class XMLParser {
                             Element trfItemDetailElement = (Element) trfItemDetailNode;
                             //Get information if road is closed
                             tIClosure = trfItemDetailElement.getElementsByTagName("ROAD_CLOSED").item(0).getTextContent();
+
                         }
                     }
                 }
             }
-            // Generate traffic item object and add to list of traffic items
-            trafficItem2List(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
+
+            if (tIId != null)
+                // Generate traffic item object and add to list of traffic items
+                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
     }
 
@@ -159,12 +162,14 @@ public class XMLParser {
      * @param shortDesc Brief description of the traffic item
      * @param longDesc  Detailed description of the traffic item
      */
-    private void trafficItem2List(String id, String status, String type, String start, String end, String openLR,
-                                  String closure, String shortDesc, String longDesc) {
+    private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
+                                   String closure, String shortDesc, String longDesc) {
         // generate traffic Item
-        TrafficItem ti = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
-        System.out.println(ti);
-        trafficItemList.add(ti);
+        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
+        System.out.println(trafficItem);
+
+        // add TrafficItem to TrafficItemList
+        trafficItemList.add(trafficItem);
     }
 
 }

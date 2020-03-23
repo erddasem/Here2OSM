@@ -25,10 +25,11 @@ public class Here2Osm {
         //test.getData();
 
         XMLParser parser = new XMLParser();
-        parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
-        OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
-        ByteArray byteArray = decoder.openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
-        decoder.decode(byteArray);
+        //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
+        parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
+        //OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
+        //ByteArray byteArray = decoder.openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
+        //decoder.decode(byteArray);
 
         CollectData collection = new CollectData();
         collection.collectInformation(parser.trafficItemList);
