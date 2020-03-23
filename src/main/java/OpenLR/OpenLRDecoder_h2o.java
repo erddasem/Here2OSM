@@ -13,6 +13,7 @@ import openlr.decoder.OpenLRDecoder;
 
 import org.apache.commons.configuration.FileConfiguration;
 
+import java.awt.*;
 import java.io.File;
 
 import java.util.Base64;
@@ -20,37 +21,27 @@ import java.util.Base64;
 
 public class OpenLRDecoder_h2o {
 
-
-    /*public static ByteArray binary2array(String base64OpenLRString) throws {
-        return array;
-       *//* LocationReference lr = new LocationReferenceBinaryImpl("test", array);
-        RawLocationReference rawLocationReference = binaryDecoder.decodeData(lr);
-        System.out.println("rawLocationReference=" + rawLocationReference);
-        if (rawLocationReference instanceof RawLineLocRef) {
-            RawLineLocRef rawLineLocRef = (RawLineLocRef) rawLocationReference;
-            System.out.println("OpenLRDecoderTest.binary2array(), centerPoint=" + rawLineLocRef.getCenterPoint());
-            for (LocationReferencePoint locationReferencePoint : rawLineLocRef.getLocationReferencePoints()) {
-                locationReferencePoint.getLatitudeDeg();
-                locationReferencePoint.getLongitudeDeg();
-                System.out.println("OpenLRDecoderTest.binary2array(), lat=" + locationReferencePoint.getLatitudeDeg() +
-                        ", lon=" + locationReferencePoint.getLongitudeDeg());
-            }
-
-        }*//*
-    }*/
-
+    /**
+     * Method to decode base64 String to Byte Array.
+     *
+     * @param base64OpenLRString OpenLR String containing location references
+     * @return Byte Array containing locations
+     */
+    public ByteArray openLR2byteArray(String base64OpenLRString) {
+        // Base64 String to Byte Array
+        return new ByteArray(Base64.getDecoder().decode(base64OpenLRString));
+    }
 
     /**
-     * Method to decode Base64 String and map extracted location references on database.
+     * Decodes byte array and outputs edges of the own routing network affected by the incident.
      *
-     * @param base64OpenLRString String given by HERE Api, containing location references
+     * @param byteArray Byte Array containing location references
      * @throws Exception
      */
-    public static void decode(String base64OpenLRString) throws Exception {
+    public String decode(ByteArray byteArray) throws Exception {
 
-        // Base64 String to Byte Array
-        ByteArray array = new ByteArray(Base64.getDecoder().decode(base64OpenLRString));
-        LocationReference lr = new LocationReferenceBinaryImpl("Traffic", array);
+        // Byte array to location reference
+        LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
         // Decode Binary Array to rar location
         OpenLRBinaryDecoder binaryDecoder = new OpenLRBinaryDecoder();
@@ -67,19 +58,21 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        Location loc = decoder.decodeRaw(params, rawLocationReference);
-        //Location location = decoder.decodeRaw(params, rawLocationReference);
+        Location location = decoder.decodeRaw(params, rawLocationReference);
+        System.out.println("Negativ Offsent: " + location.getNegativeOffset());
+        System.out.println("Positiv Offsent: " + location.getPositiveOffset());
+        System.out.println("ID " + location.getID());
+        System.out.println("Lines " + location.getAffectedLines());
+        System.out.println(location.toString());
 
-        //System.out.println(decoder.decodeRaw(params, rawLocationReference));
-        System.out.println(loc);
-
+        return location.toString();
 
     }
 
-
-    public static void main(String[] args) throws Exception {
-        decode("CwnGsiRN4Qo/CP+VAbIKbzIY");
-    }
+    /*public static void main(String[] args) throws Exception {
+        ByteArray byteArray = openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
+        decode(byteArray);
+    }*/
 
 
 }

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrafficItem {
-    private String id;
     public static List<TrafficItem> trafficItemList = new ArrayList<>();
+
+    private String id;
     private String type;
     private String status;
     private String start;
