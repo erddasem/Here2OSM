@@ -13,12 +13,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-
-import static HereApi.TrafficItem.trafficItemList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLParser {
 
 // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
+
+    public List<TrafficItem> trafficItemList = new ArrayList<>();
 
     /**
      * Method to parse XML form given file path.
@@ -140,7 +142,7 @@ public class XMLParser {
                 }
             }
             // Generate traffic item object and add to list of traffic items
-            trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
+            trafficItem2List(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
     }
 
@@ -157,13 +159,12 @@ public class XMLParser {
      * @param shortDesc Brief description of the traffic item
      * @param longDesc  Detailed description of the traffic item
      */
-    private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
-                                   String closure, String shortDesc, String longDesc) {
+    private void trafficItem2List(String id, String status, String type, String start, String end, String openLR,
+                                  String closure, String shortDesc, String longDesc) {
         // generate traffic Item
-        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
-
-        // add TrafficItem to TrafficItemList
-        trafficItemList.add(trafficItem);
+        TrafficItem ti = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
+        System.out.println(ti);
+        trafficItemList.add(ti);
     }
 
 }

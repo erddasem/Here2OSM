@@ -1,4 +1,6 @@
 import DataBase.TestGetData;
+import HereApi.CollectData;
+import HereApi.TrafficItem;
 import HereApi.XMLParser;
 import OpenLR.OpenLRDecoder_h2o;
 import openlr.PhysicalFormatException;
@@ -27,6 +29,9 @@ public class Here2Osm {
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
         ByteArray byteArray = decoder.openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
         decoder.decode(byteArray);
+
+        CollectData collection = new CollectData();
+        collection.collectInformation(parser.trafficItemList);
 
 
     }

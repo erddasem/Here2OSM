@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrafficItem {
-    public static List<TrafficItem> trafficItemList = new ArrayList<>();
+
 
     private String id;
     private String type;
@@ -42,7 +42,4 @@ public class TrafficItem {
      * @return List of traffic items
      */
 
-    public List<TrafficItem> getTrafficItemList() {
-        return trafficItemList;
-    }
 }
