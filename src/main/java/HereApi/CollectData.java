@@ -10,7 +10,7 @@ public class CollectData {
     //TODO: Funktion zum sammeln der Daten
     public static List<TrafficItem> trafficItemList = new ArrayList<>();
 
-    public void collectInformation(List<TrafficItem> trafficItemList) {
+    public void collectInformation(List<TrafficItem> trafficItemList) throws Exception {
 
         String incidentId;
         String type;
@@ -41,15 +41,8 @@ public class CollectData {
             longDesc = trafficItemObject.getLongDesc();
             roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
-
-            ByteArray byteArray = decoder.openLR2byteArray("CwnGZyROrQovCACF/kkKYAPM");
-            String decodedLocation = null;
-            try {
-                decoder.decode(byteArray);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
+            String decodedLocation = decoder.decode(byteArray);
 
             System.out.print(incidentId + "\n" + type + "\n" + status + "\n" + start + "\n" + end + "\n" + openLRCode +
                     "\n" + shortDesc + "\n" + longDesc + "\n" + roadClosure + "\n" + decodedLocation);

@@ -108,7 +108,7 @@ public class XMLParser {
                         if (locationChildNodesList.item(j).getNodeName().equals("TPEGOpenLRBase64") && locationChildNodesList.item(j).getTextContent() != null) {
                             hasOpenLRCode = true;
                             // Get OpenLR Code
-                            tIOpenLR = locationChildNodesList.item(j).getTextContent();
+                            tIOpenLR = locationChildNodesList.item(j).getTextContent().replaceAll("\n", "");
                             // get information from different nodes
                             if (trfItemNode.getNodeType() == Node.ELEMENT_NODE) {
                                 // Cast Node to Element to get elements by tag name
@@ -121,8 +121,8 @@ public class XMLParser {
                                 tIEnd = trfItemElement.getElementsByTagName("END_TIME").item(0).getTextContent();
                                 // get different descriptions, same node name, different types
                                 NodeList trfItemDescList = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION");
-                                tIShortDesc = trfItemDescList.item(0).getTextContent();
-                                tILongDesc = trfItemDescList.item(1).getTextContent();
+                                tIShortDesc = trfItemDescList.item(0).getTextContent().replaceAll("\n", "");
+                                tILongDesc = trfItemDescList.item(1).getTextContent().replaceAll("\n", "");
                             }
                         } else {
                             hasOpenLRCode = false;
