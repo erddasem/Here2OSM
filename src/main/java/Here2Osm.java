@@ -1,14 +1,5 @@
-import DataBase.TestGetData;
-import HereApi.CollectData;
-import HereApi.TrafficItem;
+import DataBase.CollectData;
 import HereApi.XMLParser;
-import OpenLR.OpenLRDecoder_h2o;
-import openlr.PhysicalFormatException;
-import openlr.binary.ByteArray;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 
 public class Here2Osm {
     // mainMethode

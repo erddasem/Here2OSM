@@ -6,6 +6,7 @@ import openlr.*;
 import openlr.binary.impl.LocationReferenceBinaryImpl;
 import openlr.decoder.OpenLRDecoderParameter;
 import openlr.location.Location;
+import openlr.map.Line;
 import openlr.map.MapDatabase;
 import openlr.properties.OpenLRPropertiesReader;
 import openlr.rawLocRef.RawLocationReference;
@@ -16,6 +17,7 @@ import org.apache.commons.configuration.FileConfiguration;
 import java.io.File;
 
 import java.util.Base64;
+import java.util.List;
 
 
 public class OpenLRDecoder_h2o {
@@ -37,9 +39,7 @@ public class OpenLRDecoder_h2o {
      * @param byteArray Byte Array containing location references
      * @throws Exception Byte Array not valid
      */
-    public String decode(ByteArray byteArray) throws Exception {
-
-        System.out.println(byteArray);
+    public Location decode(ByteArray byteArray) throws Exception {
         // Byte array to location reference
         LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
@@ -58,12 +58,7 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
-        System.out.println("Negativ Offsent: " + location.getNegativeOffset());
-        System.out.println("Positiv Offsent: " + location.getPositiveOffset());
-        System.out.println(location.toString());
-
-        return location.toString();
+        return decoder.decodeRaw(params, rawLocationReference);
 
     }
 }
