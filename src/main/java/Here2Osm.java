@@ -1,4 +1,5 @@
 import DataBase.CollectData;
+import HereApi.ApiRequest;
 import HereApi.XMLParser;
 
 public class Here2Osm {
@@ -9,18 +10,11 @@ public class Here2Osm {
         request.sendRequest("incidents");
         String answer = request.getAnswer();
         XMLParser parser = new XMLParser();
-        parser.parseIncidents(answer);
-        parser.printTrafficItemsList();*/
-
-        //TestGetData test = new TestGetData();
-        //test.getData();
-
+        parser.parseXMLFromApi(answer);
+*/
         XMLParser parser = new XMLParser();
         //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
         parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
-        /*OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
-        ByteArray byteArray = decoder.openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
-        decoder.decode(byteArray);*/
 
         CollectData collection = new CollectData();
         collection.collectInformation(CollectData.trafficItemList);
