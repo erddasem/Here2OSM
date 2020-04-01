@@ -1,28 +1,38 @@
 package HereApi;
 
+import java.awt.*;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class recursiveBBox {
+public class RecursiveBBox {
 
-    private static void queryBBox() {
-
-
-    }
-
-    private void getBBox() {
+    public double[] getBBox() {
+        String bboxString;
         double leftLat, leftLon, rightLat, rightLon;
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
-        System.out.println("Geben Sie das abzufragende Gebiet als Bounding box ein.");
-        System.out.print("Geben sie  ");
-        leftLat = scanner.nextDouble();
-        System.out.print("Enter the fuel efficiency: ");
-        leftLon = scanner.nextDouble();
-        System.out.print("Enter the fuel efficiency: ");
-        rightLat = scanner.nextDouble();
-        System.out.print("Enter the fuel efficiency: ");
-        rightLon = scanner.nextDouble();
+        System.out.println("Geben Sie die Bounding Box im Format left Latitude,left Longitude;right Latitude,right Longitude ein:  ");
+        bboxString = scanner.next();
+
+        System.out.println("BBox String: " + bboxString);
+        //get coordinates
+        String[] coordArray = bboxString.split(",|;");
+        System.out.println("Länge String Array: " + coordArray.length);
+        if (coordArray.length != 4) {
+            //TODO: add exception
+        }
+        double[] coordinates = new double[4];
+        for (int i = 0; i < coordArray.length; i++) {
+            double coord = Double.valueOf(coordArray[i]);
+            coordinates[i] = coord;
+        }
+        ;
+        return coordinates;
+    }
+
+
+    private void getRecrusiveBbox(double[] coordinates) {
+
     }
 
     /*private static void queryRectangle(Rectangle rectangle) {
