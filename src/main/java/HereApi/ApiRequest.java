@@ -23,9 +23,12 @@ public class ApiRequest {
     private static URL requestUrl;
     private static String answer;
 
+    //TODO: BBox entsprechend übergeben
+
     /**
      * Sets request type. Possible types are "incidents" to get traffic incidents ord "flow" to get traffic flow
      * information.
+     *
      * @param requestType type of request either incidents or flow
      */
     public void setRequestType(String requestType) {

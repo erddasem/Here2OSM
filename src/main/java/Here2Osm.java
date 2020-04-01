@@ -5,6 +5,8 @@ import HereApi.XMLParser;
 public class Here2Osm {
     // mainMethode
     public static void main(String[] args) throws Exception {
+
+        //TODO: Übergabe BBox über Terminal
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
         /*HereApi.ApiRequest request = new ApiRequest();
         request.sendRequest("incidents");
