@@ -1,7 +1,4 @@
-import DataBase.CollectData;
 import HereApi.ApiRequest;
-import HereApi.RecursiveBBox;
-import HereApi.XMLParser;
 
 public class Here2Osm {
     // mainMethode
@@ -9,20 +6,19 @@ public class Here2Osm {
 
         //TODO: Übergabe BBox über Terminal
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
-        /*HereApi.ApiRequest request = new ApiRequest();
-        request.sendRequest("incidents");
-        String answer = request.getAnswer();
-        XMLParser parser = new XMLParser();
-        parser.parseXMLFromApi(answer);
-*/
+        HereApi.ApiRequest request = new ApiRequest();
+        request.setBoundingBox();
+        /*XMLParser parser = new XMLParser();
+        parser.parseXMLFromApi(answer);*/
+
         /*XMLParser parser = new XMLParser();
         //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
         parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
 
-        CollectData collection = new CollectData();
-        collection.collectInformation(CollectData.trafficItemList);
+        DataCollector collection = new DataCollector();
+        collection.collectInformation(DataCollector.trafficItemList);
 */
-        RecursiveBBox bbox = new RecursiveBBox();
-        bbox.getBBox();
+        /*RecursiveBBox bbox = new RecursiveBBox();
+        bbox.getBBox();*/
     }
 }

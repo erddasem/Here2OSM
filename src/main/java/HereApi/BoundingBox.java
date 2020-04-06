@@ -2,50 +2,56 @@ package HereApi;
 
 public class BoundingBox {
 
-    private double leftLat;
-    private double leftLon;
-    private double rightLat;
-    private double rightLon;
+    double height;
+    double width;
+    private double upperLeftLat;
+    private double upperLeftLon;
+    private double bottomRightLat;
+    private double bottomRightLon;
 
-    public BoundingBox(double leftLat, double leftLon, double rightLat, double rightLon) {
-        this.leftLat = leftLat;
-        this.leftLon = leftLon;
-        this.rightLat = rightLat;
-        this.rightLon = rightLon;
+    public BoundingBox(double upperLeftLat, double upperLeftLon, double bottomRightLat, double bottomRightLon) {
+        this.upperLeftLat = upperLeftLat;
+        this.upperLeftLon = upperLeftLon;
+        this.bottomRightLat = bottomRightLat;
+        this.bottomRightLon = bottomRightLon;
+        this.height = upperLeftLat - bottomRightLat;
+        this.width = bottomRightLon - upperLeftLon;
     }
 
-    public double getLeftLat() {
-        return leftLat;
+    public double getUpperLeftLat() {
+        return upperLeftLat;
     }
 
-    public double getLeftLon() {
-        return leftLon;
+    public double getUpperLeftLon() {
+        return upperLeftLon;
     }
 
-    public double getRightLat() {
-        return rightLat;
+    public double getBottomRightLat() {
+        return bottomRightLat;
     }
 
-    public double getRightLon() {
-        return rightLon;
+    public double getBottomRightLon() {
+        return bottomRightLon;
     }
 
-    public String returnBbox() {
+   /* public String returnBbox() {
 
-        String boundingBox = leftLat + "," + leftLon + "," + rightLat + "," + rightLon;
+        String boundingBox = upperLeftLat + "," + upperLeftLon + "," + bottomRightLat + "," + bottomRightLon;
         return boundingBox;
-    }
+    }*/
 
-    public double width() {
+    public double getWidth() {
 
-        double width = rightLon - leftLon;
         return width;
     }
 
-    public double height() {
+    public double getHeight() {
 
-        double height = leftLat - rightLat;
         return height;
+    }
+
+    public String getBboxRequestString() {
+        return "&bbox=" + upperLeftLat + "," + upperLeftLon + ";" + bottomRightLat + "," + bottomRightLon;
     }
 //"&bbox=51.057,13.744;51.053,13.751";
 

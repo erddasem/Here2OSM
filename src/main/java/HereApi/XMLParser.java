@@ -1,6 +1,6 @@
 package HereApi;
 
-import DataBase.CollectData;
+import DataBase.DataCollector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -11,12 +11,24 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLParser {
 
+    private List<TrafficItem> listTrafficItems;
+
+    public XMLParser() {
+        this.listTrafficItems = new ArrayList<>();
+    }
+
+    public List<TrafficItem> getListIncidents() {
+        return listTrafficItems;
+    }
 
 // File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
 
@@ -68,7 +80,7 @@ public class XMLParser {
      *
      * @param document XML Document
      */
-    public void parseXML(Document document) {
+    private void parseXML(Document document) {
         //normalize xml document
         document.getDocumentElement().normalize();
 
@@ -147,6 +159,14 @@ public class XMLParser {
                 // Generate traffic item object and add to list of traffic items
                 trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
+
+        DataCollector collector = new DataCollector();
+        try {
+            collector.collectInformation(this.listTrafficItems);
+            System.out.println(this.listTrafficItems);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -168,7 +188,7 @@ public class XMLParser {
         TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
 
         // add TrafficItem to TrafficItemList
-        CollectData.trafficItemList.add(trafficItem);
+        this.listTrafficItems.add(trafficItem);
     }
 
 }

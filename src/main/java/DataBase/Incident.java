@@ -7,8 +7,6 @@ import java.util.List;
 
 public class Incident {
 
-    public static List<Incident> incidentList = new ArrayList<>();
-
     private String incidentId;
     private String type;
     private String status;

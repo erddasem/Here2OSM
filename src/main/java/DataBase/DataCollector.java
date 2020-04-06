@@ -10,13 +10,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectData {
-    //TODO: Funktion zum sammeln der Daten
-    public static List<TrafficItem> trafficItemList = new ArrayList<>();
+public class DataCollector {
 
+
+    private List<Incident> listIncidents;
+
+    public DataCollector() {
+        this.listIncidents = new ArrayList<>();
+    }
+
+    public List<Incident> getListIncidents() {
+        return listIncidents;
+    }
 
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
-        //TDDO: Fall abfangen, wenn traffic item list leer ist
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
 
         for (TrafficItem trafficItemObject : trafficItemList) {
@@ -44,15 +51,14 @@ public class CollectData {
             /*System.out.print(incidentId + "\n" + type + "\n" + status + "\n" + start + "\n" + end + "\n" + openLRCode +
                     "\n" + shortDesc + "\n" + longDesc + "\n" + roadClosure + "\n" + decodedLocation);*/
         }
-
-
     }
 
     private String getAffectedLines(Location location) {
         List<Line> listLines = location.getLocationLines();
         String affectedLines = "";
-        for (Line line : listLines)
-            affectedLines = new StringBuilder().append(affectedLines).append(" ").append(line.getID()).toString();
+        for (Line line : listLines) {
+            affectedLines = affectedLines + " " + line.getID();
+        }
         return affectedLines;
     }
 
@@ -60,6 +66,6 @@ public class CollectData {
 
         Incident incident = new Incident(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, affectedLines, posOff, negOff);
 
-        Incident.incidentList.add(incident);
+        this.listIncidents.add(incident);
     }
 }
