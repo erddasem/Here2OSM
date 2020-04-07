@@ -1,8 +1,6 @@
 package HereApi;
 
-import DataBase.DataCollector;
 import DataBase.DatasourceConfig;
-import DataBase.Incident;
 import openlr.map.Line;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +24,7 @@ import java.util.Scanner;
 import static org.jooq.impl.DSL.constraint;
 import static org.jooq.impl.DSL.min;
 import static org.jooq.sources.tables.Incidents.INCIDENTS;
+import static org.jooq.sources.tables.Kantenincidents.KANTENINCIDENTS;
 
 
 public class ApiRequest {
@@ -34,7 +33,7 @@ public class ApiRequest {
     private String answer;
 
     private List<Incident> incidentList;
-    private List<Line> affectedLinesList;
+    private List<AffectedLine> affectedLinesList;
 
     public ApiRequest() {
         this.incidentList = new ArrayList<>();
@@ -154,7 +153,7 @@ public class ApiRequest {
      * Bounding box needs to be given in WGS84.
      * Example: 51.057,13.744;51.053,13.751
      */
-    private BoundingBox setBoundingBox() {
+    public BoundingBox setBoundingBox() {
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
         System.out.println("Geben Sie die Koordinaten für die Bounding Box wie folgt ein (Format WGS84):" +
@@ -175,6 +174,8 @@ public class ApiRequest {
 
         BoundingBox bbox = new BoundingBox(Double.parseDouble(coordinatesArray[0]), Double.parseDouble(coordinatesArray[1]),
                 Double.parseDouble(coordinatesArray[2]), Double.parseDouble(coordinatesArray[3]));
+
+        getRecursiveBbox(bbox);
         return bbox;
     }
 
@@ -205,11 +206,21 @@ public class ApiRequest {
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
             parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
-            //this.incidentList.addAll(DataCollector.getListIncidents());
 
-            // send request aufrufen + parsexml +  collectData
-            //this.incidentList.addAll(DataCollector.getListIncidents());
-            //this.affectedLinesList.add(DataCollector.getAffectedLinesList());
+            //Collect relevant data per incident, decoding
+            DataCollector collector = new DataCollector();
+            try {
+                collector.collectInformation(parser.getListTrafficItems());
+                System.out.println(parser.getListTrafficItems());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.incidentList.addAll(collector.getListIncidents());
+            this.affectedLinesList.addAll(collector.getListAffectedLines());
+
+            for (AffectedLine al : this.affectedLinesList) {
+                al.printAffectedLine();
+            }
         }
     }
 
@@ -265,15 +276,25 @@ public class ApiRequest {
             // get oldest time stamp
             Timestamp youngestEntry = ctx.select(min(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
             if (currentTimestamp.after(youngestEntry)) {
+
                 //truncate data in incident and foreign key table
                 ctx.truncate(INCIDENTS).cascade().execute();
 
                 //fill incident table
-                for (Incident inc : this.incidentList) {
+                for (Incident incident : this.incidentList) {
+
 
                 }
 
                 //fill foreign key table
+                for (AffectedLine affectedLine : this.affectedLinesList) {
+                    ctx.insertInto(KANTENINCIDENTS,
+                            KANTENINCIDENTS.LINE_ID, KANTENINCIDENTS.INCIDENT_ID,
+                            KANTENINCIDENTS.POSOFF, KANTENINCIDENTS.NEGOFF)
+                            .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
+                                    affectedLine.getPosOff(), affectedLine.getNegOff())
+                            .execute();
+                }
             }
 
         });

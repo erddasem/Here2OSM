@@ -1,4 +1,4 @@
-package DataBase;
+package HereApi;
 
 import HereApi.TrafficItem;
 
@@ -16,11 +16,10 @@ public class Incident {
     private String shortDesc;
     private String longDesc;
     private boolean roadClosure;
-    private String affectedLines;
     private int posOff;
     private int negOff;
 
-    public Incident(String incidentId, String type, String status, String start, String end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, String affectedLines, int posOff, int negOff) {
+    public Incident(String incidentId, String type, String status, String start, String end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
         this.incidentId = incidentId;
         this.type = type;
         this.status = status;
@@ -30,7 +29,6 @@ public class Incident {
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
         this.roadClosure = roadClosure;
-        this.affectedLines = affectedLines;
         this.posOff = posOff;
         this.negOff = negOff;
     }
@@ -71,10 +69,6 @@ public class Incident {
         return roadClosure;
     }
 
-    public String getAffectedLines() {
-        return affectedLines;
-    }
-
     public int getPosOff() {
         return posOff;
     }
@@ -82,4 +76,5 @@ public class Incident {
     public int getNegOff() {
         return negOff;
     }
+
 }

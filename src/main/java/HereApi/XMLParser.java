@@ -1,6 +1,5 @@
 package HereApi;
 
-import DataBase.DataCollector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -11,7 +10,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -26,7 +24,7 @@ public class XMLParser {
         this.listTrafficItems = new ArrayList<>();
     }
 
-    public List<TrafficItem> getListIncidents() {
+    public List<TrafficItem> getListTrafficItems() {
         return listTrafficItems;
     }
 
@@ -135,8 +133,6 @@ public class XMLParser {
                                 tIShortDesc = trfItemDescList.item(0).getTextContent().replaceAll("\n", "");
                                 tILongDesc = trfItemDescList.item(1).getTextContent().replaceAll("\n", "");
                             }
-                        } else {
-                            hasOpenLRCode = false;
                         }
                     }
                 }
@@ -158,14 +154,6 @@ public class XMLParser {
             if (tIId != null)
                 // Generate traffic item object and add to list of traffic items
                 trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
-        }
-
-        DataCollector collector = new DataCollector();
-        try {
-            collector.collectInformation(this.listTrafficItems);
-            System.out.println(this.listTrafficItems);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
