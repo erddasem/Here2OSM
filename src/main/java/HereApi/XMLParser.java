@@ -117,7 +117,7 @@ public class XMLParser {
                         if (locationChildNodesList.item(j).getNodeName().equals("TPEGOpenLRBase64") && locationChildNodesList.item(j).getTextContent() != null) {
                             hasOpenLRCode = true;
                             // Get OpenLR Code
-                            tIOpenLR = locationChildNodesList.item(j).getTextContent().replaceAll("\n", "");
+                            tIOpenLR = locationChildNodesList.item(j).getTextContent().replaceAll("[\n ]", "");
                             // get information from different nodes
                             if (trfItemNode.getNodeType() == Node.ELEMENT_NODE) {
                                 // Cast Node to Element to get elements by tag name

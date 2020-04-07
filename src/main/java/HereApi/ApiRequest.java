@@ -171,11 +171,8 @@ public class ApiRequest {
 
         //TODO: Check if Bbox Coordinates are valid
 
-        BoundingBox bbox = new BoundingBox(Double.parseDouble(coordinatesArray[0]), Double.parseDouble(coordinatesArray[1]),
+        return new BoundingBox(Double.parseDouble(coordinatesArray[0]), Double.parseDouble(coordinatesArray[1]),
                 Double.parseDouble(coordinatesArray[2]), Double.parseDouble(coordinatesArray[3]));
-
-        //getRecursiveBbox(bbox);
-        return bbox;
     }
 
     private void getRecursiveBbox(@NotNull BoundingBox bbox) {
@@ -204,7 +201,7 @@ public class ApiRequest {
             //Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
 
             //Collect relevant data per incident, decoding
             DataCollector collector = new DataCollector();
