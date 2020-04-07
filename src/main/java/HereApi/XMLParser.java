@@ -187,7 +187,7 @@ public class XMLParser {
         // generate traffic Item
         TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
 
-        // add TrafficItem to TrafficItemList
+        // add TrafficItem to list of traffic items
         this.listTrafficItems.add(trafficItem);
     }
 

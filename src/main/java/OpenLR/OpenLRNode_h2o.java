@@ -32,8 +32,6 @@ public class OpenLRNode_h2o implements Node {
             e.printStackTrace();
         }
     }
-    /*static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);*/
 
     @Override
     public double getLatitudeDeg() {

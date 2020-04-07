@@ -38,7 +38,6 @@ public class OpenLRLine_h2o implements Line {
         this.oneway = oneway;
     }
 
-    //static DataSource conn = DatasourceConfig.createDataSource();
     static DSLContext ctx;
 
     static {

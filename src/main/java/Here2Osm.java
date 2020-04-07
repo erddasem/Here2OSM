@@ -1,3 +1,4 @@
+import DataBase.TestGetData;
 import HereApi.ApiRequest;
 
 public class Here2Osm {
@@ -6,8 +7,8 @@ public class Here2Osm {
 
         //TODO: Übergabe BBox über Terminal
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
-        HereApi.ApiRequest request = new ApiRequest();
-        request.setBoundingBox();
+        /*HereApi.ApiRequest request = new ApiRequest();
+        request.setBoundingBox();*/
         /*XMLParser parser = new XMLParser();
         parser.parseXMLFromApi(answer);*/
 
@@ -20,5 +21,8 @@ public class Here2Osm {
 */
         /*RecursiveBBox bbox = new RecursiveBBox();
         bbox.getBBox();*/
+
+        TestGetData test = new TestGetData();
+        test.getData();
     }
 }

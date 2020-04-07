@@ -4,6 +4,10 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 
 
+import static HereApi.ApiRequest.to_regclass;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.min;
+import static org.jooq.sources.tables.Incidents.INCIDENTS;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 
@@ -12,27 +16,46 @@ import DataBase.SpatialQueries;
 
 import javax.sql.DataSource;
 import java.awt.geom.Point2D;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class TestGetData {
     // class to test JOOQ queries before implementing into openLR interfaces
 
-    /*private DSLContext ctx;
+    static DSLContext ctx;
+
+    static {
+        try {
+            ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void getData() {
-        DataSource conn = DatasourceConfig.createDataSource();
-        ctx = DSL.using(conn, SQLDialect.POSTGRES);
 
 
+        String result = String.valueOf(ctx.select(to_regclass("openlr", "incidents")).fetchOne().value1());
+        System.out.println(result);
 
-        double longitude = 13.748489;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println(timestamp);
+        Timestamp youngestEntry = ctx.select(max(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
+        System.out.println(youngestEntry);
+        boolean after = timestamp.after(youngestEntry);
+        System.out.println("Ausführungsdatum nach jüngstem Eintrag in Tabelle: " + after);
+
+       /* double longitude = 13.748489;
         double latitude = 51.058306;
         int distance = 19;
         long id = 5;
         int length = 44;
+*/
 
 
-        *//*Field<Integer> DIST = DSL.field("Round(ST_Distance(geom::geography, st_pointfromtext('POINT(" + longitude + " "
+
+        /*Field<Integer> DIST = DSL.field("Round(ST_Distance(geom::geography, st_pointfromtext('POINT(" + longitude + " "
                 + latitude + ")', 4326)::geography))", Integer.class);
 
 
@@ -82,4 +105,5 @@ public class TestGetData {
 
     }*/
 
+    }
 }
