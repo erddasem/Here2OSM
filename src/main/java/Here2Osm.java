@@ -7,8 +7,8 @@ public class Here2Osm {
 
         //TODO: Übergabe BBox über Terminal
         // ausführen aller relevanter Methoden zum erhalten des Ergebnisses
-        HereApi.ApiRequest request = new ApiRequest();
-        request.setBoundingBox();
+        /*HereApi.ApiRequest request = new ApiRequest();
+        request.setBoundingBox();*/
         /*XMLParser parser = new XMLParser();
         parser.parseXMLFromApi(answer);*/
 
@@ -19,9 +19,7 @@ public class Here2Osm {
         DataCollector collection = new DataCollector();
         collection.collectInformation(DataCollector.trafficItemList);
 */
-
-
-        /*TestGetData test = new TestGetData();
-        test.getData();*/
+        ApiRequest request = new ApiRequest();
+        request.updateIncidentData();
     }
 }

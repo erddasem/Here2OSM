@@ -2,6 +2,7 @@ package HereApi;
 
 import HereApi.TrafficItem;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,8 @@ public class Incident {
     private String incidentId;
     private String type;
     private String status;
-    private String start;
-    private String end;
+    private Timestamp start;
+    private Timestamp end;
     private String openLRCode;
     private String shortDesc;
     private String longDesc;
@@ -19,7 +20,7 @@ public class Incident {
     private int posOff;
     private int negOff;
 
-    public Incident(String incidentId, String type, String status, String start, String end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
+    public Incident(String incidentId, String type, String status, Timestamp start, Timestamp end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
         this.incidentId = incidentId;
         this.type = type;
         this.status = status;
@@ -45,11 +46,11 @@ public class Incident {
         return status;
     }
 
-    public String getStart() {
+    public Timestamp getStart() {
         return start;
     }
 
-    public String getEnd() {
+    public Timestamp getEnd() {
         return end;
     }
 
@@ -65,7 +66,7 @@ public class Incident {
         return longDesc;
     }
 
-    public boolean isRoadClosure() {
+    public boolean getRoadClosure() {
         return roadClosure;
     }
 

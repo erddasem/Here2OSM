@@ -1,7 +1,6 @@
 package HereApi;
 
 import DataBase.DatasourceConfig;
-import openlr.map.Line;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
@@ -175,7 +174,7 @@ public class ApiRequest {
         BoundingBox bbox = new BoundingBox(Double.parseDouble(coordinatesArray[0]), Double.parseDouble(coordinatesArray[1]),
                 Double.parseDouble(coordinatesArray[2]), Double.parseDouble(coordinatesArray[3]));
 
-        getRecursiveBbox(bbox);
+        //getRecursiveBbox(bbox);
         return bbox;
     }
 
@@ -224,7 +223,7 @@ public class ApiRequest {
         }
     }
 
-    public void updateIncidentData(BoundingBox bbox) throws IOException {
+    public void updateIncidentData() {
 
         //get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
@@ -275,34 +274,40 @@ public class ApiRequest {
 
             // get oldest time stamp
             Timestamp youngestEntry = ctx.select(min(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
-            if (currentTimestamp.after(youngestEntry)) {
+
+            if (youngestEntry != null && currentTimestamp.after(youngestEntry)) {
 
                 //truncate data in incident and foreign key table
                 ctx.truncate(INCIDENTS).cascade().execute();
+                ctx.truncate(KANTENINCIDENTS).execute();
+            }
 
-                //fill incident table
-                for (Incident incident : this.incidentList) {
+            //fill incident table
+            for (Incident incident : this.incidentList) {
+                ctx.insertInto(INCIDENTS,
+                        INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE, INCIDENTS.STATUS, INCIDENTS.START_DATE,
+                        INCIDENTS.END_DATE, INCIDENTS.OPENLRCODE, INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC,
+                        INCIDENTS.ROADCLOSURE, INCIDENTS.POSOFF, INCIDENTS.NEGOFF)
+                        .values(incident.getIncidentId(), incident.getType(), incident.getStatus(), incident.getStart(),
+                                incident.getEnd(), incident.getOpenLRCode(), incident.getShortDesc(),
+                                incident.getLongDesc(), incident.getRoadClosure(), incident.getPosOff(),
+                                incident.getNegOff())
+                        .execute();
 
+            }
 
-                }
-
-                //fill foreign key table
-                for (AffectedLine affectedLine : this.affectedLinesList) {
-                    ctx.insertInto(KANTENINCIDENTS,
-                            KANTENINCIDENTS.LINE_ID, KANTENINCIDENTS.INCIDENT_ID,
-                            KANTENINCIDENTS.POSOFF, KANTENINCIDENTS.NEGOFF)
-                            .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
-                                    affectedLine.getPosOff(), affectedLine.getNegOff())
-                            .execute();
-                }
+            //fill foreign key table
+            for (AffectedLine affectedLine : this.affectedLinesList) {
+                ctx.insertInto(KANTENINCIDENTS,
+                        KANTENINCIDENTS.LINE_ID, KANTENINCIDENTS.INCIDENT_ID,
+                        KANTENINCIDENTS.POSOFF, KANTENINCIDENTS.NEGOFF)
+                        .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
+                                affectedLine.getPosOff(), affectedLine.getNegOff())
+                        .execute();
             }
 
         });
-
-        //for each Schleife, für jedes Incidet insert mit Jooq
-        // for each über all Line insert in Kreuztabelle LineID IncidentID
-        // löschen alte Incidents Tabelle + umbennen temp. Tabelle in incidents Tabelle (in einer Transaktion)
+        System.out.println("Programm beenedet");
     }
-
 
 }

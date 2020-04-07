@@ -6,8 +6,13 @@ import openlr.location.Location;
 import openlr.map.Line;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataCollector {
 
@@ -29,6 +34,14 @@ public class DataCollector {
         return listAffectedLines;
     }
 
+    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+
+    private Timestamp convertString2Timestamp(String dateString) throws ParseException {
+
+        Date date = formatter.parse(dateString);
+        return new Timestamp(date.getTime());
+    }
+
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
 
@@ -37,8 +50,8 @@ public class DataCollector {
             String incidentId = trafficItemObject.getId();
             String type = trafficItemObject.getType();
             String status = trafficItemObject.getStatus();
-            String start = trafficItemObject.getStart();
-            String end = trafficItemObject.getEnd();
+            Timestamp start = convertString2Timestamp(trafficItemObject.getStart());
+            Timestamp end = convertString2Timestamp(trafficItemObject.getEnd());
             String openLRCode = trafficItemObject.getOpenLR();
             String shortDesc = trafficItemObject.getShortDesc();
             String longDesc = trafficItemObject.getLongDesc();
@@ -80,7 +93,7 @@ public class DataCollector {
         }
     }
 
-    private void incident2list(String incidentId, String type, String status, String start, String end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
+    private void incident2list(String incidentId, String type, String status, Timestamp start, Timestamp end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
         Incident incident = new Incident(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
         this.listIncidents.add(incident);
     }
