@@ -23,10 +23,10 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import static org.jooq.impl.DSL.constraint;
-import static org.jooq.impl.DSL.min;
+import static org.jooq.impl.DSL.*;
 import static org.jooq.sources.tables.Incidents.INCIDENTS;
-import static org.jooq.sources.tables.Kantenincidents.KANTENINCIDENTS;
+import static org.jooq.sources.tables.KantenIncidents.KANTEN_INCIDENTS;
+import static org.jooq.sources.tables.Kanten.KANTEN;
 
 
 public class ApiRequest {
@@ -266,7 +266,7 @@ public class ApiRequest {
                         .column("roadclosure", SQLDataType.BOOLEAN)
                         .column("posoff", SQLDataType.INTEGER)
                         .column("negoff", SQLDataType.INTEGER)
-                        .column("generationdate", SQLDataType.TIMESTAMP.defaultValue(DSL.field("now()", SQLDataType.TIMESTAMP)))
+                        .column("generationdate", SQLDataType.TIMESTAMP.defaultValue(field("now()", SQLDataType.TIMESTAMP)))
                         .column("numberaffectedlines", SQLDataType.INTEGER)
                         .constraints(
                                 constraint("pk").primaryKey("incident_id")
@@ -295,7 +295,6 @@ public class ApiRequest {
 
                 //truncate data in incident and foreign key table
                 ctx.truncate(INCIDENTS).cascade().execute();
-                ctx.truncate(KANTENINCIDENTS).execute();
             }
 
             // Fill incident table with incident data
@@ -314,13 +313,27 @@ public class ApiRequest {
 
             // Fill foreign key table
             for (AffectedLine affectedLine : this.affectedLinesList) {
-                ctx.insertInto(KANTENINCIDENTS,
-                        KANTENINCIDENTS.LINE_ID, KANTENINCIDENTS.INCIDENT_ID,
-                        KANTENINCIDENTS.POSOFF, KANTENINCIDENTS.NEGOFF)
+                ctx.insertInto(KANTEN_INCIDENTS,
+                        KANTEN_INCIDENTS.LINE_ID, KANTEN_INCIDENTS.INCIDENT_ID,
+                        KANTEN_INCIDENTS.POSOFF, KANTEN_INCIDENTS.NEGOFF)
                         .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
                                 affectedLine.getPosOff(), affectedLine.getNegOff())
                         .execute();
             }
+
+            //Delete view
+            ctx.dropView("affected").execute();
+            // Create QGIS view containing affected lines
+            ctx.createView("affected")
+                    .as(select(KANTEN.LINE_ID, KANTEN.NAME, INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE,
+                            INCIDENTS.CRITICALITY, INCIDENTS.START_DATE, INCIDENTS.END_DATE, INCIDENTS.ROADCLOSURE,
+                            INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC, KANTEN.GEOM)
+                            .from(KANTEN_INCIDENTS)
+                            .innerJoin(INCIDENTS)
+                            .on(KANTEN_INCIDENTS.INCIDENT_ID.eq(INCIDENTS.INCIDENT_ID))
+                            .innerJoin(KANTEN)
+                            .on(KANTEN.LINE_ID.eq(KANTEN_INCIDENTS.LINE_ID)))
+                    .execute();
 
         }); // End transaction
         System.out.println("Programm beenedet");
