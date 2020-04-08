@@ -1,6 +1,8 @@
 package HereApi;
 
 import DataBase.DatasourceConfig;
+import Exceptions.InvalidBboxException;
+import Exceptions.InvalidWGS84CoordinateException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import static org.jooq.impl.DSL.constraint;
 import static org.jooq.impl.DSL.min;
@@ -83,7 +86,8 @@ public class ApiRequest {
         String format = ".xml";
         String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
         String criticality = "&criticality=minor";
-        requestUrl = new URL(baseUrl + incidents + resource + format + apiKey + bbox + criticality);
+        requestUrl = new URL(baseUrl + incidents + resource + format + apiKey + bbox);
+        System.out.println(requestUrl);
         return requestUrl;
     }
 
@@ -147,12 +151,30 @@ public class ApiRequest {
         return new Timestamp(System.currentTimeMillis());
     }
 
+    private void checkWGS84validity(double[] coordinatesArray) throws InvalidBboxException, InvalidWGS84CoordinateException {
+        if (coordinatesArray.length != 4)
+            throw new InvalidBboxException();
+
+        for (int i = 0; i < 4; i++) {
+            if (i == 0 || i == 2) {
+                boolean validLat = (-180 <= coordinatesArray[i]) && (coordinatesArray[i] <= 180);
+                if (!validLat)
+                    throw new InvalidWGS84CoordinateException();
+            }
+            if (i == 1 || i == 3) {
+                boolean validLon = (-90 <= coordinatesArray[i]) && (coordinatesArray[i] <= 90);
+                if (!validLon)
+                    throw new InvalidWGS84CoordinateException();
+            }
+        }
+    }
+
     /**
      * Method to set bounding box size in terminal window.
      * Bounding box needs to be given in WGS84.
      * Example: 51.057,13.744;51.053,13.751
      */
-    public BoundingBox setBoundingBox() {
+    public BoundingBox setBoundingBox() throws InvalidBboxException, InvalidWGS84CoordinateException {
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
         System.out.println("Geben Sie die Koordinaten für die Bounding Box wie folgt ein (Format WGS84):" +
@@ -161,23 +183,20 @@ public class ApiRequest {
         String bboxString = scanner.next();
 
         //get coordinates as double values
-        String[] coordinatesArray = bboxString.split("[,;]");
+        Pattern pattern = Pattern.compile("[,;]");
 
-        // checks coordinates
-        if (coordinatesArray.length != 4) {
-            //TODO: add exception
-        }
-        double[] coordinates = new double[4];
+        double[] coordinates = pattern.splitAsStream(bboxString)
+                .mapToDouble(Double::parseDouble)
+                .toArray();
 
-        //TODO: Check if Bbox Coordinates are valid
+        checkWGS84validity(coordinates);
 
-        return new BoundingBox(Double.parseDouble(coordinatesArray[0]), Double.parseDouble(coordinatesArray[1]),
-                Double.parseDouble(coordinatesArray[2]), Double.parseDouble(coordinatesArray[3]));
+        return new BoundingBox(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
     }
 
     private void getRecursiveBbox(@NotNull BoundingBox bbox) {
 
-        // Rekursive Abfrage
+        // Recursive query
         if ((bbox.width > 2) || (bbox.height > 2)) {
 
             // Box upper left
@@ -195,15 +214,19 @@ public class ApiRequest {
         } else {
 
             //Get Here Api request answer
-            //String requestAnswer;
-            //requestAnswer = sendRequest(bbox.getBboxRequestString());
+            String requestAnswer;
+            try {
+                requestAnswer = sendRequest(bbox.getBboxRequestString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-            //Parse answer or file
+            // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
             parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
 
-            //Collect relevant data per incident, decoding
+            // Collect relevant data per incident, decoding
             DataCollector collector = new DataCollector();
             try {
                 collector.collectInformation(parser.getListTrafficItems());
@@ -211,30 +234,29 @@ public class ApiRequest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // Collect incident data
             this.incidentList.addAll(collector.getListIncidents());
             this.affectedLinesList.addAll(collector.getListAffectedLines());
-
-            for (AffectedLine al : this.affectedLinesList) {
-                al.printAffectedLine();
-            }
         }
     }
 
-    public void updateIncidentData() {
+    public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
-        //get current timestamp
+        // Get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
 
-        //get recursive bounding boxes if bbox is bigger than 2 degrees
+        // Get recursive bounding boxes if bbox is bigger than 2 degrees
         getRecursiveBbox(setBoundingBox());
 
-        //Begin Transaction
+        // Begin Transaction
         ctx.transaction(configuration -> {
 
             // Checks if table incidents is part of the database
             String tableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
                     .fetchOne().value1());
 
+            // Create incident and foreign key table, if tables are not in database yet
             if (tableExists.equals("null")) {
                 // create incidents table
                 ctx.createTable("incidents")
@@ -256,7 +278,7 @@ public class ApiRequest {
                         )
                         .execute();
 
-                // create foreign key table
+                // Create foreign key table
                 ctx.createTable("kantenincidents")
                         .column("incident_id", SQLDataType.CHAR(64).nullable(false))
                         .column("line_id", SQLDataType.INTEGER.nullable(false))
@@ -269,7 +291,7 @@ public class ApiRequest {
                         .execute();
             }
 
-            // get oldest time stamp
+            // Get youngest entry in incident table
             Timestamp youngestEntry = ctx.select(min(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
 
             if (youngestEntry != null && currentTimestamp.after(youngestEntry)) {
@@ -279,7 +301,7 @@ public class ApiRequest {
                 ctx.truncate(KANTENINCIDENTS).execute();
             }
 
-            //fill incident table
+            // Fill incident table with incident data
             for (Incident incident : this.incidentList) {
                 ctx.insertInto(INCIDENTS,
                         INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE, INCIDENTS.STATUS, INCIDENTS.START_DATE,
@@ -293,7 +315,7 @@ public class ApiRequest {
 
             }
 
-            //fill foreign key table
+            // Fill foreign key table
             for (AffectedLine affectedLine : this.affectedLinesList) {
                 ctx.insertInto(KANTENINCIDENTS,
                         KANTENINCIDENTS.LINE_ID, KANTENINCIDENTS.INCIDENT_ID,
