@@ -35,8 +35,4 @@ public class AffectedLine {
     public void setNegOff(int negOff) {
         this.negOff = negOff;
     }
-
-    public void printAffectedLine() {
-        System.out.println("LineId: " + lineId + ", IncidentId: " + incidentId + ", posOff: " + posOff + ", negOff: " + negOff);
-    }
 }

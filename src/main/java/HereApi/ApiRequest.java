@@ -31,10 +31,11 @@ import static org.jooq.sources.tables.Kantenincidents.KANTENINCIDENTS;
 
 public class ApiRequest {
 
-    private URL requestUrl;
     private String answer;
 
+    // Contains incident information for all requested bounding boxes
     private List<Incident> incidentList;
+    // Contains affected lines for all requested bounding boxes
     private List<AffectedLine> affectedLinesList;
 
     public ApiRequest() {
@@ -67,15 +68,7 @@ public class ApiRequest {
     }
 
     /**
-     * Prints generated request URL to console.
-     */
-    public void printUrl() {
-        System.out.println(requestUrl);
-    }
-
-    /**
      * Sets URL with given bbox.
-     *
      * @throws MalformedURLException URL is in the wrong format or an unknown transmission protocol is specified.
      */
     private URL setUrl(String bbox) throws MalformedURLException {
@@ -85,41 +78,20 @@ public class ApiRequest {
         String resource = "incidents";
         String format = ".xml";
         String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
-        String criticality = "&criticality=minor";
-        requestUrl = new URL(baseUrl + incidents + resource + format + apiKey + bbox);
-        System.out.println(requestUrl);
-        return requestUrl;
-    }
-
-    /**
-     * Returns XML as String.
-     *
-     * @return HERE Api Answer as String
-     */
-    public String getAnswer() {
-        return answer;
-    }
-
-    /**
-     * Prints API answer to console.
-     */
-    public void printAnswer() {
-        System.out.println(answer);
+        //String criticality = "&criticality=minor";
+        return new URL(baseUrl + incidents + resource + format + apiKey + bbox);
     }
 
     /**
      * Sends request to HERE API.
      * API returns xml, xml is converted to String.
-     *
      * @param bboxString Coordinates for bbox given as String to use in Api Request URL.
      * @return HERE Api answer as String
      * @throws IOException Signals a general input / output error
      */
     private String sendRequest(String bboxString) throws IOException {
-        setUrl(bboxString);
-        printUrl();
 
-        URL request = requestUrl;
+        URL request = setUrl(bboxString);
         HttpURLConnection con = (HttpURLConnection) request.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/xml");
@@ -151,6 +123,13 @@ public class ApiRequest {
         return new Timestamp(System.currentTimeMillis());
     }
 
+    /**
+     * Checks whether the specified bounding box is valid and the coordinates correspond to the wgs84 format.
+     *
+     * @param coordinatesArray Contains the WGS84 coordinates of the upper left and lower right corner of the bounding box
+     * @throws InvalidBboxException            Invalid bounding box
+     * @throws InvalidWGS84CoordinateException Coordinates out of WGS85 bounds
+     */
     private void checkWGS84validity(double[] coordinatesArray) throws InvalidBboxException, InvalidWGS84CoordinateException {
         if (coordinatesArray.length != 4)
             throw new InvalidBboxException();
@@ -174,12 +153,12 @@ public class ApiRequest {
      * Bounding box needs to be given in WGS84.
      * Example: 51.057,13.744;51.053,13.751
      */
-    public BoundingBox setBoundingBox() throws InvalidBboxException, InvalidWGS84CoordinateException {
+    private BoundingBox setBoundingBox() throws InvalidBboxException, InvalidWGS84CoordinateException {
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
-        System.out.println("Geben Sie die Koordinaten für die Bounding Box wie folgt ein (Format WGS84):" +
+        System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
-                "\nBeispiel: 51.057,13.744;51.053,13.751 ");
+                "\nExample: 51.057,13.744;51.053,13.751 ");
         String bboxString = scanner.next();
 
         //get coordinates as double values
@@ -194,9 +173,17 @@ public class ApiRequest {
         return new BoundingBox(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
     }
 
+    /**
+     * Checks the bounding box. For the Api Request, the boundin box must be less than 2 degrees.
+     * If the specified bounding box is too large, it is broken down into sufficiently small boxes.
+     * For each bounding box an API request is made, the XML file is parsed, the OpenLR code is decoded
+     * and the incident information and the affected lines are collected.
+     *
+     * @param bbox Bounding box
+     */
     private void getRecursiveBbox(@NotNull BoundingBox bbox) {
 
-        // Recursive query
+        // Recursive bounding box query
         if ((bbox.width > 2) || (bbox.height > 2)) {
 
             // Box upper left
@@ -213,7 +200,7 @@ public class ApiRequest {
                     (bbox.getUpperLeftLon() + (bbox.getWidth() / 2)), bbox.getUpperLeftLat(), bbox.getBottomRightLon()));
         } else {
 
-            //Get Here Api request answer
+            //Gets Here Api request answer
             String requestAnswer;
             try {
                 requestAnswer = sendRequest(bbox.getBboxRequestString());
@@ -226,21 +213,28 @@ public class ApiRequest {
             //parser.parseXMLFromApi(answer);
             parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
 
-            // Collect relevant data per incident, decoding
+            // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
             try {
                 collector.collectInformation(parser.getListTrafficItems());
-                System.out.println(parser.getListTrafficItems());
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // Collect incident data
+            // Collects incident data and affected lines for all requested bounding boxes
             this.incidentList.addAll(collector.getListIncidents());
             this.affectedLinesList.addAll(collector.getListAffectedLines());
         }
     }
 
+    /**
+     * Method for updating the incident information contained in the database for a specified bounding box.
+     * If the database does not yet contain an incident table with the corresponding foreign key table, this is
+     * created and then filled. Creation, deletion and updating take place within one transaction.
+     *
+     * @throws InvalidBboxException            Invalid bounding box
+     * @throws InvalidWGS84CoordinateException Coordinates out of WGS85 bounds
+     */
     public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
         // Get current timestamp
@@ -294,6 +288,8 @@ public class ApiRequest {
             // Get youngest entry in incident table
             Timestamp youngestEntry = ctx.select(min(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
 
+            /* If the youngest entry in the incident table is older than the current timestamp, data are deleted
+            from incident and foreign key table. */
             if (youngestEntry != null && currentTimestamp.after(youngestEntry)) {
 
                 //truncate data in incident and foreign key table
@@ -325,7 +321,7 @@ public class ApiRequest {
                         .execute();
             }
 
-        });
+        }); // End transaction
         System.out.println("Programm beenedet");
     }
 

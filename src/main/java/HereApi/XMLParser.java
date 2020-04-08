@@ -18,6 +18,7 @@ import java.util.List;
 
 public class XMLParser {
 
+    // List contains the traffic elements in the XML file
     private List<TrafficItem> listTrafficItems;
 
     public XMLParser() {
@@ -27,8 +28,6 @@ public class XMLParser {
     public List<TrafficItem> getListTrafficItems() {
         return listTrafficItems;
     }
-
-// File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
 
     /**
      * Method to parse XML form given file path.
@@ -79,7 +78,7 @@ public class XMLParser {
      * @param document XML Document
      */
     private void parseXML(Document document) {
-        //normalize xml document
+        // Normalize xml document
         document.getDocumentElement().normalize();
 
         // List containing TRAFFIC_ITEM nodes

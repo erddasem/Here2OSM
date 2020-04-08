@@ -1,8 +1,6 @@
-import DataBase.TestGetData;
 import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
 import HereApi.ApiRequest;
-import HereApi.BoundingBox;
 
 public class Here2Osm {
     // mainMethode

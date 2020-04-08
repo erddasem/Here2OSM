@@ -16,8 +16,9 @@ import java.util.Locale;
 
 public class DataCollector {
 
-
+    // Contains incident information
     private List<Incident> listIncidents;
+    // Contains affected lines
     private List<AffectedLine> listAffectedLines;
 
     public DataCollector() {
@@ -27,6 +28,7 @@ public class DataCollector {
     }
 
     public List<Incident> getListIncidents() {
+
         return listIncidents;
     }
 
@@ -34,14 +36,27 @@ public class DataCollector {
         return listAffectedLines;
     }
 
-    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-
+    /**
+     * Converts String to Timestamp
+     *
+     * @param dateString Date as String, Format: MM/dd/yyyy hh:mm:ss
+     * @return Timestamp
+     * @throws ParseException Signals that an error has been reached unexpectedly while parsing.
+     */
     private Timestamp convertString2Timestamp(String dateString) throws ParseException {
-
+        // Date formatter, needed to convert String to Timestamp
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
         Date date = formatter.parse(dateString);
         return new Timestamp(date.getTime());
     }
 
+    /**
+     * Collects incident information and affected lines for all traffic items read from the XML.
+     * Uses OpenLR decoder (TomTom, https://github.com/tomtom-international/openlr ) to determine affected lines.
+     *
+     * @param trafficItemList List containing extracted traffic items
+     * @throws Exception
+     */
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
 
@@ -50,26 +65,41 @@ public class DataCollector {
             String incidentId = trafficItemObject.getId();
             String type = trafficItemObject.getType();
             String status = trafficItemObject.getStatus();
+            // Converts start and end date from String to Timestamp
             Timestamp start = convertString2Timestamp(trafficItemObject.getStart());
             Timestamp end = convertString2Timestamp(trafficItemObject.getEnd());
             String openLRCode = trafficItemObject.getOpenLR();
             String shortDesc = trafficItemObject.getShortDesc();
             String longDesc = trafficItemObject.getLongDesc();
+            // Parses road closure information from string to boolean
             boolean roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
-            // Decoding OpenLR Code and extracting location
+            // Decodes OpenLR Base64 Code and extracts location
             ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
             Location location = decoder.decode(byteArray);
 
+            // Gets positive and negative offset
             int posOff = location.getPositiveOffset();
             int negOff = location.getNegativeOffset();
 
+            // Create incident and add to list
             incident2list(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
 
+            // Extract affected lines from location and add to list
             getAffectedLines(location, incidentId, posOff, negOff);
         }
     }
 
+    /**
+     * Extracts affected lines from decoded location. Adds incident id, line and positive / negative offset to List.
+     *
+     * @param location   Location decoded by the OpenLR code
+     * @param incidentId Incident id
+     * @param posOff     From location extracted positive offset, defines the distance between the start of the
+     *                   location reference path and the start of the location
+     * @param negOff     From location extracted negative offset, defines the distance between the end of the
+     *                   location and the end of the location reference path
+     */
     private void getAffectedLines(Location location, String incidentId, int posOff, int negOff) {
         // decode location, extract list of affected lines
         List<Line> listLines = location.getLocationLines();
@@ -93,13 +123,25 @@ public class DataCollector {
         }
     }
 
+    /**
+     * Creates a new incident and adds it to the list
+     *
+     * @param incidentId  Incident ID
+     * @param type        Type of incident
+     * @param status      Incident status
+     * @param start       Assumed start date of the incident
+     * @param end         Assumed end date of the incident
+     * @param openLRCode  OpenLR Code as Base64 String
+     * @param shortDesc   Abbreviated incident description
+     * @param longDesc    Details incident description
+     * @param roadClosure Information if road is closed due to the incident
+     * @param posOff      From location extracted positive offset, defines the distance between the start of the
+     *                    location reference path and the start of the location
+     * @param negOff      From location extracted negative offset, defines the distance between the end of the
+     *                    location and the end of the location reference path
+     */
     private void incident2list(String incidentId, String type, String status, Timestamp start, Timestamp end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
         Incident incident = new Incident(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
         this.listIncidents.add(incident);
-    }
-
-    private void affectedLine2List(long lineId, String incidentId) {
-        AffectedLine affectedLine = new AffectedLine(lineId, incidentId);
-        this.listAffectedLines.add(affectedLine);
     }
 }

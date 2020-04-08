@@ -34,12 +34,6 @@ public class BoundingBox {
         return bottomRightLon;
     }
 
-   /* public String returnBbox() {
-
-        String boundingBox = upperLeftLat + "," + upperLeftLon + "," + bottomRightLat + "," + bottomRightLon;
-        return boundingBox;
-    }*/
-
     public double getWidth() {
 
         return width;
@@ -50,10 +44,14 @@ public class BoundingBox {
         return height;
     }
 
+    /**
+     * Builds String from bounding box information to use in Here Api request
+     *
+     * @return Bounding Box String to use in Here Api request
+     */
     public String getBboxRequestString() {
         return "&bbox=" + upperLeftLat + "," + upperLeftLon + ";" + bottomRightLat + "," + bottomRightLon;
     }
-//"&bbox=51.057,13.744;51.053,13.751";
 
 
 }
