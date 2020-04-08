@@ -31,7 +31,6 @@ public class XMLParser {
 
     /**
      * Method to parse XML form given file path.
-     *
      * @param path Filepath of the XML file as String
      */
     public void parseXMlFromFile(String path) {
@@ -52,7 +51,6 @@ public class XMLParser {
 
     /**
      * Method to parse answer from HereApi request.
-     *
      * @param requestAnswer Request answer as String
      */
     public void parseXMLFromApi(String requestAnswer) {
@@ -74,7 +72,6 @@ public class XMLParser {
      * Method to parse given XML Document.
      * Runs through each traffic item node and checks for OpenLR code, if available relevant information are
      * extracted. Creates a traffic item object and adds it to the list of traffic items.
-     *
      * @param document XML Document
      */
     private void parseXML(Document document) {
@@ -158,7 +155,6 @@ public class XMLParser {
 
     /**
      * Generates traffic item object and adds it to the list of traffic items.
-     *
      * @param id        Traffic item id
      * @param status    Status of the traffic item
      * @param type      Type of traffic item

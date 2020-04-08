@@ -6,7 +6,6 @@ import openlr.*;
 import openlr.binary.impl.LocationReferenceBinaryImpl;
 import openlr.decoder.OpenLRDecoderParameter;
 import openlr.location.Location;
-import openlr.map.Line;
 import openlr.map.MapDatabase;
 import openlr.properties.OpenLRPropertiesReader;
 import openlr.rawLocRef.RawLocationReference;
@@ -17,14 +16,11 @@ import org.apache.commons.configuration.FileConfiguration;
 import java.io.File;
 
 import java.util.Base64;
-import java.util.List;
-
 
 public class OpenLRDecoder_h2o {
 
     /**
      * Method to decode base64 String to Byte Array.
-     *
      * @param base64OpenLRString OpenLR String containing location references
      * @return Byte Array containing locations
      */
@@ -35,7 +31,6 @@ public class OpenLRDecoder_h2o {
 
     /**
      * Decodes byte array and outputs edges of the own routing network affected by the incident.
-     *
      * @param byteArray Byte Array containing location references
      * @throws Exception Byte Array not valid
      */
