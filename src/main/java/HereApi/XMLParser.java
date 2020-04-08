@@ -94,6 +94,7 @@ public class XMLParser {
             String tIClosure = null;
             String tIShortDesc = null;
             String tILongDesc = null;
+            String tICriticality = null;
 
             Node trfItemNode = trfItemList.item(node);
 
@@ -102,6 +103,18 @@ public class XMLParser {
 
             //Find child node "LOCATION" to check for OpenLR Code
             for (int i = 0; i < trfItemChildNodesList.getLength(); i++) {
+
+                if (trfItemChildNodesList.item(i).getNodeName().equals("CRITICALITY")) {
+                    // Create Node criticality
+                    Node criticalityNode = trfItemChildNodesList.item(i);
+                    // Get criticality
+                    if (criticalityNode.getNodeType() == Node.ELEMENT_NODE) {
+                        // Cast TRAFFIC_ITEM_DETAIL node to element
+                        Element criticalityElement = (Element) criticalityNode;
+                        //Get information if road is closed
+                        tICriticality = criticalityElement.getElementsByTagName("DESCRIPTION").item(0).getTextContent();
+                    }
+                }
                 if (trfItemChildNodesList.item(i).getNodeName().equals("LOCATION")) {
                     // Create node location
                     Node locationNode = trfItemChildNodesList.item(i);
@@ -149,26 +162,29 @@ public class XMLParser {
 
             if (tIId != null)
                 // Generate traffic item object and add to list of traffic items
-                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
+                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tICriticality,
+                        tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
     }
 
     /**
      * Generates traffic item object and adds it to the list of traffic items.
-     * @param id        Traffic item id
-     * @param status    Status of the traffic item
-     * @param type      Type of traffic item
-     * @param start     Start time of the traffic item
-     * @param end       End time of the traffic item
-     * @param openLR    OpenLR Code of the traffic item
-     * @param closure   Information whether the street is closed
-     * @param shortDesc Brief description of the traffic item
-     * @param longDesc  Detailed description of the traffic item
+     *
+     * @param id          Traffic item id
+     * @param status      Status of the traffic item
+     * @param type        Type of traffic item
+     * @param start       Start time of the traffic item
+     * @param end         End time of the traffic item
+     * @param criticality Severity of the accidents
+     * @param openLR      OpenLR Code of the traffic item
+     * @param closure     Information whether the street is closed
+     * @param shortDesc   Brief description of the traffic item
+     * @param longDesc    Detailed description of the traffic item
      */
-    private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
-                                   String closure, String shortDesc, String longDesc) {
+    private void trafficItemToList(String id, String status, String type, String start, String end, String criticality,
+                                   String openLR, String closure, String shortDesc, String longDesc) {
         // generate traffic Item
-        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
+        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, criticality, openLR, closure, shortDesc, longDesc);
 
         // add TrafficItem to list of traffic items
         this.listTrafficItems.add(trafficItem);

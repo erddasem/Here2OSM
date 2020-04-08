@@ -68,6 +68,7 @@ public class DataCollector {
             // Converts start and end date from String to Timestamp
             Timestamp start = convertString2Timestamp(trafficItemObject.getStart());
             Timestamp end = convertString2Timestamp(trafficItemObject.getEnd());
+            String criticality = trafficItemObject.getCriticality();
             String openLRCode = trafficItemObject.getOpenLR();
             String shortDesc = trafficItemObject.getShortDesc();
             String longDesc = trafficItemObject.getLongDesc();
@@ -83,7 +84,7 @@ public class DataCollector {
             int negOff = location.getNegativeOffset();
 
             // Create incident and add to list
-            incident2list(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
+            incident2list(incidentId, type, status, start, end, criticality, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
 
             // Extract affected lines from location and add to list
             getAffectedLines(location, incidentId, posOff, negOff);
@@ -131,6 +132,7 @@ public class DataCollector {
      * @param status      Incident status
      * @param start       Assumed start date of the incident
      * @param end         Assumed end date of the incident
+     * @param criticality Severity of the accidents
      * @param openLRCode  OpenLR Code as Base64 String
      * @param shortDesc   Abbreviated incident description
      * @param longDesc    Details incident description
@@ -140,8 +142,13 @@ public class DataCollector {
      * @param negOff      From location extracted negative offset, defines the distance between the end of the
      *                    location and the end of the location reference path
      */
-    private void incident2list(String incidentId, String type, String status, Timestamp start, Timestamp end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
-        Incident incident = new Incident(incidentId, type, status, start, end, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
+    private void incident2list(String incidentId, String type, String status, Timestamp start, Timestamp end,
+                               String criticality, String openLRCode, String shortDesc, String longDesc,
+
+                               boolean roadClosure, int posOff, int negOff) {
+        Incident incident = new Incident(incidentId, type, status, start, end, criticality, openLRCode, shortDesc,
+                longDesc, roadClosure, posOff, negOff);
+
         this.listIncidents.add(incident);
     }
 }

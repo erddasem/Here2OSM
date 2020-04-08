@@ -13,6 +13,7 @@ public class Incident {
     private String status;
     private Timestamp start;
     private Timestamp end;
+    private String criticality;
     private String openLRCode;
     private String shortDesc;
     private String longDesc;
@@ -20,12 +21,14 @@ public class Incident {
     private int posOff;
     private int negOff;
 
-    public Incident(String incidentId, String type, String status, Timestamp start, Timestamp end, String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
+    public Incident(String incidentId, String type, String status, Timestamp start, Timestamp end, String criticality,
+                    String openLRCode, String shortDesc, String longDesc, boolean roadClosure, int posOff, int negOff) {
         this.incidentId = incidentId;
         this.type = type;
         this.status = status;
         this.start = start;
         this.end = end;
+        this.criticality = criticality;
         this.openLRCode = openLRCode;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
@@ -52,6 +55,10 @@ public class Incident {
 
     public Timestamp getEnd() {
         return end;
+    }
+
+    public String getCriticality() {
+        return criticality;
     }
 
     public String getOpenLRCode() {

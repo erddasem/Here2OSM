@@ -7,19 +7,21 @@ public class TrafficItem {
     private String type;
     private String status;
     private String start;
-    private String openLR;
     private String end;
+    private String criticality;
+    private String openLR;
     private String shortDesc;
     private String longDesc;
     private String closure;
 
-    public TrafficItem(String id, String status, String type, String start, String end, String openLR, String closure, String shortDesc, String longDesc) {
+    public TrafficItem(String id, String status, String type, String start, String end, String criticality, String openLR, String closure, String shortDesc, String longDesc) {
 
         this.id = id;
         this.status = status;
         this.type = type;
         this.start = start;
         this.end = end;
+        this.criticality = criticality;
         this.openLR = openLR;
         this.closure = closure;
         this.shortDesc = shortDesc;
@@ -40,6 +42,10 @@ public class TrafficItem {
 
     public String getStart() {
         return start;
+    }
+
+    public String getCriticality() {
+        return criticality;
     }
 
     public String getOpenLR() {
@@ -66,7 +72,7 @@ public class TrafficItem {
     @Override
     public String toString() {
         return "HereApi.TrafficItem [id = " + id + ", status = " + status + ", type = " + type + ", start = " + start +
-                ", end = " + end + ", OpenLR = " + openLR + ", closure = " + closure
+                ", end = " + end + ", critcality = " + criticality + ", OpenLR = " + openLR + ", closure = " + closure
                 + ", shortDesc = " + shortDesc + ", longDesc = " + longDesc + "]";
     }
 }

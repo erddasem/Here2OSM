@@ -211,7 +211,7 @@ public class ApiRequest {
             // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaOhneOpenLRCodeTest.xml");
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
@@ -259,6 +259,7 @@ public class ApiRequest {
                         .column("status", SQLDataType.CHAR(50))
                         .column("start_date", SQLDataType.TIMESTAMP)
                         .column("end_date", SQLDataType.TIMESTAMP)
+                        .column("criticality", SQLDataType.CHAR(10).defaultValue("lowImpact"))
                         .column("openlrcode", SQLDataType.CHAR(100))
                         .column("shortdesc", SQLDataType.CLOB)
                         .column("longdesc", SQLDataType.CLOB)
@@ -301,12 +302,12 @@ public class ApiRequest {
             for (Incident incident : this.incidentList) {
                 ctx.insertInto(INCIDENTS,
                         INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE, INCIDENTS.STATUS, INCIDENTS.START_DATE,
-                        INCIDENTS.END_DATE, INCIDENTS.OPENLRCODE, INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC,
+                        INCIDENTS.END_DATE, INCIDENTS.CRITICALITY, INCIDENTS.OPENLRCODE, INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC,
                         INCIDENTS.ROADCLOSURE, INCIDENTS.POSOFF, INCIDENTS.NEGOFF)
                         .values(incident.getIncidentId(), incident.getType(), incident.getStatus(), incident.getStart(),
-                                incident.getEnd(), incident.getOpenLRCode(), incident.getShortDesc(),
-                                incident.getLongDesc(), incident.getRoadClosure(), incident.getPosOff(),
-                                incident.getNegOff())
+                                incident.getEnd(), incident.getCriticality(), incident.getOpenLRCode(),
+                                incident.getShortDesc(), incident.getLongDesc(), incident.getRoadClosure(),
+                                incident.getPosOff(), incident.getNegOff())
                         .execute();
 
             }
