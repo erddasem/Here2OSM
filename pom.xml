@@ -187,6 +187,7 @@
                             <excludes>
                             </excludes>
                             <inputSchema>openlr</inputSchema>
+                            <outputSchema>openlr</outputSchema>
                         </database>
                         <target>
                             <packageName>org.jooq.sources</packageName>

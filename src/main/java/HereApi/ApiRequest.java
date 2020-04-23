@@ -5,9 +5,7 @@ import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -24,9 +22,8 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import static org.jooq.impl.DSL.*;
-import static org.jooq.sources.tables.Incidents.INCIDENTS;
-import static org.jooq.sources.tables.KantenIncidents.KANTEN_INCIDENTS;
 import static org.jooq.sources.tables.Kanten.KANTEN;
+
 
 
 public class ApiRequest {
@@ -243,19 +240,38 @@ public class ApiRequest {
         // Get recursive bounding boxes if bbox is bigger than 2 degrees
         getRecursiveBbox(setBoundingBox());
 
-        // Begin Transaction
-        ctx.transaction(configuration -> {
+        Name temp_incidents = DSL.name("openlr", "temp_incidents");
+        Name temp_kanten_incidents = DSL.name("openlr", "temp_kanten_incidents");
+        Name incidents = DSL.name("openlr", "incidents");
+        Name kanten_incidents = DSL.name("openlr", "kanten_incidents");
+        Name kanten = DSL.name("openlr", "kanten");
 
-            // Checks if table incidents is part of the database
-            String tableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
-                    .fetchOne().value1());
+        String incidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
+                .fetchOne().value1());
 
-            // Create incident and foreign key table, if tables are not in database yet
-            if (tableExists.equals("null")) {
-                // create incidents table
-                ctx.createTable("incidents")
+        String tempIncidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "temp_incidents"))
+                .fetchOne().value1());
+
+        Timestamp youngestEntry = "null".equals(incidentsTableExists) ? null :
+                (Timestamp) ctx.select(min(field("generationdate"))).from(table(incidents)).fetchOne().value1();
+
+
+        // Begin First Transaction - Fill temp tables
+        ctx.transaction(configuration1 -> {
+
+            if (tempIncidentsTableExists.equals("openlr.temp_incidents")) {
+                ctx.dropTable(table(temp_kanten_incidents)).cascade().execute();
+                ctx.dropTable(table(temp_incidents)).cascade().execute();
+            }
+
+            if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
+                System.out.println("The incident data is up to date, the data has not been updated.");
+
+            } else {
+                // Create temporary incident table
+                DSL.using(configuration1).createTable(temp_incidents)
                         .column("incident_id", SQLDataType.CHAR(64).nullable(false))
-                        .column("incidentType", SQLDataType.CHAR(50))
+                        .column("incident_type", SQLDataType.CHAR(50))
                         .column("status", SQLDataType.CHAR(50))
                         .column("start_date", SQLDataType.TIMESTAMP)
                         .column("end_date", SQLDataType.TIMESTAMP)
@@ -267,76 +283,85 @@ public class ApiRequest {
                         .column("posoff", SQLDataType.INTEGER)
                         .column("negoff", SQLDataType.INTEGER)
                         .column("generationdate", SQLDataType.TIMESTAMP.defaultValue(field("now()", SQLDataType.TIMESTAMP)))
-                        .column("numberaffectedlines", SQLDataType.INTEGER)
                         .constraints(
-                                constraint("pk").primaryKey("incident_id")
-                        )
+                                primaryKey("incident_id"))
                         .execute();
 
-                // Create foreign key table
-                ctx.createTable("kantenincidents")
+                // Create temporary foreign key table
+                DSL.using(configuration1)
+                        .createTable(temp_kanten_incidents)
                         .column("incident_id", SQLDataType.CHAR(64).nullable(false))
                         .column("line_id", SQLDataType.INTEGER.nullable(false))
-                        .constraints(
-                                constraint("incident_id_fk").foreignKey("incident_id")
-                                        .references("opnelr.incidents"),
-                                constraint("line_id_fk").foreignKey("line_id")
-                                        .references("openlr.kanten")
-                        )
-                        .execute();
-            }
-
-            // Get youngest entry in incident table
-            Timestamp youngestEntry = ctx.select(min(INCIDENTS.GENERATIONDATE)).from(INCIDENTS).fetchOne().value1();
-
-            /* If the youngest entry in the incident table is older than the current timestamp, data are deleted
-            from incident and foreign key table. */
-            if (youngestEntry != null && currentTimestamp.after(youngestEntry)) {
-
-                //truncate data in incident and foreign key table
-                ctx.truncate(INCIDENTS).cascade().execute();
-            }
-
-            // Fill incident table with incident data
-            for (Incident incident : this.incidentList) {
-                ctx.insertInto(INCIDENTS,
-                        INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE, INCIDENTS.STATUS, INCIDENTS.START_DATE,
-                        INCIDENTS.END_DATE, INCIDENTS.CRITICALITY, INCIDENTS.OPENLRCODE, INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC,
-                        INCIDENTS.ROADCLOSURE, INCIDENTS.POSOFF, INCIDENTS.NEGOFF)
-                        .values(incident.getIncidentId(), incident.getType(), incident.getStatus(), incident.getStart(),
-                                incident.getEnd(), incident.getCriticality(), incident.getOpenLRCode(),
-                                incident.getShortDesc(), incident.getLongDesc(), incident.getRoadClosure(),
-                                incident.getPosOff(), incident.getNegOff())
+                        .column("posoff", SQLDataType.INTEGER.defaultValue(0))
+                        .column("negoff", SQLDataType.INTEGER.defaultValue(0))
                         .execute();
 
+                //Fill temp incidents table
+                for (Incident incident : this.incidentList) {
+
+                    DSL.using(configuration1)
+                            .insertInto(table(temp_incidents),
+                                    field(name("incident_id")), field(name("incident_type")),
+                                    field(name("status")), field(name("start_date")),
+                                    field(name("end_date")), field(name("criticality")),
+                                    field(name("openlrcode")), field(name("shortdesc")),
+                                    field(name("longdesc")), field(name("roadclosure")),
+                                    field(name("posoff")), field(name("negoff")))
+                            .values(incident.getIncidentId(), incident.getType(), incident.getStatus(), incident.getStart(),
+                                    incident.getEnd(), incident.getCriticality(), incident.getOpenLRCode(),
+                                    incident.getShortDesc(), incident.getLongDesc(), incident.getRoadClosure(),
+                                    incident.getPosOff(), incident.getNegOff())
+                            .execute();
+
+                }
+
+                // Fill temp foreign key table
+                for (AffectedLine affectedLine : this.affectedLinesList) {
+                    DSL.using(configuration1)
+                            .insertInto(table(temp_kanten_incidents),
+                                    field(name("line_id")), field(name("incident_id")),
+                                    field(name("posoff")), field(name("negoff")))
+                            .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
+                                    affectedLine.getPosOff(), affectedLine.getNegOff())
+                            .execute();
+                }
             }
 
-            // Fill foreign key table
-            for (AffectedLine affectedLine : this.affectedLinesList) {
-                ctx.insertInto(KANTEN_INCIDENTS,
-                        KANTEN_INCIDENTS.LINE_ID, KANTEN_INCIDENTS.INCIDENT_ID,
-                        KANTEN_INCIDENTS.POSOFF, KANTEN_INCIDENTS.NEGOFF)
-                        .values(affectedLine.getLineId(), affectedLine.getIncidentId(),
-                                affectedLine.getPosOff(), affectedLine.getNegOff())
-                        .execute();
+        }); // End first transaction
+
+        if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
+            return;
+        }
+
+        // Begin Second Transaction
+        ctx.transaction(configuration2 -> {
+
+            if (incidentsTableExists.equals("openlr.incidents")) {
+
+                //drop tables with old data
+                ctx.dropTable(table(kanten_incidents)).cascade().execute();
+                ctx.dropTable(table(incidents)).cascade().execute();
             }
 
-            //Delete view
-            ctx.dropView("affected").execute();
-            // Create QGIS view containing affected lines
-            ctx.createView("affected")
-                    .as(select(KANTEN.LINE_ID, KANTEN.NAME, INCIDENTS.INCIDENT_ID, INCIDENTS.TYPE,
-                            INCIDENTS.CRITICALITY, INCIDENTS.START_DATE, INCIDENTS.END_DATE, INCIDENTS.ROADCLOSURE,
-                            INCIDENTS.SHORTDESC, INCIDENTS.LONGDESC, KANTEN.GEOM)
-                            .from(KANTEN_INCIDENTS)
-                            .innerJoin(INCIDENTS)
-                            .on(KANTEN_INCIDENTS.INCIDENT_ID.eq(INCIDENTS.INCIDENT_ID))
-                            .innerJoin(KANTEN)
-                            .on(KANTEN.LINE_ID.eq(KANTEN_INCIDENTS.LINE_ID)))
-                    .execute();
+            ctx.alterTable(temp_incidents).renameTo(incidents).execute();
+            ctx.alterTable(temp_kanten_incidents).renameTo(kanten_incidents).execute();
 
-        }); // End transaction
-        System.out.println("Programm beenedet");
+            ctx.alterTable(kanten_incidents).add(constraint("fk_kanten")
+                    .foreignKey("line_id").references(KANTEN)).execute();
+            ctx.alterTable(kanten_incidents).add(constraint("fk_incidents")
+                    .foreignKey("incident_id").references(incidents)).execute();
+
+        }); // End second transaction
+
+        // Create QGIS view containing affected lines
+        ctx.execute("CREATE OR REPLACE VIEW openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
+                "i.roadclosure , i.start_date , i.end_date , i.shortdesc , i.longdesc ," +
+                "k.geom from openlr.kanten_incidents ki " +
+                "join openlr.incidents i on (i.incident_id = ki.incident_id)" +
+                "join openlr.kanten k on (k.line_id = ki.line_id);");
+
+
+        System.out.println("Program ended.");
     }
 
 }
