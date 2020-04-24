@@ -227,7 +227,9 @@ public class ApiRequest {
     /**
      * Method for updating the incident information contained in the database for a specified bounding box.
      * If the database does not yet contain an incident table with the corresponding foreign key table, this is
-     * created and then filled. Creation, deletion and updating take place within one transaction.
+     * created and then filled. Generating temp tables containing the incident and foreign key data (first
+     * transaction). Deleting the tables containing the old date and altering the created temp tables
+     * (second transaction).
      *
      * @throws InvalidBboxException            Invalid bounding box
      * @throws InvalidWGS84CoordinateException Coordinates out of WGS85 bounds
@@ -240,18 +242,21 @@ public class ApiRequest {
         // Get recursive bounding boxes if bbox is bigger than 2 degrees
         getRecursiveBbox(setBoundingBox());
 
+        // Needed for creating tables to set schema
         Name temp_incidents = DSL.name("openlr", "temp_incidents");
         Name temp_kanten_incidents = DSL.name("openlr", "temp_kanten_incidents");
         Name incidents = DSL.name("openlr", "incidents");
         Name kanten_incidents = DSL.name("openlr", "kanten_incidents");
-        Name kanten = DSL.name("openlr", "kanten");
 
+        // Checks if incidents table already exists
         String incidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
                 .fetchOne().value1());
 
+        // Checks if temp_incidnts table already exists
         String tempIncidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "temp_incidents"))
                 .fetchOne().value1());
 
+        // Timestamp is only created when table "incidents" exists
         Timestamp youngestEntry = "null".equals(incidentsTableExists) ? null :
                 (Timestamp) ctx.select(min(field("generationdate"))).from(table(incidents)).fetchOne().value1();
 
@@ -259,11 +264,14 @@ public class ApiRequest {
         // Begin First Transaction - Fill temp tables
         ctx.transaction(configuration1 -> {
 
+            // Deleting temp tables if they exist, prevents program from running into "already exists"-Error
             if (tempIncidentsTableExists.equals("openlr.temp_incidents")) {
                 ctx.dropTable(table(temp_kanten_incidents)).cascade().execute();
                 ctx.dropTable(table(temp_incidents)).cascade().execute();
             }
 
+            // If the most recent entry in the incident table is younger than the time stamp when the program
+            // was started, this message is printed.
             if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
                 System.out.println("The incident data is up to date, the data has not been updated.");
 
@@ -296,7 +304,7 @@ public class ApiRequest {
                         .column("negoff", SQLDataType.INTEGER.defaultValue(0))
                         .execute();
 
-                //Fill temp incidents table
+                // Fill temp incidents table
                 for (Incident incident : this.incidentList) {
 
                     DSL.using(configuration1)
@@ -312,7 +320,6 @@ public class ApiRequest {
                                     incident.getShortDesc(), incident.getLongDesc(), incident.getRoadClosure(),
                                     incident.getPosOff(), incident.getNegOff())
                             .execute();
-
                 }
 
                 // Fill temp foreign key table
@@ -329,6 +336,8 @@ public class ApiRequest {
 
         }); // End first transaction
 
+        //If the most recent entry in the incident table is younger than the time stamp when the program was started,
+        // the data will not be updated.
         if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
             return;
         }
@@ -336,13 +345,14 @@ public class ApiRequest {
         // Begin Second Transaction
         ctx.transaction(configuration2 -> {
 
+            // Drop tables with old data if exists
             if (incidentsTableExists.equals("openlr.incidents")) {
 
-                //drop tables with old data
                 ctx.dropTable(table(kanten_incidents)).cascade().execute();
                 ctx.dropTable(table(incidents)).cascade().execute();
             }
 
+            // Rename temp tables and add foreign keys
             ctx.alterTable(temp_incidents).renameTo(incidents).execute();
             ctx.alterTable(temp_kanten_incidents).renameTo(kanten_incidents).execute();
 
