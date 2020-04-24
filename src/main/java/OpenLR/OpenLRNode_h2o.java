@@ -5,7 +5,7 @@ import openlr.map.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,8 +23,15 @@ public class OpenLRNode_h2o implements Node {
         this.lat = lat;
     }
 
-    static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
+    static DSLContext ctx;
+
+    static {
+        try {
+            ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public double getLatitudeDeg() {

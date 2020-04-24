@@ -9,6 +9,7 @@ import org.jooq.impl.DSL;
 import javax.sql.DataSource;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
@@ -37,8 +38,15 @@ public class OpenLRLine_h2o implements Line {
         this.oneway = oneway;
     }
 
-    static DataSource conn = DatasourceConfig.createDataSource();
-    static DSLContext ctx = DSL.using(conn, SQLDialect.POSTGRES);
+    static DSLContext ctx;
+
+    static {
+        try {
+            ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public Node getStartNode() {

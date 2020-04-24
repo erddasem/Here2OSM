@@ -13,17 +13,14 @@ import openlr.decoder.OpenLRDecoder;
 
 import org.apache.commons.configuration.FileConfiguration;
 
-import java.awt.*;
 import java.io.File;
 
 import java.util.Base64;
-
 
 public class OpenLRDecoder_h2o {
 
     /**
      * Method to decode base64 String to Byte Array.
-     *
      * @param base64OpenLRString OpenLR String containing location references
      * @return Byte Array containing locations
      */
@@ -34,12 +31,10 @@ public class OpenLRDecoder_h2o {
 
     /**
      * Decodes byte array and outputs edges of the own routing network affected by the incident.
-     *
      * @param byteArray Byte Array containing location references
-     * @throws Exception
+     * @throws Exception Byte Array not valid
      */
-    public String decode(ByteArray byteArray) throws Exception {
-
+    public Location decode(ByteArray byteArray) throws Exception {
         // Byte array to location reference
         LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
@@ -58,21 +53,7 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
-        System.out.println("Negativ Offsent: " + location.getNegativeOffset());
-        System.out.println("Positiv Offsent: " + location.getPositiveOffset());
-        System.out.println("ID " + location.getID());
-        System.out.println("Lines " + location.getAffectedLines());
-        System.out.println(location.toString());
-
-        return location.toString();
+        return decoder.decodeRaw(params, rawLocationReference);
 
     }
-
-    /*public static void main(String[] args) throws Exception {
-        ByteArray byteArray = openLR2byteArray("CwnGsiRN4Qo/CP+VAbIKbzIY");
-        decode(byteArray);
-    }*/
-
-
 }

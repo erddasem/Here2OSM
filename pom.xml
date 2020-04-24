@@ -110,6 +110,12 @@
             <artifactId>jts-core</artifactId>
             <version>1.16.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -181,6 +187,7 @@
                             <excludes>
                             </excludes>
                             <inputSchema>openlr</inputSchema>
+                            <outputSchema>openlr</outputSchema>
                         </database>
                         <target>
                             <packageName>org.jooq.sources</packageName>

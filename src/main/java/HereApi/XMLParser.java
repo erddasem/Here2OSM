@@ -13,16 +13,24 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-
-import static HereApi.TrafficItem.trafficItemList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLParser {
 
-// File path: "/Users/emilykast/Desktop/CarolaTestXml.xml"
+    // List contains the traffic elements in the XML file
+    private List<TrafficItem> listTrafficItems;
+
+    public XMLParser() {
+        this.listTrafficItems = new ArrayList<>();
+    }
+
+    public List<TrafficItem> getListTrafficItems() {
+        return listTrafficItems;
+    }
 
     /**
      * Method to parse XML form given file path.
-     *
      * @param path Filepath of the XML file as String
      */
     public void parseXMlFromFile(String path) {
@@ -43,7 +51,6 @@ public class XMLParser {
 
     /**
      * Method to parse answer from HereApi request.
-     *
      * @param requestAnswer Request answer as String
      */
     public void parseXMLFromApi(String requestAnswer) {
@@ -65,11 +72,10 @@ public class XMLParser {
      * Method to parse given XML Document.
      * Runs through each traffic item node and checks for OpenLR code, if available relevant information are
      * extracted. Creates a traffic item object and adds it to the list of traffic items.
-     *
      * @param document XML Document
      */
-    public void parseXML(Document document) {
-        //normalize xml document
+    private void parseXML(Document document) {
+        // Normalize xml document
         document.getDocumentElement().normalize();
 
         // List containing TRAFFIC_ITEM nodes
@@ -88,6 +94,7 @@ public class XMLParser {
             String tIClosure = null;
             String tIShortDesc = null;
             String tILongDesc = null;
+            String tICriticality = null;
 
             Node trfItemNode = trfItemList.item(node);
 
@@ -96,6 +103,18 @@ public class XMLParser {
 
             //Find child node "LOCATION" to check for OpenLR Code
             for (int i = 0; i < trfItemChildNodesList.getLength(); i++) {
+
+                if (trfItemChildNodesList.item(i).getNodeName().equals("CRITICALITY")) {
+                    // Create Node criticality
+                    Node criticalityNode = trfItemChildNodesList.item(i);
+                    // Get criticality
+                    if (criticalityNode.getNodeType() == Node.ELEMENT_NODE) {
+                        // Cast TRAFFIC_ITEM_DETAIL node to element
+                        Element criticalityElement = (Element) criticalityNode;
+                        //Get information if road is closed
+                        tICriticality = criticalityElement.getElementsByTagName("DESCRIPTION").item(0).getTextContent();
+                    }
+                }
                 if (trfItemChildNodesList.item(i).getNodeName().equals("LOCATION")) {
                     // Create node location
                     Node locationNode = trfItemChildNodesList.item(i);
@@ -107,7 +126,7 @@ public class XMLParser {
                         if (locationChildNodesList.item(j).getNodeName().equals("TPEGOpenLRBase64") && locationChildNodesList.item(j).getTextContent() != null) {
                             hasOpenLRCode = true;
                             // Get OpenLR Code
-                            tIOpenLR = locationChildNodesList.item(j).getTextContent();
+                            tIOpenLR = locationChildNodesList.item(j).getTextContent().replaceAll("[\n ]", "");
                             // get information from different nodes
                             if (trfItemNode.getNodeType() == Node.ELEMENT_NODE) {
                                 // Cast Node to Element to get elements by tag name
@@ -120,16 +139,14 @@ public class XMLParser {
                                 tIEnd = trfItemElement.getElementsByTagName("END_TIME").item(0).getTextContent();
                                 // get different descriptions, same node name, different types
                                 NodeList trfItemDescList = trfItemElement.getElementsByTagName("TRAFFIC_ITEM_DESCRIPTION");
-                                tIShortDesc = trfItemDescList.item(0).getTextContent();
-                                tILongDesc = trfItemDescList.item(1).getTextContent();
+                                tIShortDesc = trfItemDescList.item(0).getTextContent().replaceAll("\n", "");
+                                tILongDesc = trfItemDescList.item(1).getTextContent().replaceAll("\n", "");
                             }
-                        } else {
-                            hasOpenLRCode = false;
                         }
                     }
                 }
                 // If OpenLR Code is available get node TRAFFIC_ITEM_DETAIL
-                if (hasOpenLRCode == true) {
+                if (hasOpenLRCode) {
                     if (trfItemChildNodesList.item(i).getNodeName().equals("TRAFFIC_ITEM_DETAIL")) {
                         Node trfItemDetailNode = trfItemChildNodesList.item(i);
                         if (trfItemDetailNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -145,31 +162,32 @@ public class XMLParser {
 
             if (tIId != null)
                 // Generate traffic item object and add to list of traffic items
-                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
+                trafficItemToList(tIId, tIStatus, tIType, tIStart, tIEnd, tICriticality,
+                        tIOpenLR, tIClosure, tIShortDesc, tILongDesc);
         }
     }
 
     /**
      * Generates traffic item object and adds it to the list of traffic items.
      *
-     * @param id        Traffic item id
-     * @param status    Status of the traffic item
-     * @param type      Type of traffic item
-     * @param start     Start time of the traffic item
-     * @param end       End time of the traffic item
-     * @param openLR    OpenLR Code of the traffic item
-     * @param closure   Information whether the street is closed
-     * @param shortDesc Brief description of the traffic item
-     * @param longDesc  Detailed description of the traffic item
+     * @param id          Traffic item id
+     * @param status      Status of the traffic item
+     * @param type        Type of traffic item
+     * @param start       Start time of the traffic item
+     * @param end         End time of the traffic item
+     * @param criticality Severity of the accidents
+     * @param openLR      OpenLR Code of the traffic item
+     * @param closure     Information whether the street is closed
+     * @param shortDesc   Brief description of the traffic item
+     * @param longDesc    Detailed description of the traffic item
      */
-    private void trafficItemToList(String id, String status, String type, String start, String end, String openLR,
-                                   String closure, String shortDesc, String longDesc) {
+    private void trafficItemToList(String id, String status, String type, String start, String end, String criticality,
+                                   String openLR, String closure, String shortDesc, String longDesc) {
         // generate traffic Item
-        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, openLR, closure, shortDesc, longDesc);
-        System.out.println(trafficItem);
+        TrafficItem trafficItem = new TrafficItem(id, status, type, start, end, criticality, openLR, closure, shortDesc, longDesc);
 
-        // add TrafficItem to TrafficItemList
-        trafficItemList.add(trafficItem);
+        // add TrafficItem to list of traffic items
+        this.listTrafficItems.add(trafficItem);
     }
 
 }
