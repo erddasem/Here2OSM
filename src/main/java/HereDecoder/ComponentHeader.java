@@ -70,6 +70,7 @@ public class ComponentHeader {
         totalBytesRead++;
 
         //IntUnLoMb one byte
+        totalBytesRead += lengthComp.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
         totalBytesRead += lengthAttr.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
 
         isValid = lengthComp.isValid() && lengthAttr.isValid();
