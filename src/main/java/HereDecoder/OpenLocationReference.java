@@ -1,7 +1,5 @@
 package HereDecoder;
 
-import javafx.util.Pair;
-
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -50,16 +48,16 @@ public class OpenLocationReference extends BaseLocationReference {
         return new Geoposition(dlat + prev.getLatitude(), dlon + prev.getLongitude());
     }
 
-    public static Pair<Integer, Integer> absoluteToBinaryValue(Geoposition geo) {
+    public static Tuple2<Integer, Integer> absoluteToBinaryValue(Geoposition geo) {
         int ilat = absGeoEq1(geo.getLatitude());
         int ilon = absGeoEq1(geo.getLongitude());
-        return new Pair<Integer, Integer>(ilat, ilon);
+        return new Tuple2<Integer, Integer>(ilat, ilon);
     }
 
-    public static Pair<Integer, Integer> relativeToBinaryValue(Geoposition current, Geoposition previous) {
+    public static Tuple2<Integer, Integer> relativeToBinaryValue(Geoposition current, Geoposition previous) {
         int iRelativeLat = (int) Math.round(100000.0 * (current.getLatitude() - previous.getLatitude()));
         int iRelativeLon = (int) Math.round(100000.0 * (current.getLongitude() - previous.getLongitude()));
-        return new Pair<Integer, Integer>(iRelativeLat, iRelativeLon);
+        return new Tuple2<Integer, Integer>(iRelativeLat, iRelativeLon);
     }
 
     public String getVersion() {
