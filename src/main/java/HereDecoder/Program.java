@@ -1,5 +1,6 @@
 package HereDecoder;
 
+import java.io.Console;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,9 +12,14 @@ public class Program {
 
     }
 
+
+
     public static void main(String[] args) {
 
+        Program program = new Program();
+        program.run(args);
 
+        System.out.print("Press Any Key To Exit");
     }
 
     public boolean isRunTestMode() {
@@ -25,20 +31,25 @@ public class Program {
     }
 
     public void run(String[] args) {
-        boolean succeeded = parseCmdLineOptions(args);
-        if (succeeded) {
-            System.out.println("Sample Decoder");
-            if (runTestMode) {
-                List<String> olrString = getTestCodeStrings();
+        // boolean succeeded = parseCmdLineOptions(args);
+//        if (succeeded) {
+//            System.out.println("Sample Decoder");
+//            if (runTestMode) {
+//
+//            }
+//        }
 
-            }
+        List<String> olrStrings = getTestCodeStrings();
+        for (String olrString : olrStrings) {
+            OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(olrString);
+            outputOlrData(olr);
         }
     }
 
     public void outputOlrData(OpenLocationReference olr) {
         try {
             if (!olr.isValid()) {
-                System.out.println("InValid OpenLR Data");
+                System.out.println("Invalid OpenLR Data");
             } else {
                 switch (olr.getLocationReference().getType().id) {
                     case (OpenLocationReference.OLR_TYPE_GEO_COORDINATE):
@@ -72,19 +83,20 @@ public class Program {
     }
 
     private List<String> getTestCodeStrings() {
-        List<String> validBase64OlrStrings = Arrays.asList("CCoBEAAmJQTqdCRJVQAJBQQCAiYACgUEAoM/AAHDARoACQUEAgKfADCDBzA=",
-                "CCkBEAAlJAbn0SU9BgAJBQQDA7UACgUEA4ETAP8z/9cACQUEAwMxADBVAA==",
-                "CCgBEAAkIwepwCVIMwAJBQQEAv8ACgQDBBoA//8AFwAJBQQEAn8AMAAA",
-                "CCgBEAAkIwerNyVMfAAJBQQEA98ACgQDBFEA/6sAMwAJBQQEA2EAMAAA",
-                "CCoBEAAmJQeKnSUydgAJBQQDA3wACgUEA4MGAADN/r0ACQUEAwP/ADBIgiM=",
-                "CGMBEABfXgmAKiVcHgAJBQQDA6YACgUEA4c7AP+dAzAACQUEAwKFAHAD+7n95QAJBQQDA6QACgUEA4E+AP8p/5MACQUEAwOkAAoFBAOBIAD/Sv+kAAkFBAMDpAAKBQQDiTEAAAA=",
-                "CCkBEAAlJAl+BiVQ5gAJBQQBAeMACgUEAYElAP9uAHYACQUEAQFoADANcw==",
-                "CGMBEABfXgmAKiVcHgAJBQQDA6YACgUEA4c7AP+dAzAACQUEAwKFAHAD+7n95QAJBQQDA6QACgUEA4E+AP8p/5MACQUEAwOkAAoFBAOBIAD/Sv+kAAkFBAMDpAAKBQQDiTEAAAA=",
-                "CE8BEABLSgl9PyVcQgAJBQQDAokACgUEA4U4AAarAlcACQUEAwOmAHAC/5f9lAAJBQQDAoEACgQDAz4AAAH/yAAJBQQDAoAACgUEA41cAAAA",
-                "CFEBEABNTAoCaCU3QAAJBQQBAb8ACgUEAfUBANfIBFcACQUEAQFAAHACrYX3WwAJBQQBAbwACgUEAYJDAP4p/+MACQUEAQG8AAoFBAG4bAAAiko=",
-                "CCkBEAAlJAhjSyPx+wAJBQQBAWAACgUEAYE0AACz/44ACQUEAQHhADA4AA==",
-                "CCkBEAAlJAmRzCVgcAAJBQQDA1gACgUEA4YXAAPI/ngACQUEAwPGADAAAA==",
-                "CD0BEAA5OAaPjSOPLwAJBQQCA8YACgUEAo0jAPvo/b0ACQUEAgMrAHAB9xT/RgAJBQQCA7QACgUEAokmAAB1");
+        List<String> validBase64OlrStrings = Arrays.asList("CCoBEAAmJQTqdCRJVQAJBQQCAiYACgUEAoM/AAHDARoACQUEAgKfADCDBzA="
+//                "CCkBEAAlJAbn0SU9BgAJBQQDA7UACgUEA4ETAP8z/9cACQUEAwMxADBVAA==",
+//                "CCgBEAAkIwepwCVIMwAJBQQEAv8ACgQDBBoA//8AFwAJBQQEAn8AMAAA",
+//                "CCgBEAAkIwerNyVMfAAJBQQEA98ACgQDBFEA/6sAMwAJBQQEA2EAMAAA",
+//                "CCoBEAAmJQeKnSUydgAJBQQDA3wACgUEA4MGAADN/r0ACQUEAwP/ADBIgiM=",
+//                "CGMBEABfXgmAKiVcHgAJBQQDA6YACgUEA4c7AP+dAzAACQUEAwKFAHAD+7n95QAJBQQDA6QACgUEA4E+AP8p/5MACQUEAwOkAAoFBAOBIAD/Sv+kAAkFBAMDpAAKBQQDiTEAAAA=",
+//                "CCkBEAAlJAl+BiVQ5gAJBQQBAeMACgUEAYElAP9uAHYACQUEAQFoADANcw==",
+//                "CGMBEABfXgmAKiVcHgAJBQQDA6YACgUEA4c7AP+dAzAACQUEAwKFAHAD+7n95QAJBQQDA6QACgUEA4E+AP8p/5MACQUEAwOkAAoFBAOBIAD/Sv+kAAkFBAMDpAAKBQQDiTEAAAA=",
+//                "CE8BEABLSgl9PyVcQgAJBQQDAokACgUEA4U4AAarAlcACQUEAwOmAHAC/5f9lAAJBQQDAoEACgQDAz4AAAH/yAAJBQQDAoAACgUEA41cAAAA",
+//                "CFEBEABNTAoCaCU3QAAJBQQBAb8ACgUEAfUBANfIBFcACQUEAQFAAHACrYX3WwAJBQQBAbwACgUEAYJDAP4p/+MACQUEAQG8AAoFBAG4bAAAiko=",
+//                "CCkBEAAlJAhjSyPx+wAJBQQBAWAACgUEAYE0AACz/44ACQUEAQHhADA4AA==",
+//                "CCkBEAAlJAmRzCVgcAAJBQQDA1gACgUEA4YXAAPI/ngACQUEAwPGADAAAA==",
+//                "CD0BEAA5OAaPjSOPLwAJBQQCA8YACgUEAo0jAPvo/b0ACQUEAgMrAHAB9xT/RgAJBQQCA7QACgUEAokmAAB1"
+        );
 
         return validBase64OlrStrings;
 
