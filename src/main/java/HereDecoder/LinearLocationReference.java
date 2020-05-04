@@ -181,7 +181,7 @@ public class LinearLocationReference extends BaseLocationReference {
         int totalOriginalBytes = buff.length;
         int totalBytesRead = 0;
 
-        var geopoints = new List<Geoposition>();
+        List<Geoposition> geopoints = new ArrayList<>();
 
         first = new FirstReferencePoint();
         totalBytesRead += first.decode(buff);
