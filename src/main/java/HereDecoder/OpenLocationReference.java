@@ -12,7 +12,7 @@ public class OpenLocationReference extends BaseLocationReference {
     private int bytesRead;
 
     public static OpenLocationReference fromBase64TpegOlr(String base64OlrString) {
-        byte[] base64EncodedBytes = Base64.getDecoder().decode(new String(base64OlrString));
+        byte[] base64EncodedBytes = Base64.getDecoder().decode(base64OlrString);
         OpenLocationReference olr = OpenLocationReference.fromBinary(base64EncodedBytes);
         olr.base64 = base64OlrString;
         return olr;
