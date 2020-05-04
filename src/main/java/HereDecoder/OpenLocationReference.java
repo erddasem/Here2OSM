@@ -151,9 +151,11 @@ public class OpenLocationReference extends BaseLocationReference {
 
         public final int id;
 
-        private OLRType(int id) {
+        OLRType(int id) {
             this.id = id;
         }
-
     }
+
+    public static final int OLR_TYPE_LINEAR = 0;
+    public static final int OLR_TYPE_GEO_COORDINATE = 1;
 }

@@ -37,14 +37,14 @@ public class Program {
 
     public void outputOlrData(OpenLocationReference olr) {
         try {
-            if (olr.isValid() == false) {
+            if (!olr.isValid()) {
                 System.out.println("InValid OpenLR Data");
             } else {
-                switch (olr.getLocationReference().getType()) {
-                    case (OpenLocationReference.OLRType.GeoCoordinate):
+                switch (olr.getLocationReference().getType().id) {
+                    case (OpenLocationReference.OLR_TYPE_GEO_COORDINATE):
                         outputGeolocation((GeoCoordinateLocationReference) olr.getLocationReference());
                         break;
-                    case (OpenLocationReference.OLRType.Linear):
+                    case OpenLocationReference.OLR_TYPE_LINEAR:
                         outputLinearLocation((LinearLocationReference) olr.getLocationReference());
                         break;
                     default:
