@@ -105,20 +105,19 @@ public class OpenLocationReference extends BaseLocationReference {
         }
 
         MajorMinorVersion majorMinorVersion = new MajorMinorVersion();
-        bytesRead += majorMinorVersion.decode(Arrays.copyOfRange(bytes, bytesRead - 1, bytes.length - 1));
+        bytesRead += majorMinorVersion.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
         version = majorMinorVersion.getVersion();
 
         if (isValid) {
             ComponentHeader locationReferenceHeader = new ComponentHeader();
 
-            bytesRead += locationReferenceHeader.decode(Arrays.copyOfRange(bytes, bytesRead - 1, bytes.length - 1));
+            bytesRead += locationReferenceHeader.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
             if (locationReferenceHeader.getIsValid() == false) {
                 isValid = false;
-            }
-            if (locationReferenceHeader.getGcId() == OLRType.Linear.id) {
+            } else if (locationReferenceHeader.getGcId() == OLRType.Linear.id) {
                 LinearLocationReference linearlr = new LinearLocationReference();
 
-                int bytesread = linearlr.decode(Arrays.copyOfRange(bytes, bytesRead - 1, bytes.length - 1));
+                int bytesread = linearlr.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
 
                 bytesRead += bytesread;
                 locationReference = linearlr;
@@ -129,7 +128,7 @@ public class OpenLocationReference extends BaseLocationReference {
 
             if (locationReferenceHeader.getGcId() == OLRType.GeoCoordinate.id) {
                 GeoCoordinateLocationReference geoCoord = new GeoCoordinateLocationReference();
-                int byteread = geoCoord.decode(Arrays.copyOfRange(bytes, bytesRead - 1, bytes.length - 1));
+                int byteread = geoCoord.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
                 bytesRead += byteread;
                 locationReference = geoCoord;
                 origin = geoCoord.getCoordinate();

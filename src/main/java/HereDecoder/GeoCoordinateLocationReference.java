@@ -60,7 +60,7 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
         int totalBytesRead = sizeOfAbsVal;
 
         int lon = decode_absolute(buff);
-        int lat = decode_absolute(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        int lat = decode_absolute(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
         totalBytesRead += sizeOfAbsVal;
 
         coordinate = OpenLocationReference.fromAbsoluteCoordinates(lat, lon);

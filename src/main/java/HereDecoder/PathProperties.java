@@ -13,10 +13,10 @@ public class PathProperties {
     // against driving dir
     public boolean add;
 
-    public String lfrcnpStr;
+    public String lfrcnpStr = "FRC" + lfrcnp + 1;
 
     public String getLfrcnpStr() {
-        return "FRC" + lfrcnp + 1;
+        return lfrcnpStr;
     }
 
     public int decode(byte[] buf) {
@@ -29,12 +29,12 @@ public class PathProperties {
 
         //Byte 1 and 2
         IntUnLoMb distanceNextPoint = new IntUnLoMb();
-        numberBytesRead += distanceNextPoint.decode(Arrays.copyOfRange(buf, numberBytesRead - 1, buf.length - 1));
+        numberBytesRead += distanceNextPoint.decode(Arrays.copyOfRange(buf, numberBytesRead, buf.length));
         dnp = distanceNextPoint.getValue();
 
         //Byte 3
         FixedBitArray selector = new FixedBitArray();
-        numberBytesRead += selector.decode(Arrays.copyOfRange(buf, numberBytesRead - 1, buf.length - 1));
+        numberBytesRead += selector.decode(Arrays.copyOfRange(buf, numberBytesRead, buf.length));
 
         byte bitAgainstDrivingDirection = 0x01;
         if ((selector.getValue() & bitAgainstDrivingDirection) == bitAgainstDrivingDirection) {

@@ -39,16 +39,16 @@ public class IntermediateReferencePoint {
 
         lon = LinearLocationReference.decode_relative(buff);
         totalBytesRead += sizeOfRelVal;
-        lat = LinearLocationReference.decode_relative(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        lat = LinearLocationReference.decode_relative(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
         totalBytesRead += sizeOfRelVal;
 
         coordinate = OpenLocationReference.fronRelativeCoordinates(lat, lon, prev);
 
         FixedBitArray selector = new FixedBitArray();
-        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         OlrComponentHeader linePropertiesHeader = new OlrComponentHeader();
-        totalBytesRead += linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        totalBytesRead += linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         isValid = linePropertiesHeader.isValid();
 
@@ -57,10 +57,10 @@ public class IntermediateReferencePoint {
 
         if (isValid) {
             lineProperties = new LineProperties();
-            totalBytesRead *= linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead *= linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
             OlrComponentHeader pathPropertiesHeader = new OlrComponentHeader();
-            totalBytesRead += pathPropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += pathPropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
             isValid = pathPropertiesHeader.isValid();
 
@@ -68,7 +68,7 @@ public class IntermediateReferencePoint {
                 isValid = false;
 
             pathProperties = new PathProperties();
-            totalBytesRead += pathProperties.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += pathProperties.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         }
 

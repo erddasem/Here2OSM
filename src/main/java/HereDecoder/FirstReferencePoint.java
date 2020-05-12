@@ -54,12 +54,12 @@ public class FirstReferencePoint {
         int totalBytesRead = sizeOfAbsVal;
 
         lon = GeoCoordinateLocationReference.decode_absolute(buff);
-        lat = GeoCoordinateLocationReference.decode_absolute(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        lat = GeoCoordinateLocationReference.decode_absolute(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
         totalBytesRead += sizeOfAbsVal;
 
         coordinate = OpenLocationReference.fromAbsoluteCoordinates(lat, lon);
 
-        byte[] selectorBytes = Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1);
+        byte[] selectorBytes = Arrays.copyOfRange(buff, totalBytesRead, buff.length);
         if (selectorBytes[0] != 0x00) {
             //Current do not support
             isValid = false;
@@ -69,7 +69,7 @@ public class FirstReferencePoint {
         totalBytesRead++;
 
         OlrComponentHeader linePropertiesHeader = new OlrComponentHeader();
-        totalBytesRead += linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        totalBytesRead += linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         isValid = linePropertiesHeader.isValid();
         if (linePropertiesHeader.getGcId() != 0x09) {
@@ -78,10 +78,10 @@ public class FirstReferencePoint {
 
         if (isValid) {
             lineProperties = new LineProperties();
-            totalBytesRead += lineProperties.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += lineProperties.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
             OlrComponentHeader pathPropertiesHeader = new OlrComponentHeader();
-            totalBytesRead += pathPropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += pathPropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
             isValid = pathPropertiesHeader.isValid();
             if (pathPropertiesHeader.getGcId() != 0x0a) {
@@ -89,7 +89,7 @@ public class FirstReferencePoint {
             }
 
             pathProperties = new PathProperties();
-            totalBytesRead += pathProperties.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += pathProperties.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
         }
         return totalBytesRead;
     }

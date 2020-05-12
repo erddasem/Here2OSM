@@ -15,11 +15,11 @@ public class IntUnLoMb {
 
         if (unsignedValue < 1 << 7)
             size = 1; // 7 bits available
-        if (unsignedValue < 1 << 14)
+        else if (unsignedValue < 1 << 14)
             size = 2; // 14 bits available;
-        if (unsignedValue < 1 << 21)
+        else if (unsignedValue < 1 << 21)
             size = 3; // 21 bits available;
-        if (unsignedValue < 1 << 28)
+        else if (unsignedValue < 1 << 28)
             size = 4; // 28 bits available;
         else
             size = 5;

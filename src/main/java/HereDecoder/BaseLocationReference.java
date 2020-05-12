@@ -58,11 +58,11 @@ public class BaseLocationReference {
         int take = olrHeader.getTotalLength();
 
         ComponentHeader locationTypeHeader = new ComponentHeader();
-        locationTypeHeader.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
+        locationTypeHeader.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
 
         if (locationTypeHeader.getGcId() == 0x08) {
             OpenLocationReference olr = new OpenLocationReference();
-            int bytesReadFrom = olr.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, take - 1));
+            int bytesReadFrom = olr.decode(Arrays.copyOfRange(bytes, totalBytesRead, take));
             totalBytesRead += olr.getBytesRead();
 
             if (olr.isValid()) {

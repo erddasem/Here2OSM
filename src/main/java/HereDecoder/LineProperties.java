@@ -8,12 +8,12 @@ public class LineProperties {
     public int frc;
     public TpegEnums.FormOfWay fow;
     public float bearing;
-    public String frcStr;
+    public String frcStr = "FRC" + frc + 1;
     public int bearingLeft;
     public int bearingRight;
 
     public String getFrcStr() {
-        return "FRC" + frc + 1;
+        return frcStr;
     }
 
     public int decode(byte[] buf) {
@@ -43,7 +43,7 @@ public class LineProperties {
 
         //Byte 3
         FixedBitArray selector = new FixedBitArray();
-        numberBytesRead += selector.decode(Arrays.copyOfRange(buf, numberBytesRead - 1, buf.length - 1));
+        numberBytesRead += selector.decode(Arrays.copyOfRange(buf, numberBytesRead, buf.length));
 
         return numberBytesRead;
     }

@@ -18,16 +18,16 @@ public class LastReferencePoint {
 
         lon = LinearLocationReference.decode_relative(buff);
         totalBytesRead += sizeOfRealVal;
-        lat = LinearLocationReference.decode_relative(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        lat = LinearLocationReference.decode_relative(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
         totalBytesRead += sizeOfRealVal;
 
         coordinate = OpenLocationReference.fronRelativeCoordinates(lat, lon, prev);
 
         FixedBitArray selector = new FixedBitArray();
-        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         OlrComponentHeader linePropertiesHeader = new OlrComponentHeader();
-        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         isValid = linePropertiesHeader.isValid();
 
@@ -36,7 +36,7 @@ public class LastReferencePoint {
 
         if (isValid) {
             LineProperties lineproperties = new LineProperties();
-            totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+            totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
             lineProperties = lineproperties;
         }
 

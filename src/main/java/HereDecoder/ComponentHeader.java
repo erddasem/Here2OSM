@@ -9,19 +9,21 @@ public class ComponentHeader {
     private int lengthCompCH;
     private int lengthAttrCH;
     private boolean isValid;
-    private int totalLength;
-    private int bytesToRead;
+    private int totalLength = lengthCompCH + lengthAttrCH - 1;
+    ;
+    private int bytesToRead = lengthCompCH + lengthAttrCH + 2;
+    ;
 
     public static byte[] encode(int gcId, int lengthCompValue, int lengthAttrValue) {
         return new byte[]{(byte) gcId, (byte) lengthCompValue, (byte) lengthAttrValue};
     }
 
     public int getBytesToRead() {
-        return lengthCompCH + lengthAttrCH + 2;
+        return bytesToRead;
     }
 
     public int getTotalLength() {
-        return lengthCompCH + lengthAttrCH - 1;
+        return totalLength;
     }
 
     public boolean getIsValid() {
@@ -70,8 +72,9 @@ public class ComponentHeader {
         totalBytesRead++;
 
         //IntUnLoMb one byte
-        totalBytesRead += lengthComp.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
-        totalBytesRead += lengthAttr.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
+        //TODO: Array KKürzung stimmt nicht, erstes Byte muss weg
+        totalBytesRead += lengthComp.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
+        totalBytesRead += lengthAttr.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
 
         isValid = lengthComp.isValid() && lengthAttr.isValid();
 

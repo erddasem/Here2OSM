@@ -58,8 +58,8 @@ public class OlrComponentHeader {
         totalBytesRead++;
 
         //IntUnLoMB one byte
-        totalBytesRead += lengthcomp.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
-        totalBytesRead += lengthcomp.decode(Arrays.copyOfRange(bytes, totalBytesRead - 1, bytes.length - 1));
+        totalBytesRead += lengthcomp.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
+        totalBytesRead += lengthattr.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
 
         isValid = lengthcomp.isValid() && lengthattr.isValid();
 

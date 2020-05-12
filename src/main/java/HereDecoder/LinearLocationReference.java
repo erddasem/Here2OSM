@@ -193,23 +193,23 @@ public class LinearLocationReference extends BaseLocationReference {
         last = new LastReferencePoint();
         int lastBytesRead = totalBytesRead;
 
-        totalBytesRead += last.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1), currentGeoPoint);
+        totalBytesRead += last.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length), currentGeoPoint);
 
         isValid = first.isValid();
 
         if (isValid) {
-            byte selector = Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1)[0];
+            byte selector = Arrays.copyOfRange(buff, totalBytesRead, buff.length)[0];
             totalBytesRead++;
             final byte bitForIntermediates = 0x40;
             if ((selector & bitForIntermediates) == bitForIntermediates) {
                 IntUnLoMb numIntermediates = new IntUnLoMb();
-                totalBytesRead += numIntermediates.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+                totalBytesRead += numIntermediates.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
                 int num_intermediates = numIntermediates.getValue();
 
                 for (int i = 0; i < num_intermediates; i++) {
                     IntermediateReferencePoint interm = new IntermediateReferencePoint();
-                    totalBytesRead += interm.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1), currentGeoPoint);
+                    totalBytesRead += interm.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length), currentGeoPoint);
                     intermediates.add(interm);
                     currentGeoPoint = interm.coordinate;
                     geopoints.add(currentGeoPoint);
@@ -222,7 +222,7 @@ public class LinearLocationReference extends BaseLocationReference {
                 }
             }
 
-            last.decode(Arrays.copyOfRange(buff, lastBytesRead - 1, buff.length - 1), currentGeoPoint);
+            last.decode(Arrays.copyOfRange(buff, lastBytesRead, buff.length), currentGeoPoint);
 
             geopoints.add(last.coordinate);
             geometry = geopoints;
@@ -230,14 +230,14 @@ public class LinearLocationReference extends BaseLocationReference {
             final byte bitForPositiveOffset = 0x20;
             if ((selector & bitForPositiveOffset) == bitForPositiveOffset) {
                 IntUnLoMb offset = new IntUnLoMb();
-                totalBytesRead += offset.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+                totalBytesRead += offset.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
                 posOf = offset.value;
             }
 
             final byte bitForNegativeOffset = 0x10;
             if ((selector & bitForNegativeOffset) == bitForNegativeOffset) {
                 IntUnLoMb offset = new IntUnLoMb();
-                totalBytesRead += offset.decode(Arrays.copyOfRange(buff, totalBytesRead - 1, buff.length - 1));
+                totalBytesRead += offset.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
                 negOff = offset.value;
             }
         }
