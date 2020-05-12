@@ -70,7 +70,7 @@ public class IntUnLoMb {
         size = min_size;
 
         //Start with MSB
-        value = byteBuffer[0] & 0x7f;
+        value = Byte.toUnsignedInt(byteBuffer[0]) & 0x7f;
 
         // Processing 1---5 input bytes
         for (int i = 0; i < max_size; i++) {
@@ -87,7 +87,7 @@ public class IntUnLoMb {
             value <<= 7;
 
             // add 7 bite to value
-            value = (byteBuffer[i + 1] & 0x7f);
+            value |= (Byte.toUnsignedInt(byteBuffer[i + 1]) & 0x7f);
         }
 
         // If we reach here, we've read 5 bytes

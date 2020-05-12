@@ -31,7 +31,7 @@ public class OpenLocationReference extends BaseLocationReference {
     }
 
     public static double absGeoEq2(int coordBinary) {
-        double coordReal = ((coordBinary - (Math.signum(coordBinary) * 0.5) * 360) / Math.pow(2, 24));
+        double coordReal = (coordBinary - (Math.signum(coordBinary) * 0.5)) * 360 / Math.pow(2, 24);
         return coordReal;
     }
 
@@ -124,9 +124,7 @@ public class OpenLocationReference extends BaseLocationReference {
                 origin = linearlr.getLast().coordinate;
                 isValid = linearlr.isValid();
 
-            }
-
-            if (locationReferenceHeader.getGcId() == OLRType.GeoCoordinate.id) {
+            } else if (locationReferenceHeader.getGcId() == OLRType.GeoCoordinate.id) {
                 GeoCoordinateLocationReference geoCoord = new GeoCoordinateLocationReference();
                 int byteread = geoCoord.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
                 bytesRead += byteread;

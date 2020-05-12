@@ -18,21 +18,21 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
 
     public static int decode_absolute(byte[] buf) {
         // Read first 3 bytes for longitude
-        int upperVal = (buf[0] << 16);
-        int middleVal = (buf[1] << 8);
-        int lowerVal = buf[2];
+        int upperVal = (Byte.toUnsignedInt(buf[0]) << 16);
+        int middleVal = (Byte.toUnsignedInt(buf[1]) << 8);
+        int lowerVal = Byte.toUnsignedInt(buf[2]);
         int absoluteVal = (upperVal | middleVal) | lowerVal;
 
         //if negative bit set
         if ((buf[0] & 0x80) == 0x80) {
             // do tow's complete
-            byte byte0 = (byte) ~(buf[0]);
-            byte byte1 = (byte) ~(buf[1]);
-            byte byte2 = (byte) ~(buf[2]);
+            byte byte0 = (byte) ~(Byte.toUnsignedInt(buf[0]));
+            byte byte1 = (byte) ~(Byte.toUnsignedInt(buf[1]));
+            byte byte2 = (byte) ~(Byte.toUnsignedInt(buf[2]));
 
-            upperVal = (byte0 << 16);
-            middleVal = (byte1 << 8);
-            lowerVal = byte2;
+            upperVal = (Byte.toUnsignedInt(byte0) << 16);
+            middleVal = (Byte.toUnsignedInt(byte1) << 8);
+            lowerVal = (Byte.toUnsignedInt(byte2));
             absoluteVal = (upperVal | middleVal) | lowerVal;
             absoluteVal++;
 
@@ -50,7 +50,6 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
         this.coordinate = coordinate;
     }
 
-    //TODO: Enum Problem lösen
     public OpenLocationReference.OLRType getType() {
         return OpenLocationReference.OLRType.GeoCoordinate;
     }

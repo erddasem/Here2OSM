@@ -27,7 +27,7 @@ public class LastReferencePoint {
         totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         OlrComponentHeader linePropertiesHeader = new OlrComponentHeader();
-        totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
+        totalBytesRead += linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
         isValid = linePropertiesHeader.isValid();
 
@@ -36,7 +36,7 @@ public class LastReferencePoint {
 
         if (isValid) {
             LineProperties lineproperties = new LineProperties();
-            totalBytesRead += selector.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
+            totalBytesRead += lineproperties.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
             lineProperties = lineproperties;
         }
 

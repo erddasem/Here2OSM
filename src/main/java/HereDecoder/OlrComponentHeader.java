@@ -54,7 +54,7 @@ public class OlrComponentHeader {
         int totalBytesRead = 0;
 
         //IntUnTi one byte
-        gcId = bytes[0];
+        gcId = Byte.toUnsignedInt(bytes[0]);
         totalBytesRead++;
 
         //IntUnLoMB one byte

@@ -68,11 +68,11 @@ public class ComponentHeader {
         }
 
         //IntUnTi one byte
-        gcId = bytes[0];
+        gcId = Byte.toUnsignedInt(bytes[0]);
         totalBytesRead++;
 
         //IntUnLoMb one byte
-        //TODO: Array KKürzung stimmt nicht, erstes Byte muss weg
+
         totalBytesRead += lengthComp.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
         totalBytesRead += lengthAttr.decode(Arrays.copyOfRange(bytes, totalBytesRead, bytes.length));
 

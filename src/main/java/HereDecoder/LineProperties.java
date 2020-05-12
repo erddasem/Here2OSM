@@ -20,18 +20,18 @@ public class LineProperties {
         int numberBytesRead = 0;
 
         //Byte 0
-        int functionalRoadClass = buf[0];
+        int functionalRoadClass = Byte.toUnsignedInt(buf[0]);
         numberBytesRead++;
         frc = functionalRoadClass;
 
         //Byte 1
-        int form_of_way = buf[1];
+        int form_of_way = Byte.toUnsignedInt(buf[1]);
         numberBytesRead++;
 
         fow = (TpegEnums.FormOfWay.values()[form_of_way]);
 
         //Byte 2
-        int getBearing = buf[2];
+        int getBearing = Byte.toUnsignedInt(buf[2]);
         numberBytesRead++;
         bearing = (float) ((360.0 / 256) * getBearing);
         /* 360 / 256 == 1 because of integer division

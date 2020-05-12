@@ -66,7 +66,7 @@ public class Geoposition {
 
     @Override
     public String toString() {
-        return latitude + ", " + latitude;
+        return getLatitude() + ", " + getLongitude();
     }
 
 }

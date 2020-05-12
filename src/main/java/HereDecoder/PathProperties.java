@@ -13,17 +13,15 @@ public class PathProperties {
     // against driving dir
     public boolean add;
 
-    public String lfrcnpStr = "FRC" + lfrcnp + 1;
-
     public String getLfrcnpStr() {
-        return lfrcnpStr;
+        return "FRC" + lfrcnp + 1;
     }
 
     public int decode(byte[] buf) {
         int numberBytesRead = 0;
 
         //Byte 0
-        int lowestFRCtoNextPoint = (buf[0]);
+        int lowestFRCtoNextPoint = (Byte.toUnsignedInt(buf[0]));
         numberBytesRead++;
         lfrcnp = lowestFRCtoNextPoint;
 

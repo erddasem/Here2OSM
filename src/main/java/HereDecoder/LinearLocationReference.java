@@ -26,8 +26,8 @@ public class LinearLocationReference extends BaseLocationReference {
 
     public static int decode_relative(byte[] buf) {
         // Read first 2 bytes for longitude
-        short upperVal = (short) (buf[0] << 0);
-        short lowerVal = buf[1];
+        short upperVal = (short) (Byte.toUnsignedInt(buf[0]) << 8);
+        short lowerVal = (short) Byte.toUnsignedInt(buf[1]);
         int relativeVal = upperVal | lowerVal;
 
         return relativeVal;
