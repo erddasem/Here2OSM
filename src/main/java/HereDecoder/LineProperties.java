@@ -7,6 +7,7 @@ public class LineProperties {
     //functional road class
     public int frc;
     public TpegEnums.FormOfWay fow;
+    public int fow_id;
     public float bearing;
     public String frcStr = "FRC" + frc + 1;
     public int bearingLeft;
@@ -14,6 +15,14 @@ public class LineProperties {
 
     public String getFrcStr() {
         return frcStr;
+    }
+
+    public int getFOW_id() {
+        return fow_id;
+    }
+
+    public int getFrc() {
+        return frc;
     }
 
     public int decode(byte[] buf) {
@@ -26,6 +35,7 @@ public class LineProperties {
 
         //Byte 1
         int form_of_way = Byte.toUnsignedInt(buf[1]);
+        fow_id = form_of_way;
         numberBytesRead++;
 
         fow = (TpegEnums.FormOfWay.values()[form_of_way]);

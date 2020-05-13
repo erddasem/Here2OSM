@@ -31,10 +31,13 @@ public class OpenLRDecoder_h2o {
 
     /**
      * Decodes byte array and outputs edges of the own routing network affected by the incident.
+     *
      * @param byteArray Byte Array containing location references
      * @throws Exception Byte Array not valid
      */
-    public Location decode(ByteArray byteArray) throws Exception {
+
+    //TODO: Variable welcher OpenLR Code, dann Entscheidung welcher DecoderHere verwendet wird
+    public Location decodeTomTom(ByteArray byteArray) throws Exception {
         // Byte array to location reference
         LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
@@ -45,8 +48,8 @@ public class OpenLRDecoder_h2o {
         // Initialize database
         MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
 
-        // Decoder parameter
-        FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File("src/main/java/OpenLR-Decoder-Properties.xml"));
+        // DecoderHere parameter
+        FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File("src/main/java/OpenLR-DecoderHere-Properties.xml"));
         OpenLRDecoderParameter params = new OpenLRDecoderParameter.Builder().with(mapDatabase).with(decoderConfig).buildParameter();
 
         //Initialize the decoder
@@ -54,6 +57,6 @@ public class OpenLRDecoder_h2o {
 
         //decode the location on own database
         return decoder.decodeRaw(params, rawLocationReference);
-
     }
+
 }

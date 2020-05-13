@@ -89,6 +89,7 @@ public class ApiRequest {
     private String sendRequest(String bboxString) throws IOException {
 
         URL request = setUrl(bboxString);
+        System.out.println(bboxString);
         HttpURLConnection con = (HttpURLConnection) request.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/xml");
@@ -197,18 +198,18 @@ public class ApiRequest {
                     (bbox.getUpperLeftLon() + (bbox.getWidth() / 2)), bbox.getUpperLeftLat(), bbox.getBottomRightLon()));
         } else {
 
-            //Gets Here Api request answer
+            /*//Gets Here Api request answer
             String requestAnswer;
             try {
                 requestAnswer = sendRequest(bbox.getBboxRequestString());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
+            parser.parseXMLFromApi(answer);
+            //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
