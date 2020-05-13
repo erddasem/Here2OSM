@@ -198,13 +198,13 @@ public class ApiRequest {
                     (bbox.getUpperLeftLon() + (bbox.getWidth() / 2)), bbox.getUpperLeftLat(), bbox.getBottomRightLon()));
         } else {
 
-            /*//Gets Here Api request answer
+            //Gets Here Api request answer
             String requestAnswer;
             try {
                 requestAnswer = sendRequest(bbox.getBboxRequestString());
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
@@ -368,8 +368,8 @@ public class ApiRequest {
         ctx.execute("CREATE OR REPLACE VIEW openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
                 "i.roadclosure , i.start_date , i.end_date , i.shortdesc , i.longdesc ," +
                 "k.geom from openlr.kanten_incidents ki " +
-                "join openlr.incidents i on (i.incident_id = ki.incident_id)" +
-                "join openlr.kanten k on (k.line_id = ki.line_id);");
+                "join openlr.incidents i on (ki.incident_id = i.incident_id)" +
+                "join openlr.kanten k on (ki.line_id = k.line_id);");
 
 
         System.out.println("Program ended.");
