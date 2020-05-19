@@ -82,22 +82,18 @@ public class DataCollector {
             //ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
             //Location location = decoder.decodeTomTom(byteArray);
 
-            try {
-                Location location = decoderHere.decodeHere(openLRCode);
-                // Gets positive and negative offset
-                /*int posOff = location.getPositiveOffset();
-                int negOff = location.getNegativeOffset();
 
-                // Create incident and add to list
-                incident2list(incidentId, type, status, start, end, criticality, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
+            Location location = decoderHere.decodeHere(openLRCode);
 
-                // Extract affected lines from location and add to list
-                getAffectedLines(location, incidentId, posOff, negOff);*/
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // Gets positive and negative offset
+            int posOff = location.getPositiveOffset();
+            int negOff = location.getNegativeOffset();
 
+            // Create incident and add to list
+            incident2list(incidentId, type, status, start, end, criticality, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
 
+            // Extract affected lines from location and add to list
+            getAffectedLines(location, incidentId, posOff, negOff);
         }
     }
 

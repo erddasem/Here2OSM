@@ -208,8 +208,8 @@ public class ApiRequest {
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            parser.parseXMLFromApi(answer);
-            //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestHere.xml");
+            //parser.parseXMLFromApi(answer);
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestHere.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
@@ -248,6 +248,7 @@ public class ApiRequest {
         Name temp_kanten_incidents = DSL.name("openlr", "temp_kanten_incidents");
         Name incidents = DSL.name("openlr", "incidents");
         Name kanten_incidents = DSL.name("openlr", "kanten_incidents");
+        Name affected = DSL.name("openlr", "affected");
 
         // Checks if incidents table already exists
         String incidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
@@ -364,8 +365,16 @@ public class ApiRequest {
 
         }); // End second transaction
 
+        // Checks if affected table already exists
+        String affectedExists = String.valueOf(ctx.select(to_regclass("openlr", "affected"))
+                .fetchOne().value1());
+
+        if (affectedExists.equals("openlr.affected")) {
+            ctx.dropTable(table(affected)).cascade().execute();
+        }
+
         // Create QGIS view containing affected lines
-        ctx.execute("CREATE OR REPLACE VIEW openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
+        ctx.execute("CREATE TABLE openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
                 "i.roadclosure , i.start_date , i.end_date , i.shortdesc , i.longdesc ," +
                 "k.geom from openlr.kanten_incidents ki " +
                 "join openlr.incidents i on (ki.incident_id = i.incident_id)" +

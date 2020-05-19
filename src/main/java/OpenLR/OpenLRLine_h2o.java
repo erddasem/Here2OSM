@@ -9,6 +9,7 @@ import org.jooq.impl.DSL;
 import javax.sql.DataSource;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -42,7 +43,9 @@ public class OpenLRLine_h2o implements Line {
 
     static {
         try {
-            ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+            Connection con = DatasourceConfig.getConnection();
+            ctx = DSL.using(con, SQLDialect.POSTGRES);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

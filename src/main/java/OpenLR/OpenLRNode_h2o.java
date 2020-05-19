@@ -5,6 +5,7 @@ import openlr.map.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,9 @@ public class OpenLRNode_h2o implements Node {
 
     static {
         try {
-            ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+            Connection con = DatasourceConfig.getConnection();
+            ctx = DSL.using(con, SQLDialect.POSTGRES);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

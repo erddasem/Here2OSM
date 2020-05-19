@@ -24,7 +24,7 @@
 <!-- email: software@openlr.org -->
 <ml:OpenLRDecoderProperties xmlns:ml="http://www.example.org/OpenLRpropertiesProperties/"
                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                            xsi:schemaLocation="http://www.example.org/OpenLRpropertiesProperties/ properties/OpenLRDecoderProperties.xsd ">
+                            xsi:schemaLocation="http://www.example.org/OpenLRpropertiesProperties/properties/OpenLRDecoderProperties.xsd ">
     <BearingDistance>20</BearingDistance>
     <MaxNodeDistance>100</MaxNodeDistance>
     <NodeFactor>3</NodeFactor>

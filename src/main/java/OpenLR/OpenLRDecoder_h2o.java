@@ -56,7 +56,11 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        return decoder.decodeRaw(params, rawLocationReference);
+        Location location = decoder.decodeRaw(params, rawLocationReference);
+
+        ((OpenLRMapDatabase_h2o) mapDatabase).close();
+
+        return location;
     }
 
 }
