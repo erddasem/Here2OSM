@@ -53,6 +53,7 @@ public class Program {
         for (String olrString : olrStrings) {
             OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(olrString);
             outputOlrData(olr);
+            lineLocRefHere(olr);
         }
     }
 
@@ -130,20 +131,24 @@ public class Program {
                         seqNr++;
                         lrps.add(firstRP);
 
-                        for (IntermediateReferencePoint intermediateRP : lr.intermediates) {
+                        boolean empty = (lr.intermediates == null);
+                        if (!empty) {
+                            for (IntermediateReferencePoint intermediateRP : lr.intermediates) {
 
-                            LocationReferencePointBinaryImpl intermediateLRP = new LocationReferencePointBinaryImpl(
-                                    seqNr,
-                                    getFRCEnumOpenLR(intermediateRP.getLineProperties().frc),
-                                    getFOWEnumOpenLR(intermediateRP.getLineProperties().fow_id),
-                                    intermediateRP.coordinate.getLongitude(),
-                                    intermediateRP.coordinate.getLatitude(),
-                                    intermediateRP.lineProperties.bearing,
-                                    intermediateRP.pathProperties.dnp,
-                                    getFRCEnumOpenLR(intermediateRP.getPathProperties().lfrcnp),
-                                    false);
-                            seqNr++;
+                                LocationReferencePointBinaryImpl intermediateLRP = new LocationReferencePointBinaryImpl(
+                                        seqNr,
+                                        getFRCEnumOpenLR(intermediateRP.getLineProperties().frc),
+                                        getFOWEnumOpenLR(intermediateRP.getLineProperties().fow_id),
+                                        intermediateRP.coordinate.getLongitude(),
+                                        intermediateRP.coordinate.getLatitude(),
+                                        intermediateRP.lineProperties.bearing,
+                                        intermediateRP.pathProperties.dnp,
+                                        getFRCEnumOpenLR(intermediateRP.getPathProperties().lfrcnp),
+                                        false);
+                                seqNr++;
+                            }
                         }
+
 
                         LocationReferencePointBinaryImpl lastPoint = new LocationReferencePointBinaryImpl(
                                 seqNr,
@@ -157,7 +162,8 @@ public class Program {
                                 true);
                         lrps.add(lastPoint);
                         Offsets offsets = new OffsetsBinaryImpl(lr.getPosOf(), lr.getNegOff());
-                        return new RawLineLocRef("1", lrps, offsets);
+                        RawLineLocRef rawLine = new RawLineLocRef("1", lrps, offsets);
+                        return rawLine;
                     default:
                         System.out.println("Unsupported OpenLR Type");
                         break;
@@ -173,7 +179,7 @@ public class Program {
     }
 
     private List<String> getTestCodeStrings() {
-        List<String> validBase64OlrStrings = Arrays.asList("CCkBEAAlJAnGriRNtAAJBQQBAgcACgUEAYRVAP+hAhEACQUEAQKAADAAAA=="
+        List<String> validBase64OlrStrings = Arrays.asList("CCgBEAAkIwnJWyRCaAAJBQQDAwYACgQDAz8AAA4AOAAJBQQDA4cAMAAA"
 //                "CCkBEAAlJAbn0SU9BgAJBQQDA7UACgUEA4ETAP8z/9cACQUEAwMxADBVAA==",
 //                "CCgBEAAkIwepwCVIMwAJBQQEAv8ACgQDBBoA//8AFwAJBQQEAn8AMAAA",
 //                "CCgBEAAkIwerNyVMfAAJBQQEA98ACgQDBFEA/6sAMwAJBQQEA2EAMAAA",

@@ -50,8 +50,8 @@
         <MaxScore>100</MaxScore>
         <MaxBearingDiff>45</MaxBearingDiff>
     </Bearing_Rating>
-    <FRC_Variance>0</FRC_Variance>
-    <MinimumAcceptedRating>700</MinimumAcceptedRating>
+    <FRC_Variance>2</FRC_Variance>
+    <MinimumAcceptedRating>500</MinimumAcceptedRating>
     <MaxNumberRetries>3</MaxNumberRetries>
     <SameLineDegradation>0.10</SameLineDegradation>
     <ConnectedRouteIncrease>0.10</ConnectedRouteIncrease>

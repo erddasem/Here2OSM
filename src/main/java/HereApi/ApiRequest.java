@@ -89,7 +89,7 @@ public class ApiRequest {
     private String sendRequest(String bboxString) throws IOException {
 
         URL request = setUrl(bboxString);
-        System.out.println(bboxString);
+        System.out.println(request);
         HttpURLConnection con = (HttpURLConnection) request.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/xml");
@@ -209,7 +209,7 @@ public class ApiRequest {
             // Parse answer or file
             XMLParser parser = new XMLParser();
             parser.parseXMLFromApi(answer);
-            //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
+            //parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestHere.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();

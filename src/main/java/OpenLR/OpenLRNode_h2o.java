@@ -8,6 +8,7 @@ import org.jooq.impl.DSL;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 
@@ -34,6 +35,21 @@ public class OpenLRNode_h2o implements Node {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OpenLRNode_h2o that = (OpenLRNode_h2o) o;
+        return node_id == that.node_id &&
+                Double.compare(that.lat, lat) == 0 &&
+                Double.compare(that.lon, lon) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node_id, lat, lon);
+    }
+
+    @Override
     public double getLatitudeDeg() {
 
         return lat;
@@ -49,7 +65,7 @@ public class OpenLRNode_h2o implements Node {
     public GeoCoordinates getGeoCoordinates() {
         GeoCoordinates coordinates = null;
         try {
-            coordinates = new GeoCoordinatesImpl(lat, lon);
+            coordinates = new GeoCoordinatesImpl(lon, lat);
         } catch (InvalidMapDataException e) {
             e.printStackTrace();
         }

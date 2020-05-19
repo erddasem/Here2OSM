@@ -49,7 +49,7 @@ public class OpenLRDecoder_h2o {
         MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
 
         // DecoderHere parameter
-        FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File("src/main/java/OpenLR-DecoderHere-Properties.xml"));
+        FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File("src/main/resources/OpenLR-DecoderHere-Properties.xml"));
         OpenLRDecoderParameter params = new OpenLRDecoderParameter.Builder().with(mapDatabase).with(decoderConfig).buildParameter();
 
         //Initialize the decoder

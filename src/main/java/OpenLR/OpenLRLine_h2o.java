@@ -112,11 +112,13 @@ public class OpenLRLine_h2o implements Line {
 
         GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
+            //longitude
             Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
 
+            //latitude
             Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong, length_meter))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
