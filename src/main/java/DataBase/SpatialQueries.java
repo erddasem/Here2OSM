@@ -86,12 +86,11 @@ public class SpatialQueries {
      * Note: "geom" refers to the geometry of the line for which the query is being asked.
      * It is assumed that the geometry column in the data base is labeled "geom".
      *
-     * @param dist   Distance between starting point and point in meters as integer value
-     * @param length Length of the line in meters as integer value
+     * @param dist Distance between starting point and point in meters as integer value
      * @return Field for JOOQ select statement
      */
-    public static Field<?> st_LineInterpolatePointX(int dist, int length) {
-        return DSL.field("ST_X(ST_LineInterpolatePoint(geom, {0}))", fraction(dist, length));
+    public static Field<?> st_LineInterpolatePointX(int dist) {
+        return DSL.field("ST_X(ST_LineInterpolatePoint(geom, {0}/ST_Length(geom::geography)))", dist);
     }
 
     /**
@@ -101,10 +100,9 @@ public class SpatialQueries {
      * It is assumed that the geometry column in the data base is labeled "geom".
      *
      * @param dist   Distance between starting point and point in meters as integer value
-     * @param length Length of the line in meters as integer value
      * @return Field for JOOQ select statement
      */
-    public static Field<?> st_LineInterpolatePointY(int dist, int length) {
-        return DSL.field("ST_Y(ST_LineInterpolatePoint(geom, {0}))", fraction(dist, length));
+    public static Field<?> st_LineInterpolatePointY(int dist) {
+        return DSL.field("ST_Y(ST_LineInterpolatePoint(geom, {0}/ST_Length(geom::geography)))", dist);
     }
 }

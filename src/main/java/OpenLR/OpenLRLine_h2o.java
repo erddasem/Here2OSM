@@ -90,12 +90,12 @@ public class OpenLRLine_h2o implements Line {
 
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
-            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
+            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
 
-            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong, length_meter))
+            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
@@ -113,16 +113,17 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
 
+        // TODO: Query überprüfen
         GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
             //longitude
-            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong, length_meter))
+            Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
 
             //latitude
-            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong, length_meter))
+            Record1<?> yCoord = ctx.select(SpatialQueries.st_LineInterpolatePointY(distanceAlong))
                     .from(KANTEN)
                     .where(KANTEN.LINE_ID.eq(line_id))
                     .fetchOne();
@@ -238,5 +239,23 @@ public class OpenLRLine_h2o implements Line {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OpenLRLine_h2o that = (OpenLRLine_h2o) o;
+        return line_id == that.line_id &&
+                start_node == that.start_node &&
+                end_node == that.end_node &&
+                frc == that.frc &&
+                fow == that.fow &&
+                length_meter == that.length_meter &&
+                oneway == that.oneway &&
+                Objects.equals(name, that.name);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(line_id, start_node, end_node, frc, fow, length_meter, name, oneway);
+    }
 }
