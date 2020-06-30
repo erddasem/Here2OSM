@@ -3,6 +3,7 @@ package HereApi;
 import DataBase.DatasourceConfig;
 import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
+import org.apache.commons.lang.time.StopWatch;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
@@ -242,6 +243,10 @@ public class ApiRequest {
      */
     public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
+        //Start StopWatch
+        StopWatch watch = new StopWatch();
+        watch.start();
+
         // Get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
 
@@ -369,6 +374,8 @@ public class ApiRequest {
                     .foreignKey("incident_id").references(incidents)).execute();
 
         }); // End second transaction
+        watch.stop();
+
 
         // Checks if affected table already exists
         String affectedExists = String.valueOf(ctx.select(to_regclass("openlr", "affected"))
@@ -387,6 +394,7 @@ public class ApiRequest {
 
 
         System.out.println("Program ended.");
+        System.out.println("Time Elapsed: " + watch.getTime());
     }
 
 }
