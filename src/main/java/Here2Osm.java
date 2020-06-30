@@ -12,6 +12,5 @@ public class Here2Osm {
         } catch (InvalidBboxException | InvalidWGS84CoordinateException e) {
             e.printStackTrace();
         }
-
     }
 }

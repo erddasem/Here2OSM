@@ -3,6 +3,7 @@ package HereApi;
 import DataBase.DatasourceConfig;
 import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
+import org.apache.commons.lang.time.StopWatch;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
@@ -89,6 +90,7 @@ public class ApiRequest {
     private String sendRequest(String bboxString) throws IOException {
 
         URL request = setUrl(bboxString);
+        System.out.println(request);
         HttpURLConnection con = (HttpURLConnection) request.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/xml");
@@ -156,7 +158,11 @@ public class ApiRequest {
         System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
                 "\nExample: 51.057,13.744;51.053,13.751 ");
-        String bboxString = scanner.next();
+        //String bboxString = scanner.next();
+        //Dresden
+        String bboxString = "51.1809,13.5766;50.9766,13.9812";
+        //String bboxString = "51.06413,13.74957;51.06192,13.75795";
+
 
         //get coordinates as double values
         Pattern pattern = Pattern.compile("[,;]");
@@ -171,7 +177,8 @@ public class ApiRequest {
     }
 
     /**
-     * Checks the bounding box. For the Api Request, the boundin box must be less than 2 degrees.
+     * Checks the bounding box. For the Api Request, the request boundin box is limited to a
+     * maximum of 2 degrees (https://developer.here.com/documentation/traffic/dev_guide/topics/limitations.html).
      * If the specified bounding box is too large, it is broken down into sufficiently small boxes.
      * For each bounding box an API request is made, the XML file is parsed, the OpenLR code is decoded
      * and the incident information and the affected lines are collected.
@@ -207,8 +214,8 @@ public class ApiRequest {
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestXml.xml");
+            parser.parseXMLFromApi(answer);
+            //parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden_XML.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
@@ -236,6 +243,10 @@ public class ApiRequest {
      */
     public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
+        //Start StopWatch
+        StopWatch watch = new StopWatch();
+        watch.start();
+
         // Get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
 
@@ -247,6 +258,7 @@ public class ApiRequest {
         Name temp_kanten_incidents = DSL.name("openlr", "temp_kanten_incidents");
         Name incidents = DSL.name("openlr", "incidents");
         Name kanten_incidents = DSL.name("openlr", "kanten_incidents");
+        Name affected = DSL.name("openlr", "affected");
 
         // Checks if incidents table already exists
         String incidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
@@ -362,16 +374,27 @@ public class ApiRequest {
                     .foreignKey("incident_id").references(incidents)).execute();
 
         }); // End second transaction
+        watch.stop();
+
+
+        // Checks if affected table already exists
+        String affectedExists = String.valueOf(ctx.select(to_regclass("openlr", "affected"))
+                .fetchOne().value1());
+
+        if (affectedExists.equals("openlr.affected")) {
+            ctx.dropTable(table(affected)).cascade().execute();
+        }
 
         // Create QGIS view containing affected lines
-        ctx.execute("CREATE OR REPLACE VIEW openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
+        ctx.execute("CREATE TABLE openlr.affected AS select k.line_id , k.name, i.incident_id , i.incident_type , i.criticality ," +
                 "i.roadclosure , i.start_date , i.end_date , i.shortdesc , i.longdesc ," +
                 "k.geom from openlr.kanten_incidents ki " +
-                "join openlr.incidents i on (i.incident_id = ki.incident_id)" +
-                "join openlr.kanten k on (k.line_id = ki.line_id);");
+                "join openlr.incidents i on (ki.incident_id = i.incident_id)" +
+                "join openlr.kanten k on (ki.line_id = k.line_id);");
 
 
         System.out.println("Program ended.");
+        System.out.println("Time Elapsed: " + watch.getTime());
     }
 
 }

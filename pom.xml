@@ -116,6 +116,13 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- StopWatch -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -176,7 +183,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/test_carola</url>
+                        <url>jdbc:postgresql://localhost/dresden</url>
                         <user>emilykast</user>
                         <password></password>
                     </jdbc>

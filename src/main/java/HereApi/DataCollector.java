@@ -1,5 +1,6 @@
 package HereApi;
 
+import HereDecoder.DecoderHere;
 import OpenLR.OpenLRDecoder_h2o;
 import openlr.binary.ByteArray;
 import openlr.location.Location;
@@ -12,7 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+
+import static HereDecoder.DecoderHere.*;
 
 public class DataCollector {
 
@@ -59,6 +61,7 @@ public class DataCollector {
      */
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
+        DecoderHere decoderHere = new DecoderHere();
 
         for (TrafficItem trafficItemObject : trafficItemList) {
 
@@ -76,8 +79,11 @@ public class DataCollector {
             boolean roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
             // Decodes OpenLR Base64 Code and extracts location
-            ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
-            Location location = decoder.decode(byteArray);
+            //ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
+            //Location location = decoder.decodeTomTom(byteArray);
+
+
+            Location location = decoderHere.decodeHere(openLRCode);
 
             // Gets positive and negative offset
             int posOff = location.getPositiveOffset();

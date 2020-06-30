@@ -4,11 +4,13 @@ import DataBase.DatasourceConfig;
 import DataBase.SpatialQueries;
 import openlr.map.Line;
 import openlr.map.Node;
+import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.awt.geom.Rectangle2D;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -17,13 +19,16 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
-public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
+public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoCloseable {
 
-    DSLContext ctx;
+    private final DSLContext ctx;
+    private final Connection con;
 
     public OpenLRMapDatabase_h2o() throws SQLException {
-        this.ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);
+        con = DatasourceConfig.getConnection();
+        ctx = DSL.using(con, SQLDialect.POSTGRES);
     }
+
 
     @Override
     public boolean hasTurnRestrictions() {
@@ -121,5 +126,11 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase {
     public int getNumberOfLines() {
 
         return ctx.selectCount().from(KANTEN).fetchOne().value1();
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (ctx != null) ctx.close();
+        if (con != null) con.close();
     }
 }
