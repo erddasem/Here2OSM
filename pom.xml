@@ -176,7 +176,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/dresden</url>
+                        <url>jdbc:postgresql://localhost/bautzner</url>
                         <user>emilykast</user>
                         <password></password>
                     </jdbc>

@@ -218,7 +218,7 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Path2D.Double getShape() {
 
-        // TODO: Is optional and is not implemented
+        // TODO: Is optional and not implemented
 
         return null;
     }
@@ -226,7 +226,7 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public List<GeoCoordinates> getShapeCoordinates() {
 
-        // TODO: Is optional and is not implemented
+        // TODO: Is optional and not implemented
 
         return null;
     }
@@ -234,7 +234,7 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Map<Locale, List<String>> getNames() {
 
-        //TODO: Is optional and is not implemented
+        //TODO: Is optional and not implemented
 
         return null;
     }

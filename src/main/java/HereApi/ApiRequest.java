@@ -157,7 +157,11 @@ public class ApiRequest {
         System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
                 "\nExample: 51.057,13.744;51.053,13.751 ");
-        String bboxString = scanner.next();
+        //String bboxString = scanner.next();
+        //Dresden
+        //String bboxString = "51.1809,13.5766;50.9766,13.9812";
+        String bboxString = "51.06413,13.74957;51.06192,13.75795";
+
 
         //get coordinates as double values
         Pattern pattern = Pattern.compile("[,;]");
@@ -172,7 +176,8 @@ public class ApiRequest {
     }
 
     /**
-     * Checks the bounding box. For the Api Request, the boundin box must be less than 2 degrees.
+     * Checks the bounding box. For the Api Request, the request boundin box is limited to a
+     * maximum of 2 degrees (https://developer.here.com/documentation/traffic/dev_guide/topics/limitations.html).
      * If the specified bounding box is too large, it is broken down into sufficiently small boxes.
      * For each bounding box an API request is made, the XML file is parsed, the OpenLR code is decoded
      * and the incident information and the affected lines are collected.
@@ -209,7 +214,7 @@ public class ApiRequest {
             // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/CarolaTestHere.xml");
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden_XML.xml");
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
