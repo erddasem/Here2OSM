@@ -12,6 +12,8 @@ import java.awt.geom.Point2D;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
@@ -85,8 +87,6 @@ public class OpenLRLine_h2o implements Line {
 
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
-
-
 
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
@@ -165,33 +165,55 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Iterator<Line> getPrevLines() {
 
-            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
-            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
+        Condition con1 = (KANTEN.END_NODE.eq(start_node));
+        Condition con2 = (KANTEN.START_NODE.eq(start_node).and(KANTEN.ONEWAY.eq(false)));
+        // Only if oneway = false for the requested line
+        Condition con3 = (KANTEN.END_NODE.eq(end_node));
+        Condition con4 = (KANTEN.START_NODE.eq(end_node).and(KANTEN.ONEWAY.eq(false)));
 
-            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+
+        List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(con1.or(con2))
+                .fetchInto(OpenLRLine_h2o.class);
+
+        if (!oneway) {
+            List<Line> lines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                     KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                     .from(KANTEN)
-                    .where(finalCon)
+                    .where(con3.or(con4))
                     .fetchInto(OpenLRLine_h2o.class);
 
-            return prevLines.iterator();
+            prevLines.addAll(lines);
+        }
+        return prevLines.iterator();
     }
 
     @Override
     public Iterator<Line> getNextLines() {
 
-        /*Selects next lines depending on given line id. Next lines can be all lines using the end node of the given
-        line as start node and all lines where oneway = true and the end node is the same.*/
-        // select line_id from kanten where kanten.start_node = end_node or (kanten.start_node = end_node and oneway = false);
-        Condition andCon = (KANTEN.END_NODE.eq(start_node)).and(KANTEN.ONEWAY.eq(false));
-        Condition finalCon = (KANTEN.START_NODE.eq(end_node)).or(andCon);
+        Condition con1 = (KANTEN.START_NODE.eq(end_node));
+        Condition con2 = (KANTEN.END_NODE.eq(end_node).and(KANTEN.ONEWAY.eq(false)));
+        // Only if oneway = false for requested line
+        Condition con3 = (KANTEN.START_NODE.eq(start_node));
+        Condition con4 = (KANTEN.END_NODE.eq(start_node).and(KANTEN.ONEWAY.eq(false)));
 
         List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
-                .where(finalCon)
+                .where(con1.or(con2))
                 .fetchInto(OpenLRLine_h2o.class);
 
+        if (!oneway) {
+            List<Line> lines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                    .from(KANTEN)
+                    .where(con3.or(con4))
+                    .fetchInto(OpenLRLine_h2o.class);
+
+            nextLines.addAll(lines);
+        }
         return nextLines.iterator();
     }
 

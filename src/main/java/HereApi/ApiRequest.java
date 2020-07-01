@@ -158,10 +158,10 @@ public class ApiRequest {
         System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
                 "\nExample: 51.057,13.744;51.053,13.751 ");
-        //String bboxString = scanner.next();
+        String bboxString = scanner.next();
         //Dresden
-        String bboxString = "51.1809,13.5766;50.9766,13.9812";
-        //String bboxString = "51.06413,13.74957;51.06192,13.75795";
+        //String bboxString = "51.1809,13.5766;50.9766,13.9812";
+        //String bboxString = "53.697,10.118;50.730,13.491";
 
 
         //get coordinates as double values
@@ -205,17 +205,17 @@ public class ApiRequest {
         } else {
 
             //Gets Here Api request answer
-            String requestAnswer;
             try {
-                requestAnswer = sendRequest(bbox.getBboxRequestString());
+                sendRequest(bbox.getBboxRequestString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            parser.parseXMLFromApi(answer);
-            //parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden_XML.xml");
+            //parser.parseXMLFromApi(answer);
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/Request_Here_Api_Final.xml");
+
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
