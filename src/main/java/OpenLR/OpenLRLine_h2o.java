@@ -165,7 +165,8 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Iterator<Line> getPrevLines() {
 
-        Condition con1 = (KANTEN.END_NODE.eq(start_node));
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition con1 = (KANTEN.END_NODE.eq(start_node));
         Condition con2 = (KANTEN.START_NODE.eq(start_node).and(KANTEN.ONEWAY.eq(false)));
         // Only if oneway = false for the requested line
         Condition con3 = (KANTEN.END_NODE.eq(end_node));
@@ -186,14 +187,22 @@ public class OpenLRLine_h2o implements Line {
                     .fetchInto(OpenLRLine_h2o.class);
 
             prevLines.addAll(lines);
-        }
+        }*/
+
+        List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.END_NODE.eq(start_node))
+                .fetchInto(OpenLRLine_h2o.class);
+
         return prevLines.iterator();
     }
 
     @Override
     public Iterator<Line> getNextLines() {
 
-        Condition con1 = (KANTEN.START_NODE.eq(end_node));
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition con1 = (KANTEN.START_NODE.eq(end_node));
         Condition con2 = (KANTEN.END_NODE.eq(end_node).and(KANTEN.ONEWAY.eq(false)));
         // Only if oneway = false for requested line
         Condition con3 = (KANTEN.START_NODE.eq(start_node));
@@ -213,7 +222,14 @@ public class OpenLRLine_h2o implements Line {
                     .fetchInto(OpenLRLine_h2o.class);
 
             nextLines.addAll(lines);
-        }
+        }*/
+
+        List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.START_NODE.eq(end_node))
+                .fetchInto(OpenLRLine_h2o.class);
+
         return nextLines.iterator();
     }
 

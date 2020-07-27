@@ -188,7 +188,7 @@ public class ApiRequest {
     private void getRecursiveBbox(@NotNull BoundingBox bbox) {
 
         // Recursive bounding box query
-        if ((bbox.width > 2) || (bbox.height > 2)) {
+        if ((bbox.width > 10) || (bbox.height > 10)) {
 
             // Box upper left
             getRecursiveBbox(new BoundingBox(bbox.getUpperLeftLat(), bbox.getUpperLeftLon(),
@@ -213,8 +213,8 @@ public class ApiRequest {
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/Request_Here_Api_Final.xml");
+            parser.parseXMLFromApi(answer);
+            //parser.parseXMlFromFile("/Users/emilykast/Desktop/DresdenNW_XML.xml");
 
 
             // Collect relevant data per incident and decoding location
