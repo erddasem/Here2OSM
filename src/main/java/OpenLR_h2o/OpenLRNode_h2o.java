@@ -1,4 +1,4 @@
-package OpenLR;
+package OpenLR_h2o;
 
 import DataBase.DatasourceConfig;
 import openlr.map.*;

@@ -1,6 +1,6 @@
 package HereApi;
 
-public class BoundingBox {
+public class BoundingBox extends TrafficItem {
 
     double height;
     double width;

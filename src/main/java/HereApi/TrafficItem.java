@@ -28,6 +28,9 @@ public class TrafficItem {
         this.longDesc = longDesc;
     }
 
+    public TrafficItem() {
+    }
+
     public String getId() {
         return id;
     }

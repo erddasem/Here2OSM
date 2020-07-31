@@ -1,8 +1,7 @@
 package HereApi;
 
 import HereDecoder.DecoderHere;
-import OpenLR.OpenLRDecoder_h2o;
-import openlr.binary.ByteArray;
+import OpenLR_h2o.OpenLRDecoder_h2o;
 import openlr.location.Location;
 import openlr.map.Line;
 import org.jetbrains.annotations.NotNull;
@@ -85,15 +84,22 @@ public class DataCollector {
 
             Location location = decoderHere.decodeHere(openLRCode);
 
-            // Gets positive and negative offset
-            int posOff = location.getPositiveOffset();
-            int negOff = location.getNegativeOffset();
+            int posOff;
+            int negOff;
+            if (location == null) {
+                posOff = -100;
+                negOff = -100;
+            } else {
+                // Gets positive and negative offset
+                posOff = location.getPositiveOffset();
+                negOff = location.getNegativeOffset();
+
+                // Extract affected lines from location and add to list
+                getAffectedLines(location, incidentId, posOff, negOff);
+            }
 
             // Create incident and add to list
             incident2list(incidentId, type, status, start, end, criticality, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
-
-            // Extract affected lines from location and add to list
-            getAffectedLines(location, incidentId, posOff, negOff);
         }
     }
 

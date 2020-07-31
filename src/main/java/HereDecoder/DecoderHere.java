@@ -1,6 +1,8 @@
 package HereDecoder;
 
-import OpenLR.OpenLRMapDatabase_h2o;
+import Exceptions.InvalidHereOLRException;
+import OpenLR_h2o.OpenLRMapDatabase_h2o;
+import com.sun.source.doctree.InheritDocTree;
 import openlr.LocationReferencePoint;
 import openlr.Offsets;
 import openlr.binary.impl.LocationReferencePointBinaryImpl;
@@ -12,13 +14,11 @@ import openlr.map.FormOfWay;
 import openlr.map.FunctionalRoadClass;
 import openlr.map.MapDatabase;
 import openlr.properties.OpenLRPropertiesReader;
-import openlr.properties.OpenLRPropertyException;
 import openlr.rawLocRef.RawLineLocRef;
 import openlr.rawLocRef.RawLocationReference;
 import org.apache.commons.configuration.FileConfiguration;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,46 +50,47 @@ public class DecoderHere {
      * @param olr
      * @return
      */
-    public RawLineLocRef lineLocRefHere(OpenLocationReference olr) {
-        try {
-            if (!olr.isValid()) {
-                System.out.println("Invalid OpenLR Data");
-            } else {
-                switch (olr.getLocationReference().getType().id) {
-                    case OpenLocationReference.OLR_TYPE_LINEAR:
-                        LinearLocationReference lr = (LinearLocationReference) olr.getLocationReference();
-                        int seqNr = 0;
-                        List<LocationReferencePoint> lrps = new ArrayList<>();
-                        // First LRP
-                        LocationReferencePointBinaryImpl firstRP = new LocationReferencePointBinaryImpl(
-                                seqNr,
-                                getFRCEnumOpenLR(lr.first.getLineProperties().frc),
-                                getFOWEnumOpenLR(lr.first.getLineProperties().fow_id),
-                                lr.first.coordinate.getLongitude(),
-                                lr.first.coordinate.getLatitude(),
-                                lr.first.lineProperties.bearing,
-                                lr.first.pathProperties.dnp,
-                                getFRCEnumOpenLR(lr.first.pathProperties.lfrcnp),
-                                false);
-                        seqNr++;
-                        lrps.add(firstRP);
-                        // Intermediate LRPs
-                        boolean empty = (lr.intermediates == null);
-                        if (!empty) {
-                            for (IntermediateReferencePoint intermediateRP : lr.intermediates) {
+    public RawLineLocRef lineLocRefHere(OpenLocationReference olr) throws InvalidHereOLRException {
+        if (!olr.isValid()) {
+            // Exception
+            System.out.println("HERE: Invalid OpenLR Data");
+            throw new InvalidHereOLRException("HERE OLR is invalid!");
+        } else {
+            switch (olr.getLocationReference().getType().id) {
+                case OpenLocationReference.OLR_TYPE_LINEAR:
+                    LinearLocationReference lr = (LinearLocationReference) olr.getLocationReference();
+                    int seqNr = 0;
+                    List<LocationReferencePoint> lrps = new ArrayList<>();
+                    // First LRP
+                    LocationReferencePointBinaryImpl firstRP = new LocationReferencePointBinaryImpl(
+                            seqNr,
+                            getFRCEnumOpenLR(lr.first.getLineProperties().frc),
+                            getFOWEnumOpenLR(lr.first.getLineProperties().fow_id),
+                            lr.first.coordinate.getLongitude(),
+                            lr.first.coordinate.getLatitude(),
+                            lr.first.lineProperties.bearing,
+                            lr.first.pathProperties.dnp,
+                            getFRCEnumOpenLR(lr.first.pathProperties.lfrcnp),
+                            false);
+                    seqNr++;
+                    lrps.add(firstRP);
+                    // Intermediate LRPs
+                    boolean empty = (lr.intermediates == null);
+                    if (!empty) {
+                        for (IntermediateReferencePoint intermediateRP : lr.intermediates) {
 
-                                LocationReferencePointBinaryImpl intermediateLRP = new LocationReferencePointBinaryImpl(
-                                        seqNr,
-                                        getFRCEnumOpenLR(intermediateRP.getLineProperties().frc),
-                                        getFOWEnumOpenLR(intermediateRP.getLineProperties().fow_id),
-                                        intermediateRP.coordinate.getLongitude(),
-                                        intermediateRP.coordinate.getLatitude(),
-                                        intermediateRP.lineProperties.bearing,
-                                        intermediateRP.pathProperties.dnp,
-                                        getFRCEnumOpenLR(intermediateRP.getPathProperties().lfrcnp),
-                                        false);
-                                seqNr++;
-                            }
+                            LocationReferencePointBinaryImpl intermediateLRP = new LocationReferencePointBinaryImpl(
+                                    seqNr,
+                                    getFRCEnumOpenLR(intermediateRP.getLineProperties().frc),
+                                    getFOWEnumOpenLR(intermediateRP.getLineProperties().fow_id),
+                                    intermediateRP.coordinate.getLongitude(),
+                                    intermediateRP.coordinate.getLatitude(),
+                                    intermediateRP.lineProperties.bearing,
+                                    intermediateRP.pathProperties.dnp,
+                                    getFRCEnumOpenLR(intermediateRP.getPathProperties().lfrcnp),
+                                    false);
+                            seqNr++;
+                        }
                         }
                         // Last LRP
                         LocationReferencePointBinaryImpl lastPoint = new LocationReferencePointBinaryImpl(
@@ -111,9 +112,6 @@ public class DecoderHere {
                         break;
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Invalid OpenLR String");
-        }
         return null;
     }
 
@@ -130,7 +128,12 @@ public class DecoderHere {
         OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(openLRCode);
 
         // Creates Raw Line Location Reference from Here Location Reference
-        RawLocationReference rawLocationReference = lineLocRefHere(olr);
+        RawLocationReference rawLocationReference;
+        try {
+            rawLocationReference = lineLocRefHere(olr);
+        } catch (InvalidHereOLRException e) {
+            return null;
+        }
 
         // Initialize database
         MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();

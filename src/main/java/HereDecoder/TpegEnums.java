@@ -158,7 +158,6 @@ public class TpegEnums {
     }
 
     public enum CauseCodeTfp {
-        // TODO: Finish this.
 
     }
 

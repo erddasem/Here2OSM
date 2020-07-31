@@ -1,4 +1,4 @@
-package OpenLR;
+package OpenLR_h2o;
 
 import DataBase.DatasourceConfig;
 import DataBase.SpatialQueries;
@@ -6,14 +6,11 @@ import openlr.map.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
@@ -113,7 +110,6 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
 
-        // TODO: Query überprüfen
         GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
             //longitude
@@ -245,8 +241,6 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public int measureAlongLine(double longitude, double latitude) {
 
-        //select Round(e.length_meter * ST_LineLocatePoint(e.geom,ST_ClosestPoint(e.geom, 'SRID=4326;POINT(13.748489 51.058306)'))) from kanten where line_id = line_id;
-
         return ctx.select(SpatialQueries.distAlongLine(latitude, longitude).cast(Integer.class))
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(line_id))
@@ -279,6 +273,7 @@ public class OpenLRLine_h2o implements Line {
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OpenLRLine_h2o that = (OpenLRLine_h2o) o;

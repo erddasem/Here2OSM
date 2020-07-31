@@ -1,14 +1,12 @@
-package OpenLR;
+package OpenLR_h2o;
 
 import DataBase.DatasourceConfig;
 import DataBase.SpatialQueries;
 import openlr.map.Line;
 import openlr.map.Node;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
 import java.awt.geom.Rectangle2D;
 import java.sql.Connection;
 import java.sql.SQLException;
