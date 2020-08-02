@@ -13,6 +13,11 @@ import java.util.Objects;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 
+/**
+ * Implementation of the OpenLR Node interface.
+ * Represents the nodes in the road topology.
+ */
+
 public class OpenLRNode_h2o implements Node {
 
     long node_id;

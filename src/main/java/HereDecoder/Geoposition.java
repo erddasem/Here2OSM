@@ -1,5 +1,10 @@
 package HereDecoder;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class Geoposition {
     public static final int scale_factor = 10000000; // scale factor for converting to integers.
 

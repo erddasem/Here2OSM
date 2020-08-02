@@ -22,6 +22,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class DecoderHere {
 
     /**
@@ -47,8 +52,8 @@ public class DecoderHere {
     /**
      * Writes HERE Line Location Reference to Raw Line Location Reference to make it readable for the OpenLR decoder.
      *
-     * @param olr
-     * @return
+     * @param olr OpenLocationReference
+     * @return OpenLR RawLineLocation Reference
      */
     public RawLineLocRef lineLocRefHere(OpenLocationReference olr) throws InvalidHereOLRException {
         if (!olr.isValid()) {
@@ -91,27 +96,27 @@ public class DecoderHere {
                                     false);
                             seqNr++;
                         }
-                        }
-                        // Last LRP
-                        LocationReferencePointBinaryImpl lastPoint = new LocationReferencePointBinaryImpl(
-                                seqNr,
-                                getFRCEnumOpenLR(lr.last.lineProperties.frc),
-                                getFOWEnumOpenLR(lr.last.lineProperties.fow_id),
-                                lr.last.coordinate.getLongitude(),
-                                lr.last.coordinate.getLatitude(),
-                                lr.last.lineProperties.bearing,
-                                0,
-                                getFRCEnumOpenLR(lr.first.pathProperties.lfrcnp),
-                                true);
-                        lrps.add(lastPoint);
-                        // Negative and positive offsets
-                        Offsets offsets = new OffsetsBinaryImpl(lr.getPosOf(), lr.getNegOff());
-                        return new RawLineLocRef("1", lrps, offsets);
-                    default:
-                        System.out.println("Unsupported OpenLR Type");
-                        break;
-                }
+                    }
+                    // Last LRP
+                    LocationReferencePointBinaryImpl lastPoint = new LocationReferencePointBinaryImpl(
+                            seqNr,
+                            getFRCEnumOpenLR(lr.last.lineProperties.frc),
+                            getFOWEnumOpenLR(lr.last.lineProperties.fow_id),
+                            lr.last.coordinate.getLongitude(),
+                            lr.last.coordinate.getLatitude(),
+                            lr.last.lineProperties.bearing,
+                            0,
+                            getFRCEnumOpenLR(lr.first.pathProperties.lfrcnp),
+                            true);
+                    lrps.add(lastPoint);
+                    // Negative and positive offsets
+                    Offsets offsets = new OffsetsBinaryImpl(lr.getPosOf(), lr.getNegOff());
+                    return new RawLineLocRef("1", lrps, offsets);
+                default:
+                    System.out.println("Unsupported OpenLR Type");
+                    break;
             }
+        }
         return null;
     }
 
@@ -120,7 +125,7 @@ public class DecoderHere {
      *
      * @param openLRCode OpenLR Base64 String
      * @return location
-     * @throws Exception
+     * @throws Exception Invalide HERE Location
      */
     public Location decodeHere(String openLRCode) throws Exception {
 

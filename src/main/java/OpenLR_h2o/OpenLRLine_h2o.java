@@ -15,7 +15,10 @@ import java.util.*;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 
-
+/**
+ * Implementation of the OpenLR Line interface.
+ * Represents the edges in the road topology.
+ */
 public class OpenLRLine_h2o implements Line {
 
     long line_id;

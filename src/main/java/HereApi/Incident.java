@@ -6,6 +6,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class describes the incident object.
+ */
+
 public class Incident {
 
     private String incidentId;

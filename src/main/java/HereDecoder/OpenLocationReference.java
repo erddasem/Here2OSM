@@ -3,6 +3,11 @@ package HereDecoder;
 import java.util.Arrays;
 import java.util.Base64;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class OpenLocationReference extends BaseLocationReference {
 
     public String version;

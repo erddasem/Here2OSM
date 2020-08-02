@@ -159,11 +159,10 @@ public class ApiRequest {
         System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
                 "\nExample: 51.057,13.744;51.053,13.751 ");
-        //String bboxString = scanner.next();
-        //Dresden
-        String bboxString = "51.1809,13.5766;50.9766,13.9812";
-        //String bboxString = "53.697,10.118;50.730,13.491";
+        String bboxString = scanner.next();
 
+        //BBox to request incidents for Dresden
+        //String bboxString = "51.1809,13.5766;50.9766,13.9812";
 
         //get coordinates as double values
         Pattern pattern = Pattern.compile("[,;]");
@@ -232,7 +231,7 @@ public class ApiRequest {
             this.incidentList.addAll(collector.getListIncidents());
             this.affectedLinesList.addAll(collector.getListAffectedLines());
             watch2.stop();
-            System.out.println("Watch2: " + watch2.getTime());
+            System.out.println("Duration for request and location referencing: " + watch2.getTime());
 
         }
     }
@@ -279,9 +278,10 @@ public class ApiRequest {
                 (Timestamp) ctx.select(min(field("generationdate"))).from(table(incidents)).fetchOne().value1();
 
 
-        //Start StopWatch
+        //StopWatch to measure first transaction
         StopWatch watch3 = new StopWatch();
         watch3.start();
+
         // Begin First Transaction - Fill temp tables
         ctx.transaction(configuration1 -> {
 
@@ -356,6 +356,7 @@ public class ApiRequest {
             }
 
         }); // End first transaction
+
         watch3.stop();
         //If the most recent entry in the incident table is younger than the time stamp when the program was started,
         // the data will not be updated.
@@ -363,7 +364,7 @@ public class ApiRequest {
             return;
         }
 
-        //Start StopWatch
+        //StopWatch to measure second transaction
         StopWatch watch4 = new StopWatch();
         watch4.start();
         // Begin Second Transaction
@@ -386,6 +387,7 @@ public class ApiRequest {
                     .foreignKey("incident_id").references(incidents)).execute();
 
         }); // End second transaction
+
         watch4.stop();
         watch1.stop();
 
@@ -407,7 +409,7 @@ public class ApiRequest {
 
 
         System.out.println("Program ended.");
-        System.out.println("Time Elapsed: Watch1: " + watch1.getTime() + "Watch3: " + watch3.getTime() + "Watch4: " + watch4.getTime());
+        System.out.println("Time Elapsed: Total duration: " + watch1.getTime() + "1. transaction: " + watch3.getTime() + "2. transaction: " + watch4.getTime());
     }
 
 }

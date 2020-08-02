@@ -17,6 +17,10 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
+/**
+ * Implementation of the OpenLR MapDatabase interface.
+ */
+
 public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoCloseable {
 
     private final DSLContext ctx;

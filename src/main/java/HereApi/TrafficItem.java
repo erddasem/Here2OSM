@@ -1,5 +1,9 @@
 package HereApi;
 
+/**
+ * The traffic item object read from the Traffic API requested xml
+ */
+
 public class TrafficItem {
 
 

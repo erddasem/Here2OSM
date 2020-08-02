@@ -17,10 +17,16 @@ import java.io.File;
 
 import java.util.Base64;
 
+/**
+ * Decodes an TomTom OpenLR location.
+ * Not suited to decode HERE TPEG-OLR location.
+ */
+
 public class OpenLRDecoder_h2o {
 
     /**
      * Method to decode base64 String to Byte Array.
+     *
      * @param base64OpenLRString OpenLR String containing location references
      * @return Byte Array containing locations
      */

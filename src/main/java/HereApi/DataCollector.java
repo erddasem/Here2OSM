@@ -24,7 +24,9 @@ public class DataCollector {
 
     public DataCollector() {
 
+        /** List to contain all incidents */
         this.listIncidents = new ArrayList<>();
+        /** List to contains all from incidents affected lines */
         this.listAffectedLines = new ArrayList<>();
     }
 
@@ -77,15 +79,18 @@ public class DataCollector {
             // Parses road closure information from string to boolean
             boolean roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
+            // Can be added if you need to read out TomTom OpenLR Location
             // Decodes OpenLR Base64 Code and extracts location
             //ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
             //Location location = decoder.decodeTomTom(byteArray);
 
-
+            // Reads out TPEG-OLR Locations
             Location location = decoderHere.decodeHere(openLRCode);
 
             int posOff;
             int negOff;
+
+            // If Location is invalid positive and negative offset get the value -100
             if (location == null) {
                 posOff = -100;
                 negOff = -100;

@@ -1,5 +1,10 @@
 package HereDecoder;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class IntUnLo {
 
     private static final int min_size = 4;
