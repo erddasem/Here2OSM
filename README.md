@@ -32,18 +32,18 @@ Use for instance <https://github.com/ekalinin/github-markdown-toc>:
 
 ### Content
 
-Implementation need PostgreSQL Database with PostGIS extention containing a routable OpenStreetMap road topology. 
-Topology can be created with pgRouting. In the database the schema openlr is needed. 
-If you want to change the schema open pom.xml and change in configuration generator. 
+Implementation need PostgreSQL Database with PostGIS extension containing a routable OpenStreetMap road topology. 
+Topology can be created with pgRouting. In the database the scheme openlr is needed. 
+If you want to change the scheme open pom.xml and change in configuration generator. 
 Set database and login information in pom.xml and src/main/java/DataBase/DatasourceConfig. You need a HERE developer Account to get an API Key. This is needed to 
-reuquest traffic incident data from the provider HERE.
+request traffic incident data from the provider HERE.
 
 ### Requirements
 
 * HERE Account to request Traffic API
-* PostgreSQL Database with PostGIS extention 
+* PostgreSQL Database with PostGIS extension 
 * Routable OSM road topology 
-* Schema openlr in your map database 
+* scheme openlr in your map database 
 
 ### Build
 
