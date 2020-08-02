@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class FirstReferencePoint {
 
     public Geoposition coordinate;

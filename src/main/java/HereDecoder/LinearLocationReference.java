@@ -6,6 +6,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class LinearLocationReference extends BaseLocationReference {
 
     // Required

@@ -1,8 +1,7 @@
 package HereApi;
 
 import HereDecoder.DecoderHere;
-import OpenLR.OpenLRDecoder_h2o;
-import openlr.binary.ByteArray;
+import OpenLR_h2o.OpenLRDecoder_h2o;
 import openlr.location.Location;
 import openlr.map.Line;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +24,9 @@ public class DataCollector {
 
     public DataCollector() {
 
+        /** List to contain all incidents */
         this.listIncidents = new ArrayList<>();
+        /** List to contains all from incidents affected lines */
         this.listAffectedLines = new ArrayList<>();
     }
 
@@ -78,22 +79,32 @@ public class DataCollector {
             // Parses road closure information from string to boolean
             boolean roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
+            // Can be added if you need to read out TomTom OpenLR Location
             // Decodes OpenLR Base64 Code and extracts location
             //ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
             //Location location = decoder.decodeTomTom(byteArray);
 
-
+            // Reads out TPEG-OLR Locations
             Location location = decoderHere.decodeHere(openLRCode);
 
-            // Gets positive and negative offset
-            int posOff = location.getPositiveOffset();
-            int negOff = location.getNegativeOffset();
+            int posOff;
+            int negOff;
+
+            // If Location is invalid positive and negative offset get the value -100
+            if (location == null) {
+                posOff = -100;
+                negOff = -100;
+            } else {
+                // Gets positive and negative offset
+                posOff = location.getPositiveOffset();
+                negOff = location.getNegativeOffset();
+
+                // Extract affected lines from location and add to list
+                getAffectedLines(location, incidentId, posOff, negOff);
+            }
 
             // Create incident and add to list
             incident2list(incidentId, type, status, start, end, criticality, openLRCode, shortDesc, longDesc, roadClosure, posOff, negOff);
-
-            // Extract affected lines from location and add to list
-            getAffectedLines(location, incidentId, posOff, negOff);
         }
     }
 

@@ -10,6 +10,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
+import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -158,11 +159,10 @@ public class ApiRequest {
         System.out.println("Enter the coordinates for the bounding box as follows (format WGS84):" +
                 "\nUpper Left Lat,Upper Left Lon;Bottom Right Lat,Bottom Right Lon" +
                 "\nExample: 51.057,13.744;51.053,13.751 ");
-        //String bboxString = scanner.next();
-        //Dresden
-        String bboxString = "51.1809,13.5766;50.9766,13.9812";
-        //String bboxString = "51.06413,13.74957;51.06192,13.75795";
+        String bboxString = scanner.next();
 
+        //BBox to request incidents for Dresden
+        //String bboxString = "51.1809,13.5766;50.9766,13.9812";
 
         //get coordinates as double values
         Pattern pattern = Pattern.compile("[,;]");
@@ -188,7 +188,7 @@ public class ApiRequest {
     private void getRecursiveBbox(@NotNull BoundingBox bbox) {
 
         // Recursive bounding box query
-        if ((bbox.width > 2) || (bbox.height > 2)) {
+        if ((bbox.width > 10) || (bbox.height > 10)) {
 
             // Box upper left
             getRecursiveBbox(new BoundingBox(bbox.getUpperLeftLat(), bbox.getUpperLeftLon(),
@@ -205,17 +205,19 @@ public class ApiRequest {
         } else {
 
             //Gets Here Api request answer
-            String requestAnswer;
             try {
-                requestAnswer = sendRequest(bbox.getBboxRequestString());
+                sendRequest(bbox.getBboxRequestString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            StopWatch watch2 = new StopWatch();
+            watch2.start();
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            parser.parseXMLFromApi(answer);
-            //parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden_XML.xml");
+            //parser.parseXMLFromApi(answer);
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden29_7.xml");
+
 
             // Collect relevant data per incident and decoding location
             DataCollector collector = new DataCollector();
@@ -228,6 +230,9 @@ public class ApiRequest {
             // Collects incident data and affected lines for all requested bounding boxes
             this.incidentList.addAll(collector.getListIncidents());
             this.affectedLinesList.addAll(collector.getListAffectedLines());
+            watch2.stop();
+            System.out.println("Duration for request and location referencing: " + watch2.getTime());
+
         }
     }
 
@@ -244,8 +249,8 @@ public class ApiRequest {
     public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
         //Start StopWatch
-        StopWatch watch = new StopWatch();
-        watch.start();
+        StopWatch watch1 = new StopWatch();
+        watch1.start();
 
         // Get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
@@ -272,6 +277,10 @@ public class ApiRequest {
         Timestamp youngestEntry = "null".equals(incidentsTableExists) ? null :
                 (Timestamp) ctx.select(min(field("generationdate"))).from(table(incidents)).fetchOne().value1();
 
+
+        //StopWatch to measure first transaction
+        StopWatch watch3 = new StopWatch();
+        watch3.start();
 
         // Begin First Transaction - Fill temp tables
         ctx.transaction(configuration1 -> {
@@ -348,12 +357,16 @@ public class ApiRequest {
 
         }); // End first transaction
 
+        watch3.stop();
         //If the most recent entry in the incident table is younger than the time stamp when the program was started,
         // the data will not be updated.
         if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
             return;
         }
 
+        //StopWatch to measure second transaction
+        StopWatch watch4 = new StopWatch();
+        watch4.start();
         // Begin Second Transaction
         ctx.transaction(configuration2 -> {
 
@@ -374,7 +387,9 @@ public class ApiRequest {
                     .foreignKey("incident_id").references(incidents)).execute();
 
         }); // End second transaction
-        watch.stop();
+
+        watch4.stop();
+        watch1.stop();
 
 
         // Checks if affected table already exists
@@ -394,7 +409,7 @@ public class ApiRequest {
 
 
         System.out.println("Program ended.");
-        System.out.println("Time Elapsed: " + watch.getTime());
+        System.out.println("Time Elapsed: Total duration: " + watch1.getTime() + "1. transaction: " + watch3.getTime() + "2. transaction: " + watch4.getTime());
     }
 
 }

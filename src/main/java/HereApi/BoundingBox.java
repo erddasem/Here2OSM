@@ -1,12 +1,28 @@
 package HereApi;
 
-public class BoundingBox {
+import openlr.map.GeoCoordinates;
+
+/**
+ * This class describes the bounding box.
+ */
+
+public class BoundingBox extends TrafficItem {
 
     double height;
     double width;
+    /**
+     * The upper left corner latitude of the bounding box
+     */
     private double upperLeftLat;
+    /**
+     * The upper left corner longitude of the bounding box
+     */
     private double upperLeftLon;
+    /**
+     * The bottom right latitude corner of the bounding box
+     */
     private double bottomRightLat;
+    /** The bottom right latitude corner of the bounding box */
     private double bottomRightLon;
 
     public BoundingBox(double upperLeftLat, double upperLeftLon, double bottomRightLat, double bottomRightLon) {

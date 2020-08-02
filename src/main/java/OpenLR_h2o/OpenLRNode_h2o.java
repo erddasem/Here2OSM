@@ -1,4 +1,4 @@
-package OpenLR;
+package OpenLR_h2o;
 
 import DataBase.DatasourceConfig;
 import openlr.map.*;
@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
+
+/**
+ * Implementation of the OpenLR Node interface.
+ * Represents the nodes in the road topology.
+ */
 
 public class OpenLRNode_h2o implements Node {
 
@@ -100,13 +105,20 @@ public class OpenLRNode_h2o implements Node {
     @Override
     public Iterator<Line> getOutgoingLines() {
 
-        Condition andCon = (KANTEN.END_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition andCon = (KANTEN.END_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
         Condition finalCon = (KANTEN.START_NODE.eq(node_id)).or(andCon);
 
         List<Line> linesOut = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
+                .fetchInto(OpenLRLine_h2o.class);*/
+
+        List<Line> linesOut = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.START_NODE.eq(node_id))
                 .fetchInto(OpenLRLine_h2o.class);
 
         return linesOut.iterator();
@@ -115,13 +127,20 @@ public class OpenLRNode_h2o implements Node {
     @Override
     public Iterator<Line> getIncomingLines() {
 
-        Condition andCon = (KANTEN.START_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition andCon = (KANTEN.START_NODE.eq(node_id)).and(KANTEN.ONEWAY.eq(false));
         Condition finalCon = (KANTEN.END_NODE.eq(node_id)).or(andCon);
 
         List<Line> linesIn = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
                 .where(finalCon)
+                .fetchInto(OpenLRLine_h2o.class);*/
+
+        List<Line> linesIn = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.END_NODE.eq(node_id))
                 .fetchInto(OpenLRLine_h2o.class);
 
         return linesIn.iterator();

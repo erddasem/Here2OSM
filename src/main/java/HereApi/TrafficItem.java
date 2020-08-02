@@ -1,5 +1,9 @@
 package HereApi;
 
+/**
+ * The traffic item object read from the Traffic API requested xml
+ */
+
 public class TrafficItem {
 
 
@@ -26,6 +30,9 @@ public class TrafficItem {
         this.closure = closure;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
+    }
+
+    public TrafficItem() {
     }
 
     public String getId() {

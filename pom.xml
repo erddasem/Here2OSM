@@ -27,7 +27,7 @@
             <version>2.3.0-jaxb-1.0.6</version>
         </dependency>
 
-        <!-- OpenLR -->
+        <!-- OpenLR_h2o -->
         <dependency>
             <groupId>org.openlr</groupId>
             <artifactId>data</artifactId>
@@ -183,7 +183,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/dresden</url>
+                        <url>jdbc:postgresql://localhost/db-name</url>
                         <user>emilykast</user>
                         <password></password>
                     </jdbc>

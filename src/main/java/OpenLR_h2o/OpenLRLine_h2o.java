@@ -1,4 +1,4 @@
-package OpenLR;
+package OpenLR_h2o;
 
 import DataBase.DatasourceConfig;
 import DataBase.SpatialQueries;
@@ -6,7 +6,6 @@ import openlr.map.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.sql.Connection;
@@ -16,7 +15,10 @@ import java.util.*;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
 
-
+/**
+ * Implementation of the OpenLR Line interface.
+ * Represents the edges in the road topology.
+ */
 public class OpenLRLine_h2o implements Line {
 
     long line_id;
@@ -86,8 +88,6 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
 
-
-
         if (distanceAlong < length_meter) {
             // return coordinates of point along line. By using distance along line.
             Record1<?> xCoord = ctx.select(SpatialQueries.st_LineInterpolatePointX(distanceAlong))
@@ -113,7 +113,6 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
 
-        // TODO: Query überprüfen
         GeoCoordinates coordinatesAlongLine = null;
         if (distanceAlong < length_meter) {
             //longitude
@@ -165,31 +164,69 @@ public class OpenLRLine_h2o implements Line {
     @Override
     public Iterator<Line> getPrevLines() {
 
-            Condition andCon = (KANTEN.START_NODE.eq(end_node)).and(KANTEN.ONEWAY.eq(false));
-            Condition finalCon = (KANTEN.END_NODE.eq(start_node)).or(andCon);
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition con1 = (KANTEN.END_NODE.eq(start_node));
+        Condition con2 = (KANTEN.START_NODE.eq(start_node).and(KANTEN.ONEWAY.eq(false)));
+        // Only if oneway = false for the requested line
+        Condition con3 = (KANTEN.END_NODE.eq(end_node));
+        Condition con4 = (KANTEN.START_NODE.eq(end_node).and(KANTEN.ONEWAY.eq(false)));
 
-            List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+
+        List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(con1.or(con2))
+                .fetchInto(OpenLRLine_h2o.class);
+
+        if (!oneway) {
+            List<Line> lines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                     KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                     .from(KANTEN)
-                    .where(finalCon)
+                    .where(con3.or(con4))
                     .fetchInto(OpenLRLine_h2o.class);
 
-            return prevLines.iterator();
+            prevLines.addAll(lines);
+        }*/
+
+        List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.END_NODE.eq(start_node))
+                .fetchInto(OpenLRLine_h2o.class);
+
+        return prevLines.iterator();
     }
 
     @Override
     public Iterator<Line> getNextLines() {
 
-        /*Selects next lines depending on given line id. Next lines can be all lines using the end node of the given
-        line as start node and all lines where oneway = true and the end node is the same.*/
-        // select line_id from kanten where kanten.start_node = end_node or (kanten.start_node = end_node and oneway = false);
-        Condition andCon = (KANTEN.END_NODE.eq(start_node)).and(KANTEN.ONEWAY.eq(false));
-        Condition finalCon = (KANTEN.START_NODE.eq(end_node)).or(andCon);
+        // Can be used if lines in DB are only digitalized once and have an oneway information
+        /*Condition con1 = (KANTEN.START_NODE.eq(end_node));
+        Condition con2 = (KANTEN.END_NODE.eq(end_node).and(KANTEN.ONEWAY.eq(false)));
+        // Only if oneway = false for requested line
+        Condition con3 = (KANTEN.START_NODE.eq(start_node));
+        Condition con4 = (KANTEN.END_NODE.eq(start_node).and(KANTEN.ONEWAY.eq(false)));
 
         List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
                 KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
                 .from(KANTEN)
-                .where(finalCon)
+                .where(con1.or(con2))
+                .fetchInto(OpenLRLine_h2o.class);
+
+        if (!oneway) {
+            List<Line> lines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                    KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                    .from(KANTEN)
+                    .where(con3.or(con4))
+                    .fetchInto(OpenLRLine_h2o.class);
+
+            nextLines.addAll(lines);
+        }*/
+
+        List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
+                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                .from(KANTEN)
+                .where(KANTEN.START_NODE.eq(end_node))
                 .fetchInto(OpenLRLine_h2o.class);
 
         return nextLines.iterator();
@@ -206,8 +243,6 @@ public class OpenLRLine_h2o implements Line {
 
     @Override
     public int measureAlongLine(double longitude, double latitude) {
-
-        //select Round(e.length_meter * ST_LineLocatePoint(e.geom,ST_ClosestPoint(e.geom, 'SRID=4326;POINT(13.748489 51.058306)'))) from kanten where line_id = line_id;
 
         return ctx.select(SpatialQueries.distAlongLine(latitude, longitude).cast(Integer.class))
                 .from(KANTEN)
@@ -241,6 +276,7 @@ public class OpenLRLine_h2o implements Line {
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OpenLRLine_h2o that = (OpenLRLine_h2o) o;

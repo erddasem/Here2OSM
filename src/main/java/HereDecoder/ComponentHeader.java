@@ -3,6 +3,11 @@ package HereDecoder;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
+/**
+ * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
+ * Original C# program translated to Java.
+ */
+
 public class ComponentHeader {
 
     private int gcId;
@@ -10,9 +15,7 @@ public class ComponentHeader {
     private int lengthAttrCH;
     private boolean isValid;
     private int totalLength = lengthCompCH + lengthAttrCH - 1;
-    ;
     private int bytesToRead = lengthCompCH + lengthAttrCH + 2;
-    ;
 
     public static byte[] encode(int gcId, int lengthCompValue, int lengthAttrValue) {
         return new byte[]{(byte) gcId, (byte) lengthCompValue, (byte) lengthAttrValue};
