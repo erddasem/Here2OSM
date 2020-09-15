@@ -49,11 +49,10 @@ public class FixedBitArray {
 
     @Override
     public String toString() {
-        String retVal = "(0)" + org.apache.commons.lang.StringUtils.leftPad(Integer.toBinaryString(value), 8 * size, "0");
-        return retVal;
+        return "(0)" + org.apache.commons.lang.StringUtils.leftPad(Integer.toBinaryString(value), 8 * size, "0");
     }
 
-    public int decode(byte[] byteBuffer) {
+    public int decode(int[] byteBuffer) {
         size = 0;
         value = 0x0;
         if (isBifferValid(byteBuffer)) {
@@ -74,7 +73,7 @@ public class FixedBitArray {
             }
         }
 
-        if (isValid == false) {
+        if (!isValid) {
             //If we reach here, either the buffer is  invalide or
             // we've read 5 bytes and all bytes have the continuation bit set to 1
             // -> Encoding is wrong
@@ -85,7 +84,7 @@ public class FixedBitArray {
         return size;
     }
 
-    private boolean isBifferValid(byte[] byteBuffer) {
+    private boolean isBifferValid(int[] byteBuffer) {
         boolean retVal = true;
         int buf_size = byteBuffer.length;
         if (buf_size < min_size) {
@@ -96,7 +95,6 @@ public class FixedBitArray {
     }
 
     public byte getValue() {
-        byte bytea = 0;
-        return bytea;
+        return (byte) 0;
     }
 }

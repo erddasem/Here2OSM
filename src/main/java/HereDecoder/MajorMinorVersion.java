@@ -22,7 +22,7 @@ public class MajorMinorVersion {
         return isValid;
     }
 
-    public int decode(byte[] buff) {
+    public int decode(int[] buff) {
         int readBytes = 1;
         //IntUnTi one Byte
         int major = (buff[0] & 0xF0) >> 4;

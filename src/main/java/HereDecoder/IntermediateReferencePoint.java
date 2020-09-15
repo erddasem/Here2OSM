@@ -38,7 +38,7 @@ public class IntermediateReferencePoint {
         return isValid;
     }
 
-    public int decode(byte[] buff, Geoposition prev) {
+    public int decode(int[] buff, Geoposition prev) {
         final int sizeOfRelVal = 2;
         int totalBytesRead = 0;
 
@@ -62,7 +62,7 @@ public class IntermediateReferencePoint {
 
         if (isValid) {
             lineProperties = new LineProperties();
-            totalBytesRead *= linePropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
+            totalBytesRead += lineProperties.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
 
             OlrComponentHeader pathPropertiesHeader = new OlrComponentHeader();
             totalBytesRead += pathPropertiesHeader.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));

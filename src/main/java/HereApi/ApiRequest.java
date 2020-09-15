@@ -216,7 +216,7 @@ public class ApiRequest {
             // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/Dresden29_7.xml");
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/Testdaten4LRPs.xml");
 
 
             // Collect relevant data per incident and decoding location
@@ -305,7 +305,7 @@ public class ApiRequest {
                         .column("start_date", SQLDataType.TIMESTAMP)
                         .column("end_date", SQLDataType.TIMESTAMP)
                         .column("criticality", SQLDataType.CHAR(10).defaultValue("lowImpact"))
-                        .column("openlrcode", SQLDataType.CHAR(100))
+                        .column("openlrcode", SQLDataType.CHAR(255))
                         .column("shortdesc", SQLDataType.CLOB)
                         .column("longdesc", SQLDataType.CLOB)
                         .column("roadclosure", SQLDataType.BOOLEAN)

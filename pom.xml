@@ -183,7 +183,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/db-name</url>
+                        <url>jdbc:postgresql://localhost/karlsruhe</url>
                         <user>emilykast</user>
                         <password></password>
                     </jdbc>

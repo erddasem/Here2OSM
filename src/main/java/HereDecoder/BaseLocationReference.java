@@ -46,7 +46,7 @@ public class BaseLocationReference {
     }
 
 
-    public BaseLocationReference fromBinary(byte[] bytes, int bytesRead) {
+    public BaseLocationReference fromBinary(int[] bytes, int bytesRead) {
         //Check if Buffer is valid
         if (!isBufferValid(bytes)) {
             bytesRead = 0;
@@ -71,7 +71,7 @@ public class BaseLocationReference {
             totalBytesRead += olr.getBytesRead();
 
             if (olr.isValid()) {
-                retVal = (BaseLocationReference) olr;
+                retVal = olr;
             }
         } else {
             //Undecodable Data
@@ -82,7 +82,7 @@ public class BaseLocationReference {
         return retVal;
     }
 
-    private boolean isBufferValid(byte[] byteBuffer) {
+    private boolean isBufferValid(int[] byteBuffer) {
         final int min_size = 3;
         boolean retVal = true;
         int buf_size = byteBuffer.length;

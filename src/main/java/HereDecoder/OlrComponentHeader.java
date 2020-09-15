@@ -27,8 +27,7 @@ public class OlrComponentHeader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte[] out = buf.toByteArray();
-        return out;
+        return buf.toByteArray();
 
     }
 
@@ -52,14 +51,14 @@ public class OlrComponentHeader {
         return lengthComp + lengthAttr - 1;
     }
 
-    public int decode(byte[] bytes) {
+    public int decode(int[] bytes) {
 
         IntUnLoMb lengthcomp = new IntUnLoMb();
         IntUnLoMb lengthattr = new IntUnLoMb();
         int totalBytesRead = 0;
 
         //IntUnTi one byte
-        gcId = Byte.toUnsignedInt(bytes[0]);
+        gcId = bytes[0];
         totalBytesRead++;
 
         //IntUnLoMB one byte
