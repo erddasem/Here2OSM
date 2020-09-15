@@ -17,7 +17,7 @@ public class LastReferencePoint {
     private int lat;
     private int lon;
 
-    public int decode(byte[] buff, Geoposition prev) {
+    public int decode(int[] buff, Geoposition prev) {
         final int sizeOfRealVal = 2;
         int totalBytesRead = 0;
 

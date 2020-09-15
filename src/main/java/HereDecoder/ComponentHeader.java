@@ -14,8 +14,8 @@ public class ComponentHeader {
     private int lengthCompCH;
     private int lengthAttrCH;
     private boolean isValid;
-    private int totalLength = lengthCompCH + lengthAttrCH - 1;
-    private int bytesToRead = lengthCompCH + lengthAttrCH + 2;
+    private int totalLength;
+    private int bytesToRead;
 
     public static byte[] encode(int gcId, int lengthCompValue, int lengthAttrValue) {
         return new byte[]{(byte) gcId, (byte) lengthCompValue, (byte) lengthAttrValue};
@@ -61,7 +61,7 @@ public class ComponentHeader {
         this.gcId = gcId;
     }
 
-    public int decode(byte[] bytes) {
+    public int decode(int[] bytes) {
         IntUnLoMb lengthComp = new IntUnLoMb();
         IntUnLoMb lengthAttr = new IntUnLoMb();
         int totalBytesRead = 0;
@@ -71,7 +71,7 @@ public class ComponentHeader {
         }
 
         //IntUnTi one byte
-        gcId = Byte.toUnsignedInt(bytes[0]);
+        gcId = bytes[0];
         totalBytesRead++;
 
         //IntUnLoMb one byte
@@ -83,6 +83,9 @@ public class ComponentHeader {
 
         lengthCompCH = lengthComp.getValue();
         lengthAttrCH = lengthAttr.getValue();
+
+        totalLength = lengthCompCH + lengthAttrCH - 1;
+        bytesToRead = lengthCompCH + lengthAttrCH + 2;
 
         return totalBytesRead;
     }

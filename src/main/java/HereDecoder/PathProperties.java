@@ -22,11 +22,11 @@ public class PathProperties {
         return "FRC" + lfrcnp + 1;
     }
 
-    public int decode(byte[] buf) {
+    public int decode(int[] buf) {
         int numberBytesRead = 0;
 
         //Byte 0
-        int lowestFRCtoNextPoint = (Byte.toUnsignedInt(buf[0]));
+        int lowestFRCtoNextPoint = (buf[0]);
         numberBytesRead++;
         lfrcnp = lowestFRCtoNextPoint;
 

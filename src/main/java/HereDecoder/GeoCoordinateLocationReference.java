@@ -21,19 +21,19 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
         return new byte[]{upperVal, middleVal, lowerVal};
     }
 
-    public static int decode_absolute(byte[] buf) {
+    public static int decode_absolute(int[] buf) {
         // Read first 3 bytes for longitude
-        int upperVal = (Byte.toUnsignedInt(buf[0]) << 16);
-        int middleVal = (Byte.toUnsignedInt(buf[1]) << 8);
-        int lowerVal = Byte.toUnsignedInt(buf[2]);
+        int upperVal = (buf[0] << 16);
+        int middleVal = (buf[1] << 8);
+        int lowerVal = buf[2];
         int absoluteVal = (upperVal | middleVal) | lowerVal;
 
         //if negative bit set
         if ((buf[0] & 0x80) == 0x80) {
             // do tow's complete
-            byte byte0 = (byte) ~(Byte.toUnsignedInt(buf[0]));
-            byte byte1 = (byte) ~(Byte.toUnsignedInt(buf[1]));
-            byte byte2 = (byte) ~(Byte.toUnsignedInt(buf[2]));
+            byte byte0 = (byte) ~(buf[0]);
+            byte byte1 = (byte) ~(buf[1]);
+            byte byte2 = (byte) ~(buf[2]);
 
             upperVal = (Byte.toUnsignedInt(byte0) << 16);
             middleVal = (Byte.toUnsignedInt(byte1) << 8);
@@ -59,7 +59,7 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
         return OpenLocationReference.OLRType.GeoCoordinate;
     }
 
-    public int decode(byte[] buff) {
+    public int decode(int[] buff) {
         final int sizeOfAbsVal = 3;
         int totalBytesRead = sizeOfAbsVal;
 
@@ -69,7 +69,7 @@ public class GeoCoordinateLocationReference extends BaseLocationReference {
 
         coordinate = OpenLocationReference.fromAbsoluteCoordinates(lat, lon);
 
-        byte selectorByte = buff[totalBytesRead++];
+        //byte selectorByte = buff[totalBytesRead++];
         return totalBytesRead;
     }
 

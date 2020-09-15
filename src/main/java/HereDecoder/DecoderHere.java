@@ -2,7 +2,6 @@ package HereDecoder;
 
 import Exceptions.InvalidHereOLRException;
 import OpenLR_h2o.OpenLRMapDatabase_h2o;
-import com.sun.source.doctree.InheritDocTree;
 import openlr.LocationReferencePoint;
 import openlr.Offsets;
 import openlr.binary.impl.LocationReferencePointBinaryImpl;
@@ -110,7 +109,7 @@ public class DecoderHere {
                             true);
                     lrps.add(lastPoint);
                     // Negative and positive offsets
-                    Offsets offsets = new OffsetsBinaryImpl(lr.getPosOf(), lr.getNegOff());
+                    Offsets offsets = new OffsetsBinaryImpl(lr.getPosOff(), lr.getNegOff());
                     return new RawLineLocRef("1", lrps, offsets);
                 default:
                     System.out.println("Unsupported OpenLR Type");

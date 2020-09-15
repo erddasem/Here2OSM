@@ -54,7 +54,7 @@ public class FirstReferencePoint {
         isValid = valid;
     }
 
-    public int decode(byte[] buff) {
+    public int decode(int[] buff) {
         final int sizeOfAbsVal = 3;
         int totalBytesRead = sizeOfAbsVal;
 
@@ -64,7 +64,7 @@ public class FirstReferencePoint {
 
         coordinate = OpenLocationReference.fromAbsoluteCoordinates(lat, lon);
 
-        byte[] selectorBytes = Arrays.copyOfRange(buff, totalBytesRead, buff.length);
+        int[] selectorBytes = Arrays.copyOfRange(buff, totalBytesRead, buff.length);
         if (selectorBytes[0] != 0x00) {
             //Current do not support
             isValid = false;

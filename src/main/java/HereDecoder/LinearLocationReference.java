@@ -1,7 +1,5 @@
 package HereDecoder;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -17,25 +15,24 @@ public class LinearLocationReference extends BaseLocationReference {
     public FirstReferencePoint first;
     public LastReferencePoint last;
     //[0..*]
-    public List<IntermediateReferencePoint> intermediates;
+    public ArrayList<IntermediateReferencePoint> intermediates;
     // [0..1]
-    public int posOf;
-    public int negOff;
+    public Integer posOff = null;
+    public Integer negOff = null;
     public List<Geoposition> geometry;
     public List<String> links;
     public OpenLocationReference.OLRType type;
 
     public LinearLocationReference() {
-        //intermediates = new List<IntermediateReferencePoint>();
+        intermediates = new ArrayList<>();
     }
 
-    public static int decode_relative(byte[] buf) {
+    public static int decode_relative(int[] buf) {
         // Read first 2 bytes for longitude
-        short upperVal = (short) (Byte.toUnsignedInt(buf[0]) << 8);
-        short lowerVal = (short) Byte.toUnsignedInt(buf[1]);
-        int relativeVal = upperVal | lowerVal;
+        short upperVal = (short) ( (buf[0] & 0xFF)<< 8);
+        short lowerVal = (short) buf[1];
 
-        return relativeVal;
+        return upperVal | lowerVal;
     }
 
     public static byte[] encode_relative(int relativeVal) {
@@ -67,16 +64,16 @@ public class LinearLocationReference extends BaseLocationReference {
         return intermediates;
     }
 
-    public void setIntermediates(List<IntermediateReferencePoint> intermediates) {
+    public void setIntermediates(ArrayList<IntermediateReferencePoint> intermediates) {
         this.intermediates = intermediates;
     }
 
-    public int getPosOf() {
-        return posOf;
+    public int getPosOff() {
+        return posOff;
     }
 
-    public void setPosOf(int posOf) {
-        this.posOf = posOf;
+    public void setPosOff(int posOff) {
+        this.posOff = posOff;
     }
 
     public int getNegOff() {
@@ -148,20 +145,20 @@ public class LinearLocationReference extends BaseLocationReference {
                 }
             }
 
-           /* if(posOf != null) {
+            if(posOff != 0) {
                 try {
-                    buf.write(IntUnLoMb.encode(posOf));
+                    buf.write(IntUnLoMb.encode(posOff));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if(negOff == null) {
+            if(negOff == 0) {
                 try {
                     buf.write(IntUnLoMb.encode(negOff));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }*/
+            }
         }
 
         return buf.toByteArray();
@@ -175,14 +172,14 @@ public class LinearLocationReference extends BaseLocationReference {
 
         if (intermediates.size() > 0)
             selector |= bitForIntermediates;
-        /*if(posOf != null)
+        if(posOff != null)
             selector |= bitForPosOffset;
         if(negOff != null)
-            selector |= bitForNegOffset;*/
+            selector |= bitForNegOffset;
         return new byte[]{selector};
     }
 
-    public int decode(byte[] buff) {
+    public int decode(int[] buff) {
         int totalOriginalBytes = buff.length;
         int totalBytesRead = 0;
 
@@ -203,7 +200,7 @@ public class LinearLocationReference extends BaseLocationReference {
         isValid = first.isValid();
 
         if (isValid) {
-            byte selector = Arrays.copyOfRange(buff, totalBytesRead, buff.length)[0];
+            int selector = Arrays.copyOfRange(buff, totalBytesRead, buff.length)[0];
             totalBytesRead++;
             final byte bitForIntermediates = 0x40;
             if ((selector & bitForIntermediates) == bitForIntermediates) {
@@ -236,7 +233,7 @@ public class LinearLocationReference extends BaseLocationReference {
             if ((selector & bitForPositiveOffset) == bitForPositiveOffset) {
                 IntUnLoMb offset = new IntUnLoMb();
                 totalBytesRead += offset.decode(Arrays.copyOfRange(buff, totalBytesRead, buff.length));
-                posOf = offset.value;
+                posOff = offset.value;
             }
 
             final byte bitForNegativeOffset = 0x10;

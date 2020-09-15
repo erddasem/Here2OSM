@@ -11,19 +11,28 @@ import java.util.Base64;
 public class OpenLocationReference extends BaseLocationReference {
 
     public String version;
-    private String base64 = null;
     private BaseLocationReference locationReference;
     // binary decoding properties
     private int bytesRead;
 
     public static OpenLocationReference fromBase64TpegOlr(String base64OlrString) {
+
+        // Decodes base64 String to Byte Array
         byte[] base64EncodedBytes = Base64.getDecoder().decode(base64OlrString);
-        OpenLocationReference olr = OpenLocationReference.fromBinary(base64EncodedBytes);
-        olr.base64 = base64OlrString;
-        return olr;
+
+        //Get unsigned Byte Array by creating Int.Array
+        int[] unsignedBytes = new int[base64EncodedBytes.length];
+
+        for(int i = 0; i < base64EncodedBytes.length; i++) {
+            unsignedBytes[i] = Byte.toUnsignedInt(base64EncodedBytes[i]);
+        }
+
+        // Generates OpenLocationReference from byteArray
+
+        return OpenLocationReference.fromBinary(unsignedBytes);
     }
 
-    public static OpenLocationReference fromBinary(byte[] bytes) {
+    public static OpenLocationReference fromBinary(int[] bytes) {
         OpenLocationReference olr = new OpenLocationReference();
         olr.bytesRead = olr.decode(bytes);
 
@@ -31,13 +40,11 @@ public class OpenLocationReference extends BaseLocationReference {
     }
 
     public static int absGeoEq1(double coordReal) {
-        int coordBinary = (int) (Math.signum(coordReal) * 0.5 + ((coordReal * Math.pow(2, 24))) / 360);
-        return coordBinary;
+        return (int) (Math.signum(coordReal) * 0.5 + ((coordReal * Math.pow(2, 24))) / 360);
     }
 
     public static double absGeoEq2(int coordBinary) {
-        double coordReal = (coordBinary - (Math.signum(coordBinary) * 0.5)) * 360 / Math.pow(2, 24);
-        return coordReal;
+        return (coordBinary - (Math.signum(coordBinary) * 0.5)) * 360 / Math.pow(2, 24);
     }
 
     public static Geoposition fromAbsoluteCoordinates(int lat, int lon) {
@@ -62,7 +69,7 @@ public class OpenLocationReference extends BaseLocationReference {
     public static Tuple2<Integer, Integer> relativeToBinaryValue(Geoposition current, Geoposition previous) {
         int iRelativeLat = (int) Math.round(100000.0 * (current.getLatitude() - previous.getLatitude()));
         int iRelativeLon = (int) Math.round(100000.0 * (current.getLongitude() - previous.getLongitude()));
-        return new Tuple2<Integer, Integer>(iRelativeLat, iRelativeLon);
+        return new Tuple2<>(iRelativeLat, iRelativeLon);
     }
 
     public String getVersion() {
@@ -89,7 +96,7 @@ public class OpenLocationReference extends BaseLocationReference {
         this.bytesRead = bytesRead;
     }
 
-    public int decode(byte[] bytes) {
+    public int decode(int[] bytes) {
         bytesRead = 0;
         ComponentHeader olrHeader = new ComponentHeader();
         bytesRead += olrHeader.decode(bytes);
@@ -117,7 +124,7 @@ public class OpenLocationReference extends BaseLocationReference {
             ComponentHeader locationReferenceHeader = new ComponentHeader();
 
             bytesRead += locationReferenceHeader.decode(Arrays.copyOfRange(bytes, bytesRead, bytes.length));
-            if (locationReferenceHeader.getIsValid() == false) {
+            if (!locationReferenceHeader.getIsValid()) {
                 isValid = false;
             } else if (locationReferenceHeader.getGcId() == OLRType.Linear.id) {
                 LinearLocationReference linearlr = new LinearLocationReference();
