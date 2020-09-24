@@ -28,9 +28,18 @@ public class OpenLRLine_h2o implements Line {
     int fow;
     int length_meter;
     String name;
-    boolean oneway;
 
-    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean oneway) {
+    public Boolean getReversed() {
+        return reversed;
+    }
+
+    Boolean reversed;
+
+    public long getLine_id() {
+        return line_id;
+    }
+
+    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name) {
         this.line_id = line_id;
         this.start_node = start_node;
         this.end_node = end_node;
@@ -38,8 +47,9 @@ public class OpenLRLine_h2o implements Line {
         this.fow = fow;
         this.length_meter = length_meter;
         this.name = name;
-        this.oneway = oneway;
     }
+
+
 
     static DSLContext ctx;
 
@@ -189,7 +199,7 @@ public class OpenLRLine_h2o implements Line {
         }*/
 
         List<Line> prevLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.END_NODE.eq(start_node))
                 .fetchInto(OpenLRLine_h2o.class);
@@ -224,7 +234,7 @@ public class OpenLRLine_h2o implements Line {
         }*/
 
         List<Line> nextLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.START_NODE.eq(end_node))
                 .fetchInto(OpenLRLine_h2o.class);
@@ -286,12 +296,11 @@ public class OpenLRLine_h2o implements Line {
                 frc == that.frc &&
                 fow == that.fow &&
                 length_meter == that.length_meter &&
-                oneway == that.oneway &&
                 Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(line_id, start_node, end_node, frc, fow, length_meter, name, oneway);
+        return Objects.hash(line_id, start_node, end_node, frc, fow, length_meter, name);
     }
 }

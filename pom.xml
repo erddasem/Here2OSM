@@ -15,11 +15,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>jaxp-api</artifactId>
-            <version>1.4</version>
-        </dependency>
 
         <dependency>
             <groupId>org.w3c</groupId>
@@ -183,7 +178,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost/karlsruhe</url>
+                        <url>jdbc:postgresql://localhost/bautzner</url>
                         <user>emilykast</user>
                         <password></password>
                     </jdbc>

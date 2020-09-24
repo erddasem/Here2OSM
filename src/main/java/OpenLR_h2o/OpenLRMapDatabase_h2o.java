@@ -40,8 +40,9 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoClosea
     @Override
     public Line getLine(long id) {
 
+
         return ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.LINE_ID.eq(id))
                 .fetchAny().into(OpenLRLine_h2o.class);
@@ -72,7 +73,7 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoClosea
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
 
         List<Line> linesCloseBy = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(SpatialQueries.stDWithin(longitude, latitude, distance))
                 .fetchInto(OpenLRLine_h2o.class);
@@ -100,7 +101,7 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoClosea
     public Iterator<Line> getAllLines() {
 
         List<Line> allLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN).fetchInto(OpenLRLine_h2o.class);
 
         return allLines.iterator();

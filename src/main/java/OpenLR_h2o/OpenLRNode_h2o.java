@@ -30,6 +30,10 @@ public class OpenLRNode_h2o implements Node {
         this.lat = lat;
     }
 
+    public long getNode_id() {
+        return node_id;
+    }
+
     static DSLContext ctx;
 
     static {
@@ -84,7 +88,7 @@ public class OpenLRNode_h2o implements Node {
     public Iterator<Line> getConnectedLines() {
 
         List<Line> connectedLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .or(KANTEN.END_NODE.eq(node_id))
@@ -96,10 +100,13 @@ public class OpenLRNode_h2o implements Node {
     @Override
     public int getNumberConnectedLines() {
 
-        return ctx.selectCount().from(KANTEN)
+        /*return ctx.selectCount().from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .or(KANTEN.END_NODE.eq(node_id))
-                .fetchOne().value1();
+                .fetchOne().value1();*/
+
+        return 0;
+
     }
 
     @Override
@@ -116,12 +123,13 @@ public class OpenLRNode_h2o implements Node {
                 .fetchInto(OpenLRLine_h2o.class);*/
 
         List<Line> linesOut = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.START_NODE.eq(node_id))
                 .fetchInto(OpenLRLine_h2o.class);
 
-        return linesOut.iterator();
+        //return linesOut.iterator();
+        return null;
     }
 
     @Override
@@ -138,12 +146,12 @@ public class OpenLRNode_h2o implements Node {
                 .fetchInto(OpenLRLine_h2o.class);*/
 
         List<Line> linesIn = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
-                KANTEN.LENGTH_METER, KANTEN.NAME, KANTEN.ONEWAY)
+                KANTEN.LENGTH_METER, KANTEN.NAME)
                 .from(KANTEN)
                 .where(KANTEN.END_NODE.eq(node_id))
                 .fetchInto(OpenLRLine_h2o.class);
-
-        return linesIn.iterator();
+    return null;
+        //return linesIn.iterator();
     }
 
     @Override

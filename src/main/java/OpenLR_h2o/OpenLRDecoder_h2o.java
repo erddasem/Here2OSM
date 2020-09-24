@@ -1,5 +1,6 @@
 package OpenLR_h2o;
 
+import Loader.OSMMapLoader;
 import openlr.binary.ByteArray;
 import openlr.binary.OpenLRBinaryDecoder;
 import openlr.*;
