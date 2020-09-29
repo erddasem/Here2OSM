@@ -35,12 +35,6 @@ public class SpatialQueries {
                 lat + ")', 4326)," + dist_deg + ")=true";
     }
 
-    public static String stDWithinReversed(double lon, double lat, int dist) {
-        double dist_deg = distToDeg(lat, dist);
-        return "ST_DWithin(ST_Reverse(geom), ST_PointFromText('POINT(" + lon + " " +
-                lat + ")', 4326)," + dist_deg + ")=true";
-    }
-
     /**
      * ST_Distance PostGIS function as field for using in JOOQ select query. Returns the distance between line geometry
      * and the point (latitude and longitude) in meters as an integer value.
@@ -54,11 +48,6 @@ public class SpatialQueries {
     public static Field<?> stDistance(double lat, double lon) {
 
         String query = "Round(ST_Distance(geom::geography, 'SRID=4326;POINT(" + lon + " " + lat + ")'::geography))";
-        return DSL.field(query);
-    }
-
-    public static Field<?> stDistanceReversed(double lat, double lon) {
-        String query = "Round(ST_Distance(ST_Reverse(geom::geography), 'SRID=4326;POINT(" + lon + " " + lat + ")'::geography))";
         return DSL.field(query);
     }
 
@@ -76,6 +65,12 @@ public class SpatialQueries {
      */
     public static Field<?> distAlongLine(double lat, double lon) {
         String query = " Round(length_meter * ST_LineLocatePoint(geom,ST_ClosestPoint(geom, 'SRID=4326;POINT(" +
+                lon + " " + lat + ")')))";
+        return DSL.field(query);
+    }
+
+    public static Field<?> distAlongLineReversed(double lat, double lon) {
+        String query = " Round(length_meter * ST_LineLocatePoint(ST_Reverse(geom), ST_ClosestPoint(geom, 'SRID=4326;POINT(" +
                 lon + " " + lat + ")')))";
         return DSL.field(query);
     }

@@ -12,6 +12,8 @@
         <java.version>1.11</java.version>
         <maven.compiler.source>1.11</maven.compiler.source>
         <maven.compiler.target>1.11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <geotools.version>24.0</geotools.version>
     </properties>
 
     <dependencies>
@@ -100,17 +102,30 @@
             <version>3.12.3</version>
         </dependency>
 
-        <dependency>
+     <!--   <dependency>
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
             <version>1.16.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>LATEST</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Geotools -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>24.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-epsg-hsql</artifactId>
+            <version>24.0</version>
+        </dependency>
+
 
         <!-- StopWatch -->
         <dependency>
@@ -121,22 +136,14 @@
     </dependencies>
 
     <repositories>
+
+        <!-- Geotools -->
         <repository>
-            <id>locationtech-releases</id>
-            <url>https://repo.locationtech.org/content/groups/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>jts-snapshots</id>
-            <url>https://repo.locationtech.org/content/repositories/jts-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
         </repository>
     </repositories>
 

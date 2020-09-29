@@ -3,6 +3,7 @@ package HereApi;
 import HereDecoder.DecoderHere;
 import Loader.OSMMapLoader;
 import OpenLR_h2o.OpenLRDecoder_h2o;
+import OpenLR_h2o.OpenLRLine_h2o;
 import openlr.location.Location;
 import openlr.map.Line;
 import org.jetbrains.annotations.NotNull;

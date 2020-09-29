@@ -28,18 +28,14 @@ public class OpenLRLine_h2o implements Line {
     int fow;
     int length_meter;
     String name;
+    boolean reversed;
 
-    public Boolean getReversed() {
-        return reversed;
-    }
-
-    Boolean reversed;
 
     public long getLine_id() {
         return line_id;
     }
 
-    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name) {
+    public OpenLRLine_h2o(long line_id, long start_node, long end_node, int frc, int fow, int length_meter, String name, boolean reversed) {
         this.line_id = line_id;
         this.start_node = start_node;
         this.end_node = end_node;
