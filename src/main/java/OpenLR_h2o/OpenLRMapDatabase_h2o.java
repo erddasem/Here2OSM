@@ -110,7 +110,6 @@ public class OpenLRMapDatabase_h2o implements openlr.map.MapDatabase, AutoClosea
     @Override
     public Rectangle2D.Double getMapBoundingBox() {
 
-        // select * from mapdata;
         double x = ctx.select(METADATA.LEFT_LAT).from(METADATA).fetchOne().value1();
         double y = ctx.select(METADATA.LEFT_LON).from(METADATA).fetchOne().value1();
         double width = ctx.select(METADATA.BBOX_WIDTH).from(METADATA).fetchOne().value1();

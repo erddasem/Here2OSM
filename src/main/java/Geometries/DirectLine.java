@@ -1,4 +1,4 @@
-package Loader;
+package Geometries;
 
 public class DirectLine {
 

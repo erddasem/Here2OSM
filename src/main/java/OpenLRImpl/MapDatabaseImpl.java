@@ -1,11 +1,14 @@
 package OpenLRImpl;
 
+import GeometryFunctions.*;
 import Loader.OSMMapLoader;
 import openlr.map.Line;
 import openlr.map.MapDatabase;
 import openlr.map.Node;
+import org.geotools.filter.function.GeometryFunction;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +20,7 @@ public class MapDatabaseImpl implements MapDatabase {
     public MapDatabaseImpl(OSMMapLoader osmLoader) {
         this.osmLoader = osmLoader;
     }
+
 
     @Override
     public boolean hasTurnRestrictions() {
@@ -42,11 +46,16 @@ public class MapDatabaseImpl implements MapDatabase {
 
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
+
+        //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
+
+        //function in SearchWithinDistance Class
         return null;
     }
 
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
+        //""
         return null;
     }
 
@@ -57,29 +66,32 @@ public class MapDatabaseImpl implements MapDatabase {
 
     @Override
     public Iterator<Node> getAllNodes() {
-
+        osmLoader.getAllNodes();
+        //Umwandlung in Iterator
         return null;
     }
 
     @Override
     public Iterator<Line> getAllLines() {
 
+        //return osmLoader.getAllLines().iterator();
         return null;
     }
 
     @Override
     public Rectangle2D.Double getMapBoundingBox() {
-        return null;
+
+        ArrayList<Double> bbox = osmLoader.getBoundingBox();
+        return new Rectangle2D.Double(bbox.get(0), bbox.get(1), bbox.get(2), bbox.get(3));
     }
 
     @Override
     public int getNumberOfNodes() {
-        //int numberOfNodes =
-        return 0;
+       return osmLoader.numberOfNodes();
     }
 
     @Override
     public int getNumberOfLines() {
-        return 0;
+        return osmLoader.numberOfLines();
     }
 }

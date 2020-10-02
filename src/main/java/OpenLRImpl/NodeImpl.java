@@ -2,16 +2,17 @@ package OpenLRImpl;
 
 import Loader.OSMMapLoader;
 import openlr.map.*;
-import org.opengis.geometry.primitive.Point;
+import org.locationtech.jts.geom.Point;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 public class NodeImpl implements Node {
 
     long node_id;
     double lat;
     double lon;
-    Point pointGeometry;
+    org.locationtech.jts.geom.Point pointGeometry;
     OSMMapLoader loader;
     // Geotools Point Geometry
 
@@ -37,6 +38,10 @@ public class NodeImpl implements Node {
 
     public double getLon() {
         return lon;
+    }
+
+    public Point getPointGeometry() {
+        return pointGeometry;
     }
 
     @Override
@@ -87,5 +92,21 @@ public class NodeImpl implements Node {
     @Override
     public long getID() {
         return node_id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NodeImpl node = (NodeImpl) o;
+        return node_id == node.node_id &&
+                Double.compare(node.lat, lat) == 0 &&
+                Double.compare(node.lon, lon) == 0 &&
+                pointGeometry.equals(node.pointGeometry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node_id, lat, lon, pointGeometry);
     }
 }

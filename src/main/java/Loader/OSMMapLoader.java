@@ -1,28 +1,31 @@
 package Loader;
 
 import DataBase.DatasourceConfig;
+import Geometries.DirectLine;
+import Geometries.LineConverter;
+import Geometries.ReversedLine;
 import OpenLRImpl.LineImpl;
 import OpenLRImpl.NodeImpl;
-import openlr.map.*;
 import org.apache.commons.collections.ListUtils;
-import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
-import org.opengis.geometry.primitive.Point;
+import org.locationtech.jts.geom.Point;
 
 
+import java.awt.geom.Rectangle2D;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
 import static org.jooq.sources.tables.Kanten.KANTEN;
 import static org.jooq.sources.tables.Knoten.KNOTEN;
+import static org.jooq.sources.tables.Metadata.METADATA;
 
 public class OSMMapLoader {
 
@@ -47,7 +50,13 @@ public class OSMMapLoader {
 
     }
 
+    public int numberOfNodes() {
+        return allNodesList.size();
+    }
 
+    public int numberOfLines() {
+        return allLinesList.size();
+    }
 
     // get all Nodes from PostgresDB
     public List<NodeImpl> getAllNodes() {
@@ -55,11 +64,14 @@ public class OSMMapLoader {
         List<NodeImpl> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN).fetchInto(NodeImpl.class);
 
-        GeometryBuilder builder = new GeometryBuilder( DefaultGeographicCRS.WGS84 );
+        GeometryFactory factory = new GeometryFactory();
 
         allNodes.forEach(n -> {
-            Point point = builder.createPoint(n.getLat(), n.getLon());
+            // Create point geometry for each node
+            Point point = factory.createPoint(new Coordinate(n.getLat(), n.getLon()));
             n.setPointGeometry(point);
+
+            // Set List of
         });
 
         return null;
@@ -77,7 +89,8 @@ public class OSMMapLoader {
     //Get all lines from Postgres DB
     public List<LineImpl> getAllLines() {
 
-        List<LineImpl> allLines = new ArrayList<>();
+        List<LineImpl> linesDirect = new ArrayList<>();
+        List<LineImpl> linesReversed = new ArrayList<>();
 
         /*convertedLines = reversedLines.stream().map(reversedLine -> {
             OpenLRLine_h2o openLRLineH2o = new OpenLRLine_h2o(reversedLine.line_id, reversedLine.start_node, reversedLine.end_node, reversedLine.frc, reversedLine.fow, reversedLine.length, reversedLine.name, reversedLine.reversed);
@@ -92,7 +105,7 @@ public class OSMMapLoader {
                 .fetchInto(DirectLine.class);
 
         // Convert directLine to TomTomLine
-        directLines.forEach(directLine -> allLines.add(LineConverter.directLine2OpenLRLine(directLine)));
+        directLines.forEach(directLine -> linesDirect.add(LineConverter.directLineToOpenLRLine(directLine)));
 
         // get all lines from database where oneway=false as reversed line > start and end node are siwtched within the constructor
         List<ReversedLine> reversedLines = ctx.select(KANTEN.LINE_ID, KANTEN.START_NODE, KANTEN.END_NODE, KANTEN.FRC, KANTEN.FOW,
@@ -102,17 +115,20 @@ public class OSMMapLoader {
                 .fetchInto(ReversedLine.class);
 
         // Convert reversedLine to tomtomLine
-        reversedLines.forEach(reversedLine -> allLines.add(LineConverter.revertedLine2OpenLRLine(reversedLine)));
+        reversedLines.forEach(reversedLine -> linesReversed.add(LineConverter.reversedLineToOpenLRLine(reversedLine)));
 
-        setLineNodes(allLines);
-        setLineGeometry(allLines);
+        List<LineImpl> allLines = ListUtils.union(linesDirect, linesReversed);
+
+        allLines = setLineNodes(allLines);
+        allLines = setLineGeometry(allLines);
+
 
         return allLines;
 
         //return allLines.iterator();
     }
 
-    private void setLineNodes(List<LineImpl> lines) {
+    private List<LineImpl> setLineNodes(List<LineImpl> lines) {
         lines.forEach(l -> {
 
             long startNodeID = l.getStartNodeID();
@@ -123,9 +139,10 @@ public class OSMMapLoader {
             Optional<NodeImpl> endNode = allNodesList.stream().filter(n -> n.getID() == endNodeID).findFirst();
             endNode.ifPresent(l::setEndNode);
         });
+        return lines;
     }
 
-    public static Field<?> st_asText(boolean reversed) {
+    private static Field<?> st_asText(boolean reversed) {
         if(!reversed)
             return DSL.field("ST_AsText(geom)");
         else {
@@ -133,7 +150,7 @@ public class OSMMapLoader {
         }
     }
 
-    private void setLineGeometry(List<LineImpl> lines) {
+    private List<LineImpl> setLineGeometry(List<LineImpl> lines) {
 
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
         WKTReader reader = new WKTReader( geometryFactory );
@@ -146,7 +163,25 @@ public class OSMMapLoader {
                 e.printStackTrace();
             }
         });
+        return lines;
     }
+
+    public ArrayList<Double> getBoundingBox() {
+
+        double x = ctx.select(METADATA.LEFT_LAT).from(METADATA).fetchOne().value1();
+        double y = ctx.select(METADATA.LEFT_LON).from(METADATA).fetchOne().value1();
+        double width = ctx.select(METADATA.BBOX_WIDTH).from(METADATA).fetchOne().value1();
+        double height = ctx.select(METADATA.BBOX_HEIGHT).from(METADATA).fetchOne().value1();
+
+        ArrayList<Double> bboxInformation = new ArrayList<>();
+        bboxInformation.add(x);
+        bboxInformation.add(y);
+        bboxInformation.add(width);
+        bboxInformation.add(height);
+
+        return bboxInformation;
+    }
+
 
     /*public Line getLine(long id) {
 

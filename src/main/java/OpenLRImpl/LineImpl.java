@@ -6,10 +6,7 @@ import org.locationtech.jts.geom.LineString;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 
 public class LineImpl implements Line {
@@ -26,7 +23,6 @@ public class LineImpl implements Line {
     boolean reversedGeom;
     LineString lineGeometry;
     //String wktGeometryRepresentation; > über Loader? und nur Geometrierepräsentation
-    OSMMapLoader loader;
     // LineGeometry über geoTools WKT Abfrage anlegen > über Setter wie bei Node
     MapDatabaseImpl mdb;
 
@@ -39,10 +35,6 @@ public class LineImpl implements Line {
         this.length_meter = length_meter;
         this.name = name;
         this.reversedGeom = reversedGeom;
-    }
-
-    public void setLineOSMMapLoader(OSMMapLoader loader) {
-        this.loader = loader;
     }
 
     public void setStartNode(Node startNode) {
@@ -63,6 +55,10 @@ public class LineImpl implements Line {
 
     public long getEndNodeID() {
         return endNode_id;
+    }
+
+    public LineString getLineGeometry() {
+        return lineGeometry;
     }
 
     public boolean isReversedGeom() {
@@ -143,5 +139,28 @@ public class LineImpl implements Line {
     @Override
     public Map<Locale, List<String>> getNames() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineImpl line = (LineImpl) o;
+        return line_id == line.line_id &&
+                startNode_id == line.startNode_id &&
+                endNode_id == line.endNode_id &&
+                frc == line.frc &&
+                fow == line.fow &&
+                length_meter == line.length_meter &&
+                reversedGeom == line.reversedGeom &&
+                startNode.equals(line.startNode) &&
+                endNode.equals(line.endNode) &&
+                Objects.equals(name, line.name) &&
+                lineGeometry.equals(line.lineGeometry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line_id, startNode_id, endNode_id, startNode, endNode, frc, fow, length_meter, name, reversedGeom, lineGeometry);
     }
 }
