@@ -11,9 +11,9 @@ import org.locationtech.jts.util.GeometricShapeFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchWithinDistance {
+public class GeometryFunctions {
 
-    private Geometry createSearchArea(double latitude, double longitude, double distance) {
+    private static Geometry createSearchArea(double latitude, double longitude, double distance) {
         GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
         shapeFactory.setNumPoints(32);
         shapeFactory.setCentre(new Coordinate(latitude, latitude));
@@ -21,7 +21,7 @@ public class SearchWithinDistance {
         return shapeFactory.createCircle();
     }
 
-    public List<NodeImpl> getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance) {
+    public static List<NodeImpl> getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance) {
         Polygon area = createSearchArea(latitude, longitude, distance).getFactory().createPolygon();
         List<NodeImpl> nodesWithinDistance = new ArrayList<>();
         nodes.forEach(n -> {
@@ -34,7 +34,7 @@ public class SearchWithinDistance {
     }
 
 
-    public List<LineImpl> getLinesWithinDistance(List<LineImpl> lines, double latitude, double longitude, double distance) {
+    public static List<LineImpl> getLinesWithinDistance(List<LineImpl> lines, double latitude, double longitude, double distance) {
         Polygon area = createSearchArea(latitude, longitude, distance).getFactory().createPolygon();
         List<LineImpl> linesWithinDistance = new ArrayList<>();
         lines.forEach(l -> {
@@ -44,6 +44,15 @@ public class SearchWithinDistance {
         });
 
         return linesWithinDistance;
+    }
+
+    public static double distToDeg(double lat, int dist) {
+        return dist / (111.32 * 1000 * Math.cos(lat * (Math.PI / 180)));
+    }
+
+    public static int distToMeter(double distDeg) {
+        int distMeter = (int) Math.round(distDeg * (Math.PI/180) * 6378137);
+        return distMeter;
     }
 
 }

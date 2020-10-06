@@ -4,8 +4,11 @@ import Loader.OSMMapLoader;
 import openlr.map.*;
 import org.locationtech.jts.geom.Point;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class NodeImpl implements Node {
 
@@ -13,8 +16,10 @@ public class NodeImpl implements Node {
     double lat;
     double lon;
     org.locationtech.jts.geom.Point pointGeometry;
-    OSMMapLoader loader;
-    // Geotools Point Geometry
+    ArrayList<Long> connectedLinesIDs;
+    MapDatabaseImpl mdb;
+
+    List<Line> connectedLines;
 
     public NodeImpl(long node_id, double lat, double lon) {
         this.node_id = node_id;
@@ -27,30 +32,38 @@ public class NodeImpl implements Node {
         this.pointGeometry = pointGeometry;
     }
 
-    // Methode: ruft GeoemtyBuilder auf, builder.createPoint(lat, lon); return: Point
-    public void setNodeOSMMapLoader(OSMMapLoader loader) {
-        this.loader = loader;
+    public void setConnectedLinesIDs(ArrayList<Long> connectedLinesIDs) {
+        this.connectedLinesIDs = connectedLinesIDs;
+    }
+
+    public void setMdb(MapDatabaseImpl mdb) {
+        this.mdb = mdb;
     }
 
     public double getLat() {
+
         return lat;
     }
 
     public double getLon() {
+
         return lon;
     }
 
     public Point getPointGeometry() {
+
         return pointGeometry;
     }
 
     @Override
     public double getLatitudeDeg() {
+
         return lat;
     }
 
     @Override
     public double getLongitudeDeg() {
+
         return lon;
     }
 
@@ -67,26 +80,50 @@ public class NodeImpl implements Node {
 
     @Override
     public Iterator<Line> getConnectedLines() {
-        // add Function in Loader
-        return null;
+
+        if (connectedLines != null) {
+            return connectedLines.iterator();
+        }
+        Iterator<Line> lineIterator = mdb.getAllLines();
+        List<Line> getConnectedLines = new ArrayList<>();
+        while(lineIterator.hasNext()) {
+            Line line = lineIterator.next();
+            getConnectedLines.addAll(connectedLines.stream().filter(
+                    id -> id.getID() == line.getID()).collect(Collectors.toList()));
+        }
+        connectedLines = getConnectedLines;
+        return getConnectedLines.iterator();
     }
 
     @Override
     public int getNumberConnectedLines() {
-        // add Function in Loader
-        return 0;
+        if (connectedLines != null){
+            return connectedLines.size();
+        }
+        getConnectedLines();
+        return  connectedLines.size();
     }
 
     @Override
     public Iterator<Line> getOutgoingLines() {
-        // add Function in Loader
-        return null;
+        if(connectedLines != null)
+            getConnectedLines();
+
+        List<Line> outgoingLines = connectedLines.stream()
+                .filter(l -> l.getStartNode().getID() == node_id)
+                .collect(Collectors.toList());
+        return outgoingLines.iterator();
     }
 
     @Override
     public Iterator<Line> getIncomingLines() {
-        // add function in Loader
-        return null;
+        if(connectedLines != null)
+            getConnectedLines();
+
+        List<Line> incomingLines = connectedLines.stream()
+                .filter(l -> l.getEndNode().getID() == node_id)
+                .collect(Collectors.toList());
+        return incomingLines.iterator();
     }
 
     @Override

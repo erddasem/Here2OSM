@@ -18,7 +18,6 @@ import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.geom.Point;
 
 
-import java.awt.geom.Rectangle2D;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -64,15 +63,7 @@ public class OSMMapLoader {
         List<NodeImpl> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN).fetchInto(NodeImpl.class);
 
-        GeometryFactory factory = new GeometryFactory();
-
-        allNodes.forEach(n -> {
-            // Create point geometry for each node
-            Point point = factory.createPoint(new Coordinate(n.getLat(), n.getLon()));
-            n.setPointGeometry(point);
-
-            // Set List of
-        });
+        setNodeGeometry(allNodes);
 
         return null;
 
@@ -80,11 +71,32 @@ public class OSMMapLoader {
         //return allNodes.iterator();
     }
 
-    /**
-     * Gets all lines from MapDatabase. Since lines with oneway=false are only saved for one direction
-     * reversed lines are created with reversed start and end node.
-     * @returnNa
-     */
+    private void setConnectedLinesList(List<LineImpl> allLinesList) {
+
+        allNodesList.forEach(n -> {
+            ArrayList<Long> connectedLinesIDs = new ArrayList<>();
+            allLinesList.forEach(l -> {
+                if (l.getStartNodeID() == n.getID() || l.getEndNodeID() == n.getID()) {
+                    connectedLinesIDs.add(l.getID());
+                }
+            });
+            n.setConnectedLinesIDs(connectedLinesIDs);
+        });
+    }
+
+    private List<NodeImpl> setNodeGeometry(List<NodeImpl> allNodesList) {
+
+        GeometryFactory factory = new GeometryFactory();
+
+        allNodesList.forEach(n -> {
+            // Create point geometry for each node
+            Point point = factory.createPoint(new Coordinate(n.getLon(), n.getLat()));
+            n.setPointGeometry(point);
+        });
+
+        return allNodesList;
+    }
+
 
     //Get all lines from Postgres DB
     public List<LineImpl> getAllLines() {
@@ -117,11 +129,13 @@ public class OSMMapLoader {
         // Convert reversedLine to tomtomLine
         reversedLines.forEach(reversedLine -> linesReversed.add(LineConverter.reversedLineToOpenLRLine(reversedLine)));
 
-        List<LineImpl> allLines = ListUtils.union(linesDirect, linesReversed);
+        List allLines = ListUtils.union(linesDirect, linesReversed);
 
-        allLines = setLineNodes(allLines);
-        allLines = setLineGeometry(allLines);
+        setLineNodes(allLines);
+        setLineGeometry(allLines);
 
+        //set list of connected lines for each node.
+        setConnectedLinesList(allLines);
 
         return allLines;
 

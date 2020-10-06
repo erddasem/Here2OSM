@@ -1,8 +1,12 @@
 package OpenLRImpl;
 
-import Loader.OSMMapLoader;
+import GeometryFunctions.GeometryFunctions;
 import openlr.map.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.operation.distance.DistanceOp;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -22,9 +26,9 @@ public class LineImpl implements Line {
     String name;
     boolean reversedGeom;
     LineString lineGeometry;
-    //String wktGeometryRepresentation; > über Loader? und nur Geometrierepräsentation
-    // LineGeometry über geoTools WKT Abfrage anlegen > über Setter wie bei Node
     MapDatabaseImpl mdb;
+
+    GeometryFactory geometryFactory = new GeometryFactory();
 
     public LineImpl(long line_id, long startNode_id, long endNode_id, int frc, int fow, int length_meter, String name, boolean reversedGeom) {
         this.line_id = line_id;
@@ -49,29 +53,26 @@ public class LineImpl implements Line {
         this.lineGeometry = lineGeometry;
     }
 
-    public long getStartNodeID() {
-        return startNode_id;
-    }
+    public void setMdb(MapDatabaseImpl mdb) {
+        this.mdb = mdb; }
 
-    public long getEndNodeID() {
-        return endNode_id;
-    }
+    public long getStartNodeID() { return startNode_id; }
 
-    public LineString getLineGeometry() {
-        return lineGeometry;
-    }
+    public long getEndNodeID() { return endNode_id; }
 
-    public boolean isReversedGeom() {
-        return reversedGeom;
-    }
+    public LineString getLineGeometry() { return lineGeometry; }
+
+    public boolean isReversedGeom() { return reversedGeom; }
 
     @Override
     public Node getStartNode() {
+
         return startNode;
     }
 
     @Override
     public Node getEndNode() {
+
         return endNode;
     }
 
@@ -83,61 +84,122 @@ public class LineImpl implements Line {
 
     @Override
     public FunctionalRoadClass getFRC() {
+
         return FunctionalRoadClass.getFRCs().get(frc);
     }
 
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
+
+        //TODO: Geometry Function
         return null;
     }
 
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
+
+        //TODO: Geometry Function
         return null;
     }
 
     @Override
     public int getLineLength() {
+
         return length_meter;
     }
 
     @Override
     public long getID() {
+
         return line_id;
     }
 
     @Override
     public Iterator<Line> getPrevLines() {
-        return null;
+
+        List<Line> previousLines = new ArrayList<>();
+        Iterator<Line> allLines = mdb.getAllLines();
+        while(allLines.hasNext()) {
+            Line line = allLines.next();
+            if(line.getEndNode().getID() == startNode_id)
+                previousLines.add(line);
+        }
+        return previousLines.iterator();
     }
 
     @Override
     public Iterator<Line> getNextLines() {
-        return null;
+
+        List<Line> nextLines = new ArrayList<>();
+        Iterator<Line> allLines = mdb.getAllLines();
+        while(allLines.hasNext()) {
+            Line line = allLines.next();
+            if(line.getStartNode().getID() == endNode_id)
+                nextLines.add(line);
+        }
+        return nextLines.iterator();
     }
+
+    /*
+    The curvature of the earth is ignored.
+    At a distance of 100m, the influence of the curvature is about 0.8mm. Since integers are returned and the standard
+    search radius is set to 100m, the curvature is ignored. If the parameter for the search radius
+    (OpenLR-Decoder-Properties.xml) is set to more than 100m, the method must be adapted.
+     */
 
     @Override
     public int distanceToPoint(double longitude, double latitude) {
-        return 0;
+
+        Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        double distanceDeg  = DistanceOp.distance(lineGeometry, p);
+
+        return GeometryFunctions.distToMeter(distanceDeg);
     }
 
     @Override
     public int measureAlongLine(double longitude, double latitude) {
-        return 0;
+
+        double length = 0;
+        // create point to check for intersection with line
+        Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        Point projectionPoint = geometryFactory.createPoint(DistanceOp.nearestPoints(lineGeometry, p)[0]);
+        Coordinate[] theLineCoordinates = lineGeometry.getCoordinates();
+        // iterate over linestring and create sub-lines for each coordinate pair
+        for(int i = 1; i < theLineCoordinates.length; i++){
+            LineString currentLine = geometryFactory.createLineString(new Coordinate[]{theLineCoordinates[i-1], theLineCoordinates[i]});
+            // check if coordinateOnTheLine is on currentLine
+            if(currentLine.intersects(projectionPoint)){
+                // create new currentLine with coordinateOnTheLine as endpoint and calculate length
+                currentLine = geometryFactory.createLineString(new Coordinate[]{theLineCoordinates[i-1], projectionPoint.getCoordinate()});
+                length += currentLine.getLength();
+                // return result length
+                int distanceMeter = GeometryFunctions.distToMeter(length);
+                return distanceMeter;
+            }
+            length += currentLine.getLength();
+        }
+        // coordinate was not on the line -> return length of complete linestring
+        return length_meter;
     }
 
     @Override
     public Path2D.Double getShape() {
+
+        //Optional method
         return null;
     }
 
     @Override
     public List<GeoCoordinates> getShapeCoordinates() {
+
+        //Optional method
         return null;
     }
 
     @Override
     public Map<Locale, List<String>> getNames() {
+
+        //Optional method
         return null;
     }
 

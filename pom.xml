@@ -186,8 +186,8 @@
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
                         <url>jdbc:postgresql://localhost/bautzner</url>
-                        <user>emilykast</user>
-                        <password></password>
+                        <user>postgres</user>
+                        <password>postgres</password>
                     </jdbc>
                     <!-- Generator parameters -->
                     <generator>

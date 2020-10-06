@@ -21,6 +21,10 @@ public class MapDatabaseImpl implements MapDatabase {
         this.osmLoader = osmLoader;
     }
 
+    private void setMapDatabaseImpl() {
+        osmLoader.getAllLines().forEach(l -> l.setMdb(this));
+        osmLoader.getAllNodes().forEach(n -> n.setMdb(this));
+    }
 
     @Override
     public boolean hasTurnRestrictions() {
@@ -66,16 +70,16 @@ public class MapDatabaseImpl implements MapDatabase {
 
     @Override
     public Iterator<Node> getAllNodes() {
-        osmLoader.getAllNodes();
-        //Umwandlung in Iterator
-        return null;
+
+        List allNodes = osmLoader.getAllNodes();
+        return allNodes.iterator();
     }
 
     @Override
     public Iterator<Line> getAllLines() {
 
-        //return osmLoader.getAllLines().iterator();
-        return null;
+        List allLines = osmLoader.getAllLines();
+        return allLines.iterator();
     }
 
     @Override
