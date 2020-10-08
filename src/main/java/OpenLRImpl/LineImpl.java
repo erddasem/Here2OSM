@@ -2,16 +2,12 @@ package OpenLRImpl;
 
 import GeometryFunctions.GeometryFunctions;
 import openlr.map.*;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.distance.DistanceOp;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.*;
-
 
 public class LineImpl implements Line {
 
@@ -24,13 +20,13 @@ public class LineImpl implements Line {
     int fow;
     int length_meter;
     String name;
-    boolean reversedGeom;
+    boolean isReversed;
     LineString lineGeometry;
     MapDatabaseImpl mdb;
 
     GeometryFactory geometryFactory = new GeometryFactory();
 
-    public LineImpl(long line_id, long startNode_id, long endNode_id, int frc, int fow, int length_meter, String name, boolean reversedGeom) {
+    public LineImpl(long line_id, long startNode_id, long endNode_id, int frc, int fow, int length_meter, String name, boolean isReversed) {
         this.line_id = line_id;
         this.startNode_id = startNode_id;
         this.endNode_id = endNode_id;
@@ -38,7 +34,7 @@ public class LineImpl implements Line {
         this.fow = fow;
         this.length_meter = length_meter;
         this.name = name;
-        this.reversedGeom = reversedGeom;
+        this.isReversed = isReversed;
     }
 
     public void setStartNode(Node startNode) {
@@ -62,7 +58,7 @@ public class LineImpl implements Line {
 
     public LineString getLineGeometry() { return lineGeometry; }
 
-    public boolean isReversedGeom() { return reversedGeom; }
+    public boolean isReversed() { return isReversed; }
 
     @Override
     public Node getStartNode() {
@@ -91,15 +87,42 @@ public class LineImpl implements Line {
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
 
-        //TODO: Geometry Function
-        return null;
+        //TODO: Check method. Use testcase, check for distance and position along the line using QGIS and DB. (ST_ postgis queries)
+        if(distanceAlong < length_meter) {
+            int segmentLengthTotal = 0;
+            Coordinate[] lineCoordinates = lineGeometry.getCoordinates();
+
+            for(int i = 0; i <= lineCoordinates.length-2; i++) {
+                LineSegment segment = new LineSegment(lineCoordinates[i], lineCoordinates[i+1]);
+                //Get segment length
+                int segmentLength = GeometryFunctions.distToMeter(segment.getLength());
+                segmentLengthTotal += segmentLength;
+
+                if(segmentLengthTotal >= distanceAlong) {
+                    int newDistAlong = segmentLength-(segmentLengthTotal-distanceAlong);
+                    double fraction = GeometryFunctions.getFraction(newDistAlong, segmentLength);
+                    Coordinate pointAlongCoordinates = segment.pointAlong(newDistAlong/segmentLength);
+                    Coordinate[] nearestPoints = DistanceOp.nearestPoints(segment.toGeometry(geometryFactory), geometryFactory.createPoint(pointAlongCoordinates));
+                    Point theNearestPoint = geometryFactory.createPoint(nearestPoints[0]);
+                    boolean isVertex = lineGeometry.isCoordinate(theNearestPoint.getCoordinate());
+                    return new Point2D.Double(theNearestPoint.getX(), theNearestPoint.getY());
+                }
+            }
+        }
+        return new Point2D.Double(endNode.getLongitudeDeg(), endNode.getLatitudeDeg());
     }
 
     @Override
     public GeoCoordinates getGeoCoordinateAlongLine(int distanceAlong) {
 
-        //TODO: Geometry Function
-        return null;
+        Point2D.Double pointAlongLine = getPointAlongLine(distanceAlong);
+        GeoCoordinates coordinatesAlongLine = null;
+        try {
+            coordinatesAlongLine = new GeoCoordinatesImpl(pointAlongLine.getX(), pointAlongLine.getY());
+        } catch (InvalidMapDataException e) {
+            e.printStackTrace();
+        }
+        return coordinatesAlongLine;
     }
 
     @Override
@@ -150,6 +173,7 @@ public class LineImpl implements Line {
     @Override
     public int distanceToPoint(double longitude, double latitude) {
 
+        //TODO: Check distance methods if conversion degree to meter is correct. Using ST_distance postgis function and geography
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         double distanceDeg  = DistanceOp.distance(lineGeometry, p);
 
@@ -159,10 +183,14 @@ public class LineImpl implements Line {
     @Override
     public int measureAlongLine(double longitude, double latitude) {
 
+        //TODO: Check method, maybe transform geometry to EPSG: 3857.
+
         double length = 0;
         // create point to check for intersection with line
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+
         Point projectionPoint = geometryFactory.createPoint(DistanceOp.nearestPoints(lineGeometry, p)[0]);
+        boolean isVertex = lineGeometry.isCoordinate(projectionPoint.getCoordinate());
         Coordinate[] theLineCoordinates = lineGeometry.getCoordinates();
         // iterate over linestring and create sub-lines for each coordinate pair
         for(int i = 1; i < theLineCoordinates.length; i++){
@@ -173,8 +201,7 @@ public class LineImpl implements Line {
                 currentLine = geometryFactory.createLineString(new Coordinate[]{theLineCoordinates[i-1], projectionPoint.getCoordinate()});
                 length += currentLine.getLength();
                 // return result length
-                int distanceMeter = GeometryFunctions.distToMeter(length);
-                return distanceMeter;
+                return GeometryFunctions.distToMeter(length);
             }
             length += currentLine.getLength();
         }
@@ -214,7 +241,7 @@ public class LineImpl implements Line {
                 frc == line.frc &&
                 fow == line.fow &&
                 length_meter == line.length_meter &&
-                reversedGeom == line.reversedGeom &&
+                isReversed == line.isReversed &&
                 startNode.equals(line.startNode) &&
                 endNode.equals(line.endNode) &&
                 Objects.equals(name, line.name) &&
@@ -223,6 +250,6 @@ public class LineImpl implements Line {
 
     @Override
     public int hashCode() {
-        return Objects.hash(line_id, startNode_id, endNode_id, startNode, endNode, frc, fow, length_meter, name, reversedGeom, lineGeometry);
+        return Objects.hash(line_id, startNode_id, endNode_id, startNode, endNode, frc, fow, length_meter, name, isReversed, lineGeometry);
     }
 }

@@ -16,7 +16,7 @@ public class NodeImpl implements Node {
     double lat;
     double lon;
     org.locationtech.jts.geom.Point pointGeometry;
-    ArrayList<Long> connectedLinesIDs;
+    List<Long> connectedLinesIDs;
     MapDatabaseImpl mdb;
 
     List<Line> connectedLines;
@@ -25,14 +25,14 @@ public class NodeImpl implements Node {
         this.node_id = node_id;
         this.lat = lat;
         this.lon = lon;
-        // this.PointGeometry = Methode aufrufen
+
     }
 
     public void setPointGeometry(Point pointGeometry) {
         this.pointGeometry = pointGeometry;
     }
 
-    public void setConnectedLinesIDs(ArrayList<Long> connectedLinesIDs) {
+    public void setConnectedLinesIDs(List<Long> connectedLinesIDs) {
         this.connectedLinesIDs = connectedLinesIDs;
     }
 
@@ -84,15 +84,18 @@ public class NodeImpl implements Node {
         if (connectedLines != null) {
             return connectedLines.iterator();
         }
+
         Iterator<Line> lineIterator = mdb.getAllLines();
         List<Line> getConnectedLines = new ArrayList<>();
-        while(lineIterator.hasNext()) {
-            Line line = lineIterator.next();
-            getConnectedLines.addAll(connectedLines.stream().filter(
-                    id -> id.getID() == line.getID()).collect(Collectors.toList()));
-        }
-        connectedLines = getConnectedLines;
-        return getConnectedLines.iterator();
+        connectedLinesIDs.forEach(id -> {
+            while(lineIterator.hasNext()) {
+                Line l = lineIterator.next();
+                if(id == l.getID())
+                    getConnectedLines.add(l);
+            }
+        });
+         connectedLines = getConnectedLines;
+         return connectedLines.iterator();
     }
 
     @Override

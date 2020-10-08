@@ -5,6 +5,7 @@ import Geometries.DirectLine;
 import Geometries.LineConverter;
 import Geometries.ReversedLine;
 import OpenLRImpl.LineImpl;
+import OpenLRImpl.MapDatabaseImpl;
 import OpenLRImpl.NodeImpl;
 import org.apache.commons.collections.ListUtils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -32,6 +33,14 @@ public class OSMMapLoader {
     private final Connection con;
     private final List<NodeImpl> allNodesList;
     private final List<LineImpl> allLinesList;
+    private MapDatabaseImpl mdb;
+
+    public OSMMapLoader() throws SQLException {
+        con = DatasourceConfig.getConnection();
+        ctx = DSL.using(con, SQLDialect.POSTGRES);
+        allNodesList = getAllNodes();
+        allLinesList = getAllLines();
+    }
 
     public List<NodeImpl> getAllNodesList() {
         return allNodesList;
@@ -41,12 +50,10 @@ public class OSMMapLoader {
         return allLinesList;
     }
 
-    public OSMMapLoader() throws SQLException {
-        con = DatasourceConfig.getConnection();
-        ctx = DSL.using(con, SQLDialect.POSTGRES);
-        allNodesList = getAllNodes();
-        allLinesList = getAllLines();
 
+
+    public void setMdb(MapDatabaseImpl mdb) {
+        this.mdb = mdb;
     }
 
     public int numberOfNodes() {
@@ -64,24 +71,25 @@ public class OSMMapLoader {
                 .from(KNOTEN).fetchInto(NodeImpl.class);
 
         setNodeGeometry(allNodes);
+        setConnectedLinesList(allNodes);
 
-        return null;
+        return allNodes;
 
         //for each node set Geometry
         //return allNodes.iterator();
     }
 
-    private void setConnectedLinesList(List<LineImpl> allLinesList) {
+    private List<NodeImpl> setConnectedLinesList(List<NodeImpl> allNodesList) {
 
         allNodesList.forEach(n -> {
-            ArrayList<Long> connectedLinesIDs = new ArrayList<>();
-            allLinesList.forEach(l -> {
-                if (l.getStartNodeID() == n.getID() || l.getEndNodeID() == n.getID()) {
-                    connectedLinesIDs.add(l.getID());
-                }
-            });
+            List<Long> connectedLinesIDs = ctx.select().from(KANTEN)
+                    .where(KANTEN.START_NODE.eq(n.getID()))
+                    .or(KANTEN.END_NODE.eq(n.getID()))
+                    .fetch().getValues(KANTEN.LINE_ID);
+
             n.setConnectedLinesIDs(connectedLinesIDs);
         });
+        return allNodesList;
     }
 
     private List<NodeImpl> setNodeGeometry(List<NodeImpl> allNodesList) {
@@ -92,6 +100,7 @@ public class OSMMapLoader {
             // Create point geometry for each node
             Point point = factory.createPoint(new Coordinate(n.getLon(), n.getLat()));
             n.setPointGeometry(point);
+            n.setMdb(mdb);
         });
 
         return allNodesList;
@@ -134,9 +143,6 @@ public class OSMMapLoader {
         setLineNodes(allLines);
         setLineGeometry(allLines);
 
-        //set list of connected lines for each node.
-        setConnectedLinesList(allLines);
-
         return allLines;
 
         //return allLines.iterator();
@@ -156,8 +162,8 @@ public class OSMMapLoader {
         return lines;
     }
 
-    private static Field<?> st_asText(boolean reversed) {
-        if(!reversed)
+    private static Field<?> st_asText(boolean isReversed) {
+        if(!isReversed)
             return DSL.field("ST_AsText(geom)");
         else {
             return DSL.field("ST_AsText(ST_Reverse(geom))");
@@ -170,12 +176,14 @@ public class OSMMapLoader {
         WKTReader reader = new WKTReader( geometryFactory );
 
         lines.forEach(l -> {
-            String wktString = ctx.select(st_asText(l.isReversedGeom())).from(KANTEN).where(KANTEN.LINE_ID.eq(l.getID())).fetchOne().value1().toString();
+            String wktString;
+            wktString = ctx.select(st_asText(l.isReversed())).from(KANTEN).where(KANTEN.LINE_ID.eq(l.getID())).fetchOne().value1().toString();
             try {
                  l.setLineGeometry((LineString) reader.read(wktString));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            l.setMdb(mdb);
         });
         return lines;
     }
@@ -194,6 +202,11 @@ public class OSMMapLoader {
         bboxInformation.add(height);
 
         return bboxInformation;
+    }
+
+    public void close() throws Exception {
+        if (ctx != null) ctx.close();
+        if (con != null) con.close();
     }
 
 

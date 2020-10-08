@@ -5,25 +5,28 @@ import Loader.OSMMapLoader;
 import openlr.map.Line;
 import openlr.map.MapDatabase;
 import openlr.map.Node;
-import org.geotools.filter.function.GeometryFunction;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.operation.distance.DistanceOp;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MapDatabaseImpl implements MapDatabase {
 
     OSMMapLoader osmLoader;
 
+    GeometryFactory geometryFactory = new GeometryFactory();
+
     public MapDatabaseImpl(OSMMapLoader osmLoader) {
         this.osmLoader = osmLoader;
-    }
-
-    private void setMapDatabaseImpl() {
-        osmLoader.getAllLines().forEach(l -> l.setMdb(this));
-        osmLoader.getAllNodes().forEach(n -> n.setMdb(this));
+        osmLoader.setMdb(this);
     }
 
     @Override
@@ -45,22 +48,32 @@ public class MapDatabaseImpl implements MapDatabase {
 
         Optional<NodeImpl> matchingNode = osmLoader.getAllNodesList().stream()
             .filter(n -> n.getID() == id).findFirst();
+
         return matchingNode.get();
     }
 
     @Override
     public Iterator<Node> findNodesCloseByCoordinate(double longitude, double latitude, int distance) {
 
+        double distanceDeg = GeometryFunctions.distToDeg(latitude, distance);
+        Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        List<Node> closeByNodes = new ArrayList(osmLoader.getAllNodes().stream().filter(l ->
+                DistanceOp.isWithinDistance(l.pointGeometry, p, distanceDeg)
+        ).collect(Collectors.toList()));
         //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
+        return closeByNodes.iterator();
 
-        //function in SearchWithinDistance Class
-        return null;
     }
 
     @Override
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
-        //""
-        return null;
+        double distanceDeg = GeometryFunctions.distToDeg(latitude, distance);
+        Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        List closeByLines = new ArrayList(osmLoader.getAllLines().stream().filter(l ->
+                DistanceOp.isWithinDistance(l.lineGeometry, p, distanceDeg)
+        ).collect(Collectors.toList()));
+        //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
+        return closeByLines.iterator();
     }
 
     @Override

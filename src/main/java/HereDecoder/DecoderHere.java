@@ -1,6 +1,8 @@
 package HereDecoder;
 
 import Exceptions.InvalidHereOLRException;
+import Loader.OSMMapLoader;
+import OpenLRImpl.MapDatabaseImpl;
 import OpenLR_h2o.OpenLRMapDatabase_h2o;
 import openlr.LocationReferencePoint;
 import openlr.Offsets;
@@ -140,7 +142,12 @@ public class DecoderHere {
         }
 
         // Initialize database
-        MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
+        //MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
+        // Initialize OSM Database Loader
+        OSMMapLoader osmMapLoader = new OSMMapLoader();
+
+        // Initialize database
+        MapDatabase mapDatabase = new MapDatabaseImpl(osmMapLoader);
 
         // Decoder parameter, properties for writing on map database
         FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File(this.getClass().getClassLoader().getResource("OpenLR-Decoder-Properties.xml").getFile()));
@@ -152,7 +159,8 @@ public class DecoderHere {
         //decode the location on map database
         Location location = decoder.decodeRaw(params, rawLocationReference);
 
-        ((OpenLRMapDatabase_h2o) mapDatabase).close();
+        osmMapLoader.close();
+        //((OpenLRMapDatabase_h2o) mapDatabase).close();
 
         return location;
     }

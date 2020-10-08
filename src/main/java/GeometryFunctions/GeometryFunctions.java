@@ -55,4 +55,8 @@ public class GeometryFunctions {
         return distMeter;
     }
 
+    public static double getFraction(int distance, int length_meter) {
+        return distance / length_meter;
+    }
+
 }

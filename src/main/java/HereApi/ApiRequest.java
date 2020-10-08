@@ -216,7 +216,7 @@ public class ApiRequest {
             // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("C:/Users/Kast/Documents/Masterarbeit/01_Testdaten/02_Vergleich/Karlsruhe.xml");
+            parser.parseXMlFromFile("C:/Users/Kast/Documents/Bautzner_2Richtungen.xml");
 
 
             // Collect relevant data per incident and decoding location
