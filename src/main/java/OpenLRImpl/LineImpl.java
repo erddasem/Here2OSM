@@ -1,9 +1,12 @@
 package OpenLRImpl;
 
 import GeometryFunctions.GeometryFunctions;
+import com.spatial4j.core.distance.DistanceUtils;
 import openlr.map.*;
+import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.distance.DistanceOp;
+
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -87,7 +90,6 @@ public class LineImpl implements Line {
     @Override
     public Point2D.Double getPointAlongLine(int distanceAlong) {
 
-        //TODO: Check method. Use testcase, check for distance and position along the line using QGIS and DB. (ST_ postgis queries)
         if(distanceAlong < length_meter) {
             int segmentLengthTotal = 0;
             Coordinate[] lineCoordinates = lineGeometry.getCoordinates();
@@ -95,17 +97,15 @@ public class LineImpl implements Line {
             for(int i = 0; i <= lineCoordinates.length-2; i++) {
                 LineSegment segment = new LineSegment(lineCoordinates[i], lineCoordinates[i+1]);
                 //Get segment length
-                int segmentLength = GeometryFunctions.distToMeter(segment.getLength());
+                Coordinate[] segmentCoordinates = new Coordinate[]{segment.p0, segment.p1};
+                int segmentLength = (int) Math.round(calculateOthodromicDist(segmentCoordinates));
                 segmentLengthTotal += segmentLength;
 
                 if(segmentLengthTotal >= distanceAlong) {
+
                     int newDistAlong = segmentLength-(segmentLengthTotal-distanceAlong);
-                    double fraction = GeometryFunctions.getFraction(newDistAlong, segmentLength);
-                    Coordinate pointAlongCoordinates = segment.pointAlong(newDistAlong/segmentLength);
-                    Coordinate[] nearestPoints = DistanceOp.nearestPoints(segment.toGeometry(geometryFactory), geometryFactory.createPoint(pointAlongCoordinates));
-                    Point theNearestPoint = geometryFactory.createPoint(nearestPoints[0]);
-                    boolean isVertex = lineGeometry.isCoordinate(theNearestPoint.getCoordinate());
-                    return new Point2D.Double(theNearestPoint.getX(), theNearestPoint.getY());
+                    Coordinate pointAlong = segment.pointAlong((double) newDistAlong/ (double) segmentLength);
+                    return new Point2D.Double(pointAlong.x, pointAlong.y);
                 }
             }
         }
@@ -163,49 +163,50 @@ public class LineImpl implements Line {
         return nextLines.iterator();
     }
 
-    /*
-    The curvature of the earth is ignored.
-    At a distance of 100m, the influence of the curvature is about 0.8mm. Since integers are returned and the standard
-    search radius is set to 100m, the curvature is ignored. If the parameter for the search radius
-    (OpenLR-Decoder-Properties.xml) is set to more than 100m, the method must be adapted.
-     */
-
     @Override
     public int distanceToPoint(double longitude, double latitude) {
 
-        //TODO: Check distance methods if conversion degree to meter is correct. Using ST_distance postgis function and geography
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         double distanceDeg  = DistanceOp.distance(lineGeometry, p);
-
         return GeometryFunctions.distToMeter(distanceDeg);
+    }
+
+    private double calculateOthodromicDist(Coordinate[] coordinates) {
+
+        GeodeticCalculator gc = new GeodeticCalculator();
+        gc.setStartingGeographicPoint(coordinates[0].x, coordinates[0].y);
+        gc.setDestinationGeographicPoint(coordinates[1].x, coordinates[1].y);
+        return gc.getOrthodromicDistance();
     }
 
     @Override
     public int measureAlongLine(double longitude, double latitude) {
 
-        //TODO: Check method, maybe transform geometry to EPSG: 3857.
 
-        double length = 0;
-        // create point to check for intersection with line
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-
         Point projectionPoint = geometryFactory.createPoint(DistanceOp.nearestPoints(lineGeometry, p)[0]);
-        boolean isVertex = lineGeometry.isCoordinate(projectionPoint.getCoordinate());
-        Coordinate[] theLineCoordinates = lineGeometry.getCoordinates();
-        // iterate over linestring and create sub-lines for each coordinate pair
-        for(int i = 1; i < theLineCoordinates.length; i++){
-            LineString currentLine = geometryFactory.createLineString(new Coordinate[]{theLineCoordinates[i-1], theLineCoordinates[i]});
-            // check if coordinateOnTheLine is on currentLine
-            if(currentLine.intersects(projectionPoint)){
+
+        //Create Buffer around point geometry since jts is not able to check if line intersects point:
+        double bufferDist = GeometryFunctions.distToDeg(latitude, 0.0001);
+        Geometry pointBuffer = projectionPoint.buffer(bufferDist);
+
+        Coordinate[] lineCoordinates = lineGeometry.getCoordinates();
+        double distAlong = 0;
+
+        //Create line segments from line coordinates
+        for(int i = 1; i < lineCoordinates.length; i++){
+            LineString lineSegment = geometryFactory.createLineString(new Coordinate[]{lineCoordinates[i-1], lineCoordinates[i]});
+
+            if(lineSegment.intersects(pointBuffer)){
+
                 // create new currentLine with coordinateOnTheLine as endpoint and calculate length
-                currentLine = geometryFactory.createLineString(new Coordinate[]{theLineCoordinates[i-1], projectionPoint.getCoordinate()});
-                length += currentLine.getLength();
-                // return result length
-                return GeometryFunctions.distToMeter(length);
+                LineString lineFraction = geometryFactory.createLineString(new Coordinate[]{lineCoordinates[i-1], projectionPoint.getCoordinate()});
+                distAlong += calculateOthodromicDist(lineFraction.getCoordinates());
+                return (int) Math.round(distAlong);
             }
-            length += currentLine.getLength();
+
+            distAlong += calculateOthodromicDist(lineSegment.getCoordinates());
         }
-        // coordinate was not on the line -> return length of complete linestring
         return length_meter;
     }
 

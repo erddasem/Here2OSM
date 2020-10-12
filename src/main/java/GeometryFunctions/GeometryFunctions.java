@@ -46,17 +46,12 @@ public class GeometryFunctions {
         return linesWithinDistance;
     }
 
-    public static double distToDeg(double lat, int dist) {
+    public static double distToDeg(double lat, double dist) {
         return dist / (111.32 * 1000 * Math.cos(lat * (Math.PI / 180)));
     }
 
     public static int distToMeter(double distDeg) {
-        int distMeter = (int) Math.round(distDeg * (Math.PI/180) * 6378137);
-        return distMeter;
-    }
-
-    public static double getFraction(int distance, int length_meter) {
-        return distance / length_meter;
+        return (int) Math.round(distDeg * (Math.PI/180) * 6378137);
     }
 
 }
