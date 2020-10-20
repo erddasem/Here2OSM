@@ -65,6 +65,10 @@ public class DataCollector {
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
         OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
         DecoderHere decoderHere = new DecoderHere();
+        // Initialize OSM Database Loader
+        OSMMapLoader osmMapLoader = new OSMMapLoader();
+
+        osmMapLoader.close();
 
         for (TrafficItem trafficItemObject : trafficItemList) {
 
@@ -87,7 +91,8 @@ public class DataCollector {
             //Location location = decoder.decodeTomTom(byteArray);
 
             // Reads out TPEG-OLR Locations
-            Location location = decoderHere.decodeHere(openLRCode);
+
+            Location location = decoderHere.decodeHere(openLRCode, osmMapLoader);
 
             int posOff;
             int negOff;

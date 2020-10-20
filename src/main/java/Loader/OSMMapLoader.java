@@ -34,12 +34,14 @@ public class OSMMapLoader {
     private final List<NodeImpl> allNodesList;
     private final List<LineImpl> allLinesList;
     private MapDatabaseImpl mdb;
+    private final ArrayList<Double> boundingBoxInformation;
 
     public OSMMapLoader() throws SQLException {
         con = DatasourceConfig.getConnection();
         ctx = DSL.using(con, SQLDialect.POSTGRES);
         allNodesList = getAllNodes();
         allLinesList = getAllLines();
+        boundingBoxInformation = getBoundingBox();
     }
 
     public List<NodeImpl> getAllNodesList() {
@@ -50,10 +52,16 @@ public class OSMMapLoader {
         return allLinesList;
     }
 
-
+    public ArrayList<Double> getBoundingBoxInformation() {
+        return boundingBoxInformation;
+    }
 
     public void setMdb(MapDatabaseImpl mdb) {
+
         this.mdb = mdb;
+        allNodesList.forEach(n -> n.setMdb(this.mdb));
+        allLinesList.forEach(l -> l.setMdb(this.mdb));
+        //setMdbForNodes(mdb);
     }
 
     public int numberOfNodes() {
@@ -74,12 +82,9 @@ public class OSMMapLoader {
         setConnectedLinesList(allNodes);
 
         return allNodes;
-
-        //for each node set Geometry
-        //return allNodes.iterator();
     }
 
-    private List<NodeImpl> setConnectedLinesList(List<NodeImpl> allNodesList) {
+    private void setConnectedLinesList(List<NodeImpl> allNodesList) {
 
         allNodesList.forEach(n -> {
             List<Long> connectedLinesIDs = ctx.select().from(KANTEN)
@@ -89,10 +94,10 @@ public class OSMMapLoader {
 
             n.setConnectedLinesIDs(connectedLinesIDs);
         });
-        return allNodesList;
+
     }
 
-    private List<NodeImpl> setNodeGeometry(List<NodeImpl> allNodesList) {
+    private void setNodeGeometry(List<NodeImpl> allNodesList) {
 
         GeometryFactory factory = new GeometryFactory();
 
@@ -102,8 +107,6 @@ public class OSMMapLoader {
             n.setPointGeometry(point);
             n.setMdb(mdb);
         });
-
-        return allNodesList;
     }
 
 
@@ -148,7 +151,7 @@ public class OSMMapLoader {
         //return allLines.iterator();
     }
 
-    private List<LineImpl> setLineNodes(List<LineImpl> lines) {
+    private void setLineNodes(List<LineImpl> lines) {
         lines.forEach(l -> {
 
             long startNodeID = l.getStartNodeID();
@@ -159,7 +162,6 @@ public class OSMMapLoader {
             Optional<NodeImpl> endNode = allNodesList.stream().filter(n -> n.getID() == endNodeID).findFirst();
             endNode.ifPresent(l::setEndNode);
         });
-        return lines;
     }
 
     private static Field<?> st_asText(boolean isReversed) {
@@ -170,7 +172,7 @@ public class OSMMapLoader {
         }
     }
 
-    private List<LineImpl> setLineGeometry(List<LineImpl> lines) {
+    private void setLineGeometry(List<LineImpl> lines) {
 
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
         WKTReader reader = new WKTReader( geometryFactory );
@@ -185,7 +187,6 @@ public class OSMMapLoader {
             }
             l.setMdb(mdb);
         });
-        return lines;
     }
 
     public ArrayList<Double> getBoundingBox() {
@@ -203,6 +204,10 @@ public class OSMMapLoader {
 
         return bboxInformation;
     }
+
+    /*private void setMdbForNodes(MapDatabaseImpl mdb) {
+        allNodesList.forEach(n -> n.setMdb(mdb));
+    } */
 
     public void close() throws Exception {
         if (ctx != null) ctx.close();

@@ -128,7 +128,7 @@ public class DecoderHere {
      * @return location
      * @throws Exception Invalide HERE Location
      */
-    public Location decodeHere(String openLRCode) throws Exception {
+    public Location decodeHere(String openLRCode, OSMMapLoader osmMapLoader) throws Exception {
 
         // Gets Open Location Reference from Base64 String
         OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(openLRCode);
@@ -143,8 +143,7 @@ public class DecoderHere {
 
         // Initialize database
         //MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
-        // Initialize OSM Database Loader
-        OSMMapLoader osmMapLoader = new OSMMapLoader();
+
 
         // Initialize database
         MapDatabase mapDatabase = new MapDatabaseImpl(osmMapLoader);
@@ -159,7 +158,7 @@ public class DecoderHere {
         //decode the location on map database
         Location location = decoder.decodeRaw(params, rawLocationReference);
 
-        osmMapLoader.close();
+        //osmMapLoader.close();
         //((OpenLRMapDatabase_h2o) mapDatabase).close();
 
         return location;

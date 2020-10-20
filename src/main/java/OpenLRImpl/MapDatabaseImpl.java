@@ -57,7 +57,7 @@ public class MapDatabaseImpl implements MapDatabase {
 
         double distanceDeg = GeometryFunctions.distToDeg(latitude, distance);
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        List<Node> closeByNodes = new ArrayList(osmLoader.getAllNodes().stream().filter(l ->
+        List<Node> closeByNodes = new ArrayList(osmLoader.getAllNodesList().stream().filter(l ->
                 DistanceOp.isWithinDistance(l.pointGeometry, p, distanceDeg)
         ).collect(Collectors.toList()));
         //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
@@ -69,7 +69,7 @@ public class MapDatabaseImpl implements MapDatabase {
     public Iterator<Line> findLinesCloseByCoordinate(double longitude, double latitude, int distance) {
         double distanceDeg = GeometryFunctions.distToDeg(latitude, distance);
         Point p = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        List closeByLines = new ArrayList(osmLoader.getAllLines().stream().filter(l ->
+        List closeByLines = new ArrayList(osmLoader.getAllLinesList().stream().filter(l ->
                 DistanceOp.isWithinDistance(l.lineGeometry, p, distanceDeg)
         ).collect(Collectors.toList()));
         //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
@@ -84,21 +84,21 @@ public class MapDatabaseImpl implements MapDatabase {
     @Override
     public Iterator<Node> getAllNodes() {
 
-        List allNodes = osmLoader.getAllNodes();
+        List allNodes = osmLoader.getAllNodesList();
         return allNodes.iterator();
     }
 
     @Override
     public Iterator<Line> getAllLines() {
 
-        List allLines = osmLoader.getAllLines();
+        List allLines = osmLoader.getAllLinesList();
         return allLines.iterator();
     }
 
     @Override
     public Rectangle2D.Double getMapBoundingBox() {
 
-        ArrayList<Double> bbox = osmLoader.getBoundingBox();
+        ArrayList<Double> bbox = osmLoader.getBoundingBoxInformation();
         return new Rectangle2D.Double(bbox.get(0), bbox.get(1), bbox.get(2), bbox.get(3));
     }
 
