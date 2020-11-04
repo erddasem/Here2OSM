@@ -1,9 +1,6 @@
 import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
 import HereApi.ApiRequest;
-import Loader.OSMMapLoader;
-
-import java.sql.SQLException;
 
 public class Here2Osm {
     // mainMethode

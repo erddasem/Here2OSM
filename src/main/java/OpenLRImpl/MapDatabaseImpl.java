@@ -1,7 +1,7 @@
 package OpenLRImpl;
 
 import GeometryFunctions.*;
-import Loader.OSMMapLoader;
+import Loader.RoutableOSMMapLoader;
 import openlr.map.Line;
 import openlr.map.MapDatabase;
 import openlr.map.Node;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 
 public class MapDatabaseImpl implements MapDatabase {
 
-    OSMMapLoader osmLoader;
+    RoutableOSMMapLoader osmLoader;
 
     GeometryFactory geometryFactory = new GeometryFactory();
 
-    public MapDatabaseImpl(OSMMapLoader osmLoader) {
+    public MapDatabaseImpl(RoutableOSMMapLoader osmLoader) {
         this.osmLoader = osmLoader;
         osmLoader.setMdb(this);
     }
@@ -60,7 +60,7 @@ public class MapDatabaseImpl implements MapDatabase {
         List<Node> closeByNodes = new ArrayList(osmLoader.getAllNodesList().stream().filter(l ->
                 DistanceOp.isWithinDistance(l.pointGeometry, p, distanceDeg)
         ).collect(Collectors.toList()));
-        //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
+
         return closeByNodes.iterator();
 
     }
@@ -72,7 +72,7 @@ public class MapDatabaseImpl implements MapDatabase {
         List closeByLines = new ArrayList(osmLoader.getAllLinesList().stream().filter(l ->
                 DistanceOp.isWithinDistance(l.lineGeometry, p, distanceDeg)
         ).collect(Collectors.toList()));
-        //ArrayList<Double> nodesCloseBy = getNodesWithinDistance(List<NodeImpl> nodes, double latitude, double longitude, double distance);
+
         return closeByLines.iterator();
     }
 

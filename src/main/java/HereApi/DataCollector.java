@@ -1,9 +1,7 @@
 package HereApi;
 
 import HereDecoder.DecoderHere;
-import Loader.OSMMapLoader;
-import OpenLR_h2o.OpenLRDecoder_h2o;
-import OpenLR_h2o.OpenLRLine_h2o;
+import Loader.RoutableOSMMapLoader;
 import openlr.location.Location;
 import openlr.map.Line;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static HereDecoder.DecoderHere.*;
-
 public class DataCollector {
 
     // Contains incident information
@@ -26,9 +22,9 @@ public class DataCollector {
 
     public DataCollector() {
 
-        /** List to contain all incidents */
+        /* List to contain all incidents */
         this.listIncidents = new ArrayList<>();
-        /** List to contains all from incidents affected lines */
+        /* List to contains all from incidents affected lines */
         this.listAffectedLines = new ArrayList<>();
     }
 
@@ -63,11 +59,12 @@ public class DataCollector {
      * @throws Exception
      */
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
-        OpenLRDecoder_h2o decoder = new OpenLRDecoder_h2o();
+
+        // Initialize Decoder for HERE OpenLR Codes.
         DecoderHere decoderHere = new DecoderHere();
         // Initialize OSM Database Loader
-        OSMMapLoader osmMapLoader = new OSMMapLoader();
-
+        RoutableOSMMapLoader osmMapLoader = new RoutableOSMMapLoader();
+        //Close Database connection
         osmMapLoader.close();
 
         for (TrafficItem trafficItemObject : trafficItemList) {
@@ -75,6 +72,7 @@ public class DataCollector {
             String incidentId = trafficItemObject.getId();
             String type = trafficItemObject.getType();
             String status = trafficItemObject.getStatus();
+
             // Converts start and end date from String to Timestamp
             Timestamp start = convertString2Timestamp(trafficItemObject.getStart());
             Timestamp end = convertString2Timestamp(trafficItemObject.getEnd());
@@ -85,19 +83,13 @@ public class DataCollector {
             // Parses road closure information from string to boolean
             boolean roadClosure = Boolean.parseBoolean(trafficItemObject.getClosure());
 
-            // Can be added if you need to read out TomTom OpenLR Location
-            // Decodes OpenLR Base64 Code and extracts location
-            //ByteArray byteArray = decoder.openLR2byteArray(openLRCode);
-            //Location location = decoder.decodeTomTom(byteArray);
-
             // Reads out TPEG-OLR Locations
-
             Location location = decoderHere.decodeHere(openLRCode, osmMapLoader);
 
             int posOff;
             int negOff;
 
-            // If Location is invalid positive and negative offset get the value -100
+            // If location is invalid positive and negative offsets get the value -100
             if (location == null) {
                 posOff = -100;
                 negOff = -100;

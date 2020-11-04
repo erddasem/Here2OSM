@@ -1,6 +1,5 @@
 package OpenLRImpl;
 
-import Loader.OSMMapLoader;
 import openlr.map.*;
 import org.locationtech.jts.geom.Point;
 
@@ -15,7 +14,7 @@ public class NodeImpl implements Node {
     long node_id;
     double lat;
     double lon;
-    org.locationtech.jts.geom.Point pointGeometry;
+    Point pointGeometry;
     List<Long> connectedLinesIDs;
     MapDatabaseImpl mdb;
 
@@ -112,6 +111,7 @@ public class NodeImpl implements Node {
         if(connectedLines != null)
             getConnectedLines();
 
+        assert connectedLines != null;
         List<Line> outgoingLines = connectedLines.stream()
                 .filter(l -> l.getStartNode().getID() == node_id)
                 .collect(Collectors.toList());
@@ -123,6 +123,7 @@ public class NodeImpl implements Node {
         if(connectedLines != null)
             getConnectedLines();
 
+        assert connectedLines != null;
         List<Line> incomingLines = connectedLines.stream()
                 .filter(l -> l.getEndNode().getID() == node_id)
                 .collect(Collectors.toList());

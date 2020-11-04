@@ -211,12 +211,10 @@ public class ApiRequest {
                 e.printStackTrace();
             }
 
-            StopWatch watch2 = new StopWatch();
-            watch2.start();
             // Parse answer or file
             XMLParser parser = new XMLParser();
             //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("C:/Users/Kast/Documents/Bautzner_2Richtungen.xml");
+            parser.parseXMlFromFile("/Users/emilykast/Desktop/Bautzner_2Richtungen.xml");
 
 
             // Collect relevant data per incident and decoding location
@@ -230,8 +228,6 @@ public class ApiRequest {
             // Collects incident data and affected lines for all requested bounding boxes
             this.incidentList.addAll(collector.getListIncidents());
             this.affectedLinesList.addAll(collector.getListAffectedLines());
-            watch2.stop();
-            System.out.println("Duration for request and location referencing: " + watch2.getTime());
 
         }
     }
@@ -248,28 +244,24 @@ public class ApiRequest {
      */
     public void updateIncidentData() throws InvalidBboxException, InvalidWGS84CoordinateException {
 
-        //Start StopWatch
-        StopWatch watch1 = new StopWatch();
-        watch1.start();
-
         // Get current timestamp
         Timestamp currentTimestamp = getTimeStamp();
 
         // Get recursive bounding boxes if bbox is bigger than 2 degrees
         getRecursiveBbox(setBoundingBox());
 
-        // Needed for creating tables to set schema
+        // Needed to set schema for creating tables
         Name temp_incidents = DSL.name("openlr", "temp_incidents");
         Name temp_kanten_incidents = DSL.name("openlr", "temp_kanten_incidents");
         Name incidents = DSL.name("openlr", "incidents");
         Name kanten_incidents = DSL.name("openlr", "kanten_incidents");
         Name affected = DSL.name("openlr", "affected");
 
-        // Checks if incidents table already exists
+        // Checks if "incidents" table already exists
         String incidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "incidents"))
                 .fetchOne().value1());
 
-        // Checks if temp_incidnts table already exists
+        // Checks if "temp_incidents" table already exists
         String tempIncidentsTableExists = String.valueOf(ctx.select(to_regclass("openlr", "temp_incidents"))
                 .fetchOne().value1());
 
@@ -277,15 +269,10 @@ public class ApiRequest {
         Timestamp youngestEntry = "null".equals(incidentsTableExists) ? null :
                 (Timestamp) ctx.select(min(field("generationdate"))).from(table(incidents)).fetchOne().value1();
 
-
-        //StopWatch to measure first transaction
-        StopWatch watch3 = new StopWatch();
-        watch3.start();
-
-        // Begin First Transaction - Fill temp tables
+        // Begin First Transaction - Fills temporary tables
         ctx.transaction(configuration1 -> {
 
-            // Deleting temp tables if they exist, prevents program from running into "already exists"-Error
+            // Deleting temp_ tables if they exist, prevents program from running into "already exists"-Error
             if (tempIncidentsTableExists.equals("openlr.temp_incidents")) {
                 ctx.dropTable(table(temp_kanten_incidents)).cascade().execute();
                 ctx.dropTable(table(temp_incidents)).cascade().execute();
@@ -357,16 +344,12 @@ public class ApiRequest {
 
         }); // End first transaction
 
-        watch3.stop();
         //If the most recent entry in the incident table is younger than the time stamp when the program was started,
         // the data will not be updated.
         if (youngestEntry != null && currentTimestamp.before(youngestEntry)) {
             return;
         }
 
-        //StopWatch to measure second transaction
-        StopWatch watch4 = new StopWatch();
-        watch4.start();
         // Begin Second Transaction
         ctx.transaction(configuration2 -> {
 
@@ -388,10 +371,6 @@ public class ApiRequest {
 
         }); // End second transaction
 
-        watch4.stop();
-        watch1.stop();
-
-
         // Checks if affected table already exists
         String affectedExists = String.valueOf(ctx.select(to_regclass("openlr", "affected"))
                 .fetchOne().value1());
@@ -409,7 +388,6 @@ public class ApiRequest {
 
 
         System.out.println("Program ended.");
-        System.out.println("Time Elapsed: Total duration: " + watch1.getTime() + "1. transaction: " + watch3.getTime() + "2. transaction: " + watch4.getTime());
     }
 
 }

@@ -1,9 +1,8 @@
 package HereDecoder;
 
 import Exceptions.InvalidHereOLRException;
-import Loader.OSMMapLoader;
+import Loader.RoutableOSMMapLoader;
 import OpenLRImpl.MapDatabaseImpl;
-import OpenLR_h2o.OpenLRMapDatabase_h2o;
 import openlr.LocationReferencePoint;
 import openlr.Offsets;
 import openlr.binary.impl.LocationReferencePointBinaryImpl;
@@ -128,7 +127,7 @@ public class DecoderHere {
      * @return location
      * @throws Exception Invalide HERE Location
      */
-    public Location decodeHere(String openLRCode, OSMMapLoader osmMapLoader) throws Exception {
+    public Location decodeHere(String openLRCode, RoutableOSMMapLoader osmMapLoader) throws Exception {
 
         // Gets Open Location Reference from Base64 String
         OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(openLRCode);
@@ -156,12 +155,7 @@ public class DecoderHere {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on map database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
-
-        //osmMapLoader.close();
-        //((OpenLRMapDatabase_h2o) mapDatabase).close();
-
-        return location;
+        return decoder.decodeRaw(params, rawLocationReference);
     }
 
 
