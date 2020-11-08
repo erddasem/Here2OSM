@@ -1,4 +1,12 @@
-package Geometries;
+package Lines;
+
+/**
+ * Swaps start and end node for the line and sets the boolean 'reverse' as true.
+ * Is needed if the road network in the database only contains lines in one direction, even if the line has two
+ * driving directions. Reversed information is needed to rotate the geometry information if needed.
+ *
+ * @author Emily Kast
+ */
 
 public class ReversedLine {
 

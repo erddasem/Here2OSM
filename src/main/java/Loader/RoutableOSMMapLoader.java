@@ -1,9 +1,9 @@
 package Loader;
 
 import DataBase.DatasourceConfig;
-import Geometries.DirectLine;
-import Geometries.LineConverter;
-import Geometries.ReversedLine;
+import Lines.DirectLine;
+import Lines.LineConverter;
+import Lines.ReversedLine;
 import OpenLRImpl.LineImpl;
 import OpenLRImpl.MapDatabaseImpl;
 import OpenLRImpl.NodeImpl;
@@ -28,9 +28,14 @@ import static org.jooq.sources.tables.Knoten.KNOTEN;
 import static org.jooq.sources.tables.Metadata.METADATA;
 
 /**
- * Loader for routable OSM data in PostgreSQL database.
+ *
+ * Loader for routable OSM data in a PostgreSQL database with PostGIS extension.
  * Database queries are constructed with the help of JOOQ.
+ *
+ * @author Emily Kast
+ *
  */
+
 public class RoutableOSMMapLoader implements MapLoader {
 
     private final DSLContext ctx;
@@ -48,35 +53,42 @@ public class RoutableOSMMapLoader implements MapLoader {
         boundingBoxInformation = getBoundingBox();
     }
 
+    @Override
     public List<NodeImpl> getAllNodesList() {
         return allNodesList;
     }
 
+    @Override
     public List<LineImpl> getAllLinesList() {
         return allLinesList;
     }
 
+    @Override
     public ArrayList<Double> getBoundingBoxInformation() {
         return boundingBoxInformation;
     }
 
+    @Override
     public void setMdb(MapDatabaseImpl mdb) {
         this.mdb = mdb;
-        allNodesList.forEach(n -> n.setMdb(this.mdb));
-        allLinesList.forEach(l -> l.setMdb(this.mdb));
+        allNodesList.forEach(node -> node.setMdb(this.mdb));
+        allLinesList.forEach(line -> line.setMdb(this.mdb));
     }
 
+    @Override
     public int numberOfNodes() {
         return allNodesList.size();
     }
 
+    @Override
     public int numberOfLines() {
         return allLinesList.size();
     }
 
-
+    @Override
     public List<NodeImpl> getAllNodes() {
 
+        // Get node information from PostgreSQL database and write it into NodeImpl class using JOOQ
         List<NodeImpl> allNodes = ctx.select(KNOTEN.NODE_ID, KNOTEN.LAT, KNOTEN.LON)
                 .from(KNOTEN).fetchInto(NodeImpl.class);
 
@@ -112,12 +124,15 @@ public class RoutableOSMMapLoader implements MapLoader {
      */
     private void setNodeGeometry(List<NodeImpl> allNodesList) {
 
+        // GeometryFactory needed to create point geometry
         GeometryFactory factory = new GeometryFactory();
-        allNodesList.forEach(n -> {
+        allNodesList.forEach(node -> {
             // Create point geometry for each node
-            Point point = factory.createPoint(new Coordinate(n.getLon(), n.getLat()));
-            n.setPointGeometry(point);
-            n.setMdb(mdb);
+            Point point = factory.createPoint(new Coordinate(node.getLon(), node.getLat()));
+            // Set point geometry for the node
+            node.setPointGeometry(point);
+            // set MapDatabase for the node
+            node.setMdb(mdb);
         });
     }
 
@@ -221,7 +236,7 @@ public class RoutableOSMMapLoader implements MapLoader {
 
     /**
      * Closes database connection.
-     * @throws Exception
+     * @throws Exception Exception
      */
     public void close() throws Exception {
         if (ctx != null) ctx.close();

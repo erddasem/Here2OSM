@@ -1,6 +1,9 @@
-package HereDecoder;
+package Decoder;
 
 import Exceptions.InvalidHereOLRException;
+import HereDecoder.IntermediateReferencePoint;
+import HereDecoder.LinearLocationReference;
+import HereDecoder.OpenLocationReference;
 import Loader.RoutableOSMMapLoader;
 import OpenLRImpl.MapDatabaseImpl;
 import openlr.LocationReferencePoint;
@@ -25,9 +28,15 @@ import java.util.List;
 /**
  * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
  * Original C# program translated to Java.
+ * The TPEG-OLR standard differs from the TomTom OpenLR standard in the binary representation.
+ * To overcome this issue HERE decoder decodes the TPEG-OLR location as a raw location reference in accordance
+ * with the TomTom OpenLR standard. This makes it possible to decode the location with the TomTom decoder and
+ * find the shortest path (affected lines) in the given road network.
+ *
+ * @author Emily Kast
  */
 
-public class DecoderHere {
+public class HereDecoder {
 
     /**
      * Gets the OpenLR FOW Enum depending on the given FOW integer value
@@ -61,6 +70,7 @@ public class DecoderHere {
             System.out.println("HERE: Invalid OpenLR Data");
             throw new InvalidHereOLRException("HERE OLR is invalid!");
         } else {
+            // switch statement since OpenLR offers more than line locations.
             switch (olr.getLocationReference().getType().id) {
                 case OpenLocationReference.OLR_TYPE_LINEAR:
                     LinearLocationReference lr = (LinearLocationReference) olr.getLocationReference();
@@ -121,7 +131,8 @@ public class DecoderHere {
     }
 
     /**
-     * HERE Decoder, decodes Base64 Strings to LineLocations.
+     * HERE Decoder, decodes Base64 Strings to LineLocations by generating a raw location reference according
+     * to the TomTom OpenLR standard.
      *
      * @param openLRCode OpenLR Base64 String
      * @return location
@@ -139,10 +150,6 @@ public class DecoderHere {
         } catch (InvalidHereOLRException e) {
             return null;
         }
-
-        // Initialize database
-        //MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
-
 
         // Initialize database
         MapDatabase mapDatabase = new MapDatabaseImpl(osmMapLoader);

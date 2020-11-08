@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the TomTom OpenLR Node interface.
+ *
+ * @author Emily Kast
+ */
+
 public class NodeImpl implements Node {
 
     long node_id;

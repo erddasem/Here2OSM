@@ -1,6 +1,6 @@
 package HereApi;
 
-import HereDecoder.DecoderHere;
+import Decoder.HereDecoder;
 import Loader.RoutableOSMMapLoader;
 import openlr.location.Location;
 import openlr.map.Line;
@@ -56,12 +56,12 @@ public class DataCollector {
      * Uses OpenLR decoder (TomTom, https://github.com/tomtom-international/openlr ) to determine affected lines.
      *
      * @param trafficItemList List containing extracted traffic items
-     * @throws Exception
+     * @throws Exception Exception
      */
     public void collectInformation(@NotNull List<TrafficItem> trafficItemList) throws Exception {
 
         // Initialize Decoder for HERE OpenLR Codes.
-        DecoderHere decoderHere = new DecoderHere();
+        HereDecoder decoderHere = new HereDecoder();
         // Initialize OSM Database Loader
         RoutableOSMMapLoader osmMapLoader = new RoutableOSMMapLoader();
         //Close Database connection

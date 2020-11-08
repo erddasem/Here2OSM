@@ -1,11 +1,12 @@
 package HereApi;
 
 /**
- * The traffic item object read from the Traffic API requested xml
+ * The traffic item object read from the Traffic API requested xml.
+ *
+ * @author Emily Kast
  */
 
 public class TrafficItem {
-
 
     private String id;
     private String type;

@@ -8,6 +8,9 @@ import java.util.List;
 
 /**
  * This class describes the incident object.
+ *
+ * @author Emily Kast
+ *
  */
 
 public class Incident {

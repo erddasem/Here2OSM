@@ -16,6 +16,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ */
+
 public class XMLParser {
 
     // List contains the traffic elements in the XML file

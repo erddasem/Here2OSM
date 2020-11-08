@@ -3,14 +3,12 @@ package HereApi;
 import DataBase.DatasourceConfig;
 import Exceptions.InvalidBboxException;
 import Exceptions.InvalidWGS84CoordinateException;
-import org.apache.commons.lang.time.StopWatch;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
-import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -26,7 +24,12 @@ import java.util.regex.Pattern;
 import static org.jooq.impl.DSL.*;
 import static org.jooq.sources.tables.Kanten.KANTEN;
 
-
+/**
+ *
+ *
+ * @author Emily Kast
+ *
+ */
 
 public class ApiRequest {
 
@@ -44,7 +47,6 @@ public class ApiRequest {
 
     // needed for SQL queries
     static DSLContext ctx;
-
     static {
         try {
             ctx = DSL.using(DatasourceConfig.getConnection(), SQLDialect.POSTGRES);

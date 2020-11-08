@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the TomTom OpenLR MapDatabase interface.
+ *
+ * @author Emily Kast
+ */
+
 public class MapDatabaseImpl implements MapDatabase {
 
     RoutableOSMMapLoader osmLoader;

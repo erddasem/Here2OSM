@@ -6,6 +6,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Parameter needed to get database connection.
+ *
+ * @author Emily Kast
+ */
+
 public class DatasourceConfig {
 
     /*
@@ -27,6 +33,11 @@ public class DatasourceConfig {
         ds = new HikariDataSource(config);
     }
 
+    /**
+     * Get database connection.
+     * @return database connection
+     * @throws SQLException SQL Exception
+     */
     public static Connection getConnection() throws SQLException {
         return ds.getConnection();
     }

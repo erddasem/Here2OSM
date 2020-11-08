@@ -7,10 +7,26 @@ import OpenLRImpl.NodeImpl;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Loader interface provides methods needed to get road network and use it for the OpenLR decoding process.
+ *
+ * @author  Emily Kast
+ */
+
 public interface MapLoader {
 
     /**
-     * List of all nodes in the road network.
+     * Method to get all nodes from the database and write the into AllNodesList.
+     * For each node the following information must be given:
+     * node_id as long, latitude as double, longitude as double, point geometry as Point, list of connected
+     * lineIDs and MapDatabaseImplementation.
+     *
+     * @return List of nodes
+     */
+    List<NodeImpl> getAllNodes();
+
+    /**
+     * Returns list of all nodes in the road network.
      * For each node the following information must be given:
      * node_id as long, latitude as double, longitude as double, point geometry as Point, list of connected
      * lineIDs and MapDatabaseImplementation.
@@ -18,6 +34,15 @@ public interface MapLoader {
      * @return List of nodes
      */
     List<NodeImpl> getAllNodesList();
+
+    /**
+     * Methode to get all lines from the database and write into AllLinesList.
+     * If the database only contains lines in one direct even though a line is passable in both directions,
+     * the geometry of the these lines need to be reversed and added to the list. There needs to be a line for every
+     * driving direction.
+     * @return List of lines
+     */
+    List<LineImpl> getAllLines();
 
     /**
      * List of all lines in the road network.

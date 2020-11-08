@@ -1,4 +1,11 @@
-package Geometries;
+package Lines;
+
+/**
+ * Needed information for direct line.
+ * Direct in the sens of given as in the database.
+ *
+ * @author Emily Kast
+ */
 
 public class DirectLine {
 

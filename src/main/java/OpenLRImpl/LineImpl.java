@@ -12,6 +12,12 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 
+/**
+ * Implementation of the TomTom OpenLR Line interface.
+ *
+ * @author Emily Kast
+ */
+
 public class LineImpl implements Line {
 
     long line_id;
@@ -19,7 +25,9 @@ public class LineImpl implements Line {
     long endNode_id;
     Node startNode;
     Node endNode;
+    // functional road class
     int frc;
+    //form of way
     int fow;
     int length_meter;
     String name;
