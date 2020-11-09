@@ -17,9 +17,9 @@ public class DatasourceConfig {
     /*
      * Change database url and login information depending on your database
      * */
-    private static String dbUrl = "jdbc:postgresql://localhost/bautzner";
-    private static String user = "emilykast";
-    private static String password = "";
+    private static String dbUrl = "jdbc:postgresql://localhost/dbname";
+    private static String user = "username";
+    private static String password = "password";
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
 

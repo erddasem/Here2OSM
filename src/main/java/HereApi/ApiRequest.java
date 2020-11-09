@@ -215,8 +215,9 @@ public class ApiRequest {
 
             // Parse answer or file
             XMLParser parser = new XMLParser();
-            //parser.parseXMLFromApi(answer);
-            parser.parseXMlFromFile("/Users/emilykast/Desktop/Bautzner_2Richtungen.xml");
+            parser.parseXMLFromApi(answer);
+            // If you wanne test out a file instead of the API
+            //parser.parseXMlFromFile("");
 
 
             // Collect relevant data per incident and decoding location
