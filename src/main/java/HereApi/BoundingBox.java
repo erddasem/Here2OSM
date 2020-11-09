@@ -3,7 +3,11 @@ package HereApi;
 import openlr.map.GeoCoordinates;
 
 /**
+ *
  * This class describes the bounding box.
+ *
+ * @author  Emily Kast
+ *
  */
 
 public class BoundingBox extends TrafficItem {

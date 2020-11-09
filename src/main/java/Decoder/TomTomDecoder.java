@@ -1,5 +1,7 @@
-package OpenLR_h2o;
+package Decoder;
 
+import Loader.RoutableOSMMapLoader;
+import OpenLRImpl.MapDatabaseImpl;
 import openlr.binary.ByteArray;
 import openlr.binary.OpenLRBinaryDecoder;
 import openlr.*;
@@ -17,12 +19,7 @@ import java.io.File;
 
 import java.util.Base64;
 
-/**
- * Decodes an TomTom OpenLR location.
- * Not suited to decode HERE TPEG-OLR location.
- */
-
-public class OpenLRDecoder_h2o {
+public class TomTomDecoder {
 
     /**
      * Method to decode base64 String to Byte Array.
@@ -43,7 +40,7 @@ public class OpenLRDecoder_h2o {
      */
 
 
-    public Location decodeTomTom(ByteArray byteArray) throws Exception {
+    public Location decodeTomTom(ByteArray byteArray, RoutableOSMMapLoader osmMapLoader) throws Exception {
         // Byte array to location reference
         LocationReference lr = new LocationReferenceBinaryImpl("Incident", byteArray);
 
@@ -52,7 +49,7 @@ public class OpenLRDecoder_h2o {
         RawLocationReference rawLocationReference = binaryDecoder.decodeData(lr);
 
         // Initialize database
-        MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
+        MapDatabase mapDatabase = new MapDatabaseImpl(osmMapLoader);
 
         // DecoderHere parameter
         FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File(this.getClass().getClassLoader().getResource("OpenLR-Decoder-Properties.xml").getFile()));
@@ -62,12 +59,8 @@ public class OpenLRDecoder_h2o {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on own database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
 
-        //Close database connections
-        ((OpenLRMapDatabase_h2o) mapDatabase).close();
-
-        return location;
+        return decoder.decodeRaw(params, rawLocationReference);
     }
 
 }

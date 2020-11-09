@@ -1,7 +1,11 @@
-package HereDecoder;
+package Decoder;
 
 import Exceptions.InvalidHereOLRException;
-import OpenLR_h2o.OpenLRMapDatabase_h2o;
+import HereDecoder.IntermediateReferencePoint;
+import HereDecoder.LinearLocationReference;
+import HereDecoder.OpenLocationReference;
+import Loader.RoutableOSMMapLoader;
+import OpenLRImpl.MapDatabaseImpl;
 import openlr.LocationReferencePoint;
 import openlr.Offsets;
 import openlr.binary.impl.LocationReferencePointBinaryImpl;
@@ -24,9 +28,15 @@ import java.util.List;
 /**
  * HERE implementation of the TPEG-OLR standard (ISO/TS 21219-22)
  * Original C# program translated to Java.
+ * The TPEG-OLR standard differs from the TomTom OpenLR standard in the binary representation.
+ * To overcome this issue HERE decoder decodes the TPEG-OLR location as a raw location reference in accordance
+ * with the TomTom OpenLR standard. This makes it possible to decode the location with the TomTom decoder and
+ * find the shortest path (affected lines) in the given road network.
+ *
+ * @author Emily Kast
  */
 
-public class DecoderHere {
+public class HereDecoder {
 
     /**
      * Gets the OpenLR FOW Enum depending on the given FOW integer value
@@ -60,6 +70,7 @@ public class DecoderHere {
             System.out.println("HERE: Invalid OpenLR Data");
             throw new InvalidHereOLRException("HERE OLR is invalid!");
         } else {
+            // switch statement since OpenLR offers more than line locations.
             switch (olr.getLocationReference().getType().id) {
                 case OpenLocationReference.OLR_TYPE_LINEAR:
                     LinearLocationReference lr = (LinearLocationReference) olr.getLocationReference();
@@ -120,13 +131,14 @@ public class DecoderHere {
     }
 
     /**
-     * HERE Decoder, decodes Base64 Strings to LineLocations.
+     * HERE Decoder, decodes Base64 Strings to LineLocations by generating a raw location reference according
+     * to the TomTom OpenLR standard.
      *
      * @param openLRCode OpenLR Base64 String
      * @return location
      * @throws Exception Invalide HERE Location
      */
-    public Location decodeHere(String openLRCode) throws Exception {
+    public Location decodeHere(String openLRCode, RoutableOSMMapLoader osmMapLoader) throws Exception {
 
         // Gets Open Location Reference from Base64 String
         OpenLocationReference olr = OpenLocationReference.fromBase64TpegOlr(openLRCode);
@@ -140,7 +152,7 @@ public class DecoderHere {
         }
 
         // Initialize database
-        MapDatabase mapDatabase = new OpenLRMapDatabase_h2o();
+        MapDatabase mapDatabase = new MapDatabaseImpl(osmMapLoader);
 
         // Decoder parameter, properties for writing on map database
         FileConfiguration decoderConfig = OpenLRPropertiesReader.loadPropertiesFromFile(new File(this.getClass().getClassLoader().getResource("OpenLR-Decoder-Properties.xml").getFile()));
@@ -150,11 +162,7 @@ public class DecoderHere {
         OpenLRDecoder decoder = new openlr.decoder.OpenLRDecoder();
 
         //decode the location on map database
-        Location location = decoder.decodeRaw(params, rawLocationReference);
-
-        ((OpenLRMapDatabase_h2o) mapDatabase).close();
-
-        return location;
+        return decoder.decodeRaw(params, rawLocationReference);
     }
 
 

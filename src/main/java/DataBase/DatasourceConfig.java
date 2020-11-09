@@ -6,14 +6,20 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Parameter needed to get database connection.
+ *
+ * @author Emily Kast
+ */
+
 public class DatasourceConfig {
 
     /*
      * Change database url and login information depending on your database
      * */
-    private static String dbUrl = "jdbc:postgresql://localhost/karlsruhe";
-    private static String user = "emilykast";
-    private static String password = "";
+    private static String dbUrl = "jdbc:postgresql://localhost/dbname";
+    private static String user = "username";
+    private static String password = "password";
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
 
@@ -27,6 +33,11 @@ public class DatasourceConfig {
         ds = new HikariDataSource(config);
     }
 
+    /**
+     * Get database connection.
+     * @return database connection
+     * @throws SQLException SQL Exception
+     */
     public static Connection getConnection() throws SQLException {
         return ds.getConnection();
     }
