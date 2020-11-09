@@ -3,7 +3,7 @@
 ## About
 
 * Implementation to request traffic incident data from the provider HERE and map them on your own OpenStreetMap map database
-* Uses the TomTom OpenLR and the TEPG2-OLR standards
+* Uses the TomTom OpenLR standard and the TEPG2-OLR standard
 * Project status: reference implementation
 
 Necessary information:
@@ -56,7 +56,7 @@ request traffic incident data from the provider HERE.
 * PostgreSQL: <https://www.postgresql.org>
 * PostGIS: <https://postgis.net>
 * pgRouting: <https://pgrouting.org>
-*jOOQ: <https://www.jooq.org>
+* jOOQ: <https://www.jooq.org>
 
 ## License
 
