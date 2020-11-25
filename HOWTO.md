@@ -7,7 +7,8 @@ Instructions for setting up a routable PostgreSQL database
 2. [Programms and extensions needed](#programms)
 3. [Get OSM data](#osmdata)
 4. [Setup database](#database_setup)
-6. [FAQs](#faqs)
+5. [FAQs](#faqs)
+
 
 ### General Info
 ***
@@ -56,3 +57,25 @@ If you have a larger file, e.g. OSM data for Germany use the following command:
 ```bash
 --Osm2pgsql -d dbname -U username osmpbffilename.osm.pbf --slim --hstore
 ```
+
+After loading the OSM file to your databse it should look like this: 
+
+![LoadedOSMData](src/main/resources/Screenshots/osm2pgsql.png)
+
+1. Run one of the scripts in /src/main/resources/SQL in your database client to generate a routable OSM road network:
+* If you want to use *all of the OSM* data use the [SQL_Script.sql](src/main/resources/SQL/SQL_Script.sql)
+* if you want to *clip the data to an area* use the [SQL_Script_clip2bbox.sql](src/main/resources/SQL/SQL_Script.sql). The area for the cut must be in the database in the public schema. 
+* Before running set the information in the metadata table, example for Hamburg: 
+```sql
+INSERT INTO openlr.metadata(map_name, map_owner) VALUES 
+('Hamburg', 'OSM');
+```
+
+After running one of the SQL scripts the openlr schema should look like this: 
+
+![OpenLRShema](src/main/resources/Screenshots/tables.png)
+
+
+
+
+
