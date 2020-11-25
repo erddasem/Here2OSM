@@ -205,9 +205,10 @@ CREATE TABLE openlr.metadata (
     bbox_width double precision, 
     bbox geometry(POLYGON, 0)
 );
-
+                                   
 INSERT INTO openlr.metadata(map_name, map_owner) VALUES 
-('Hamburg', 'OSM');
+('map_name', 'map_owner');
+                                   
 UPDATE openlr.metadata set bbox = (SELECT ST_Extent(geom) FROM openlr.knoten);
 
 UPDATE openlr.metadata set 
