@@ -57,7 +57,7 @@ Check out HOWTO for instructions on setting up a routable PostgreSQL database ba
 </jdbc>
 ```
 
-3. Set your [HERE Api key](src/main/java/HereApi/ApiRequest.java
+3. Set your [HERE Api key](src/main/java/HereApi/ApiRequest.java)
 ```java
 private String hereApikey = "yourApiKey";
 ```
