@@ -7,9 +7,10 @@ Reference implementation of the [TomTom OpenLR standard](https://www.openlr-asso
 2. [Programms and accounts needed](#programms)
 3. [Database setup](#database_setup)
 4. [Build](#build)
-5. [FAQs](#faqs)
-6. [Technologies](#technologies)
-7. [License](#license)
+5. [Database tables](#tables)
+6. [FAQs](#faqs)
+7. [Technologies](#technologies)
+8. [License](#license)
 
 ### General Info
 ***
@@ -38,7 +39,7 @@ If you want to set up a PostgreSQL database with OSM data:
 
 ### Database setup 
 ***
-Check out HOWTO for instructions on setting up a routable PostgreSQL database based on OSM data and the information about the relevant database tables. 
+Check out HOWTO for instructions on setting up a routable PostgreSQL database based on OSM data.
 
 ### Build
 ***
@@ -67,7 +68,22 @@ private String hereApikey = "yourApiKey";
 mvn clean install
 ```
 5. Run the program. The requested bounding must be specified as WGS84 coordinates.
-  
+
+### Databse tables 
+***
+The database sould contain the following tables before running the programm: 
++ **form_of_way** : physical characteristics of a street. For more informationn check [TomTom OpenLR White Paper](https://www.openlr-association.com/fileadmin/user_upload/openlr-whitepaper_v1.5.pdf).
++ **functional_road_class**: indicates the importance of the road in the network. For more informationn check [TomTom OpenLR White Paper](https://www.openlr-association.com/fileadmin/user_upload/openlr-whitepaper_v1.5.pdf).
++ + **kanten**: lines in the road network. 
++ + **knoten**: nodes in the road network. 
++ **metadata**: metainformation for the map, map owner, map name and bounding box information.
+
+
+After running the programm the following tables should be added to the databse: 
++ **affected** : contains all lines affected by a incident
++ **incidents** : Contains all incidents received from the Traffic API with their ID, type, status, start date, end date, criticaliy, OpenLR code, short description, detailed description, road closure, positive offset, negative offset and creation date. If a incident couldn't be mapped the offsets are set to -1, if the OpenLR code is not valid they are set to -100. 
++ **kanten_incidents**: key table
+
 ### FAQs
 ***
 1. **Is there a database example?**
@@ -76,6 +92,7 @@ _Yes, check out the HOWTO file_.
 _You can find the decoder to be used in the TomTomDecoder class._ 
 2. **How do you visualize the data in QGIS?**
 _Check this [video](https://www.youtube.com/watch?v=17AZQ2-5Rrk)._
+1. **Can I use a different spatial database?** _Yes, it is possible to use another spatial databse. But you need to implement your own map loader using the [MapLoader Interface](src/main/java/Loader/MapLoader.java). In addition, changes in the pom.xml (database connection and Jooq dialect), the DatasourceConfig class and the ApiRequest class must be made._ 
 
 ### Technologies
 ***
