@@ -23,8 +23,7 @@ Project status: reference implementation
 
 ### Programms and accounts needed
 ***
-#### Accounts
-* At least a [HERE Developer Freemium plan](https://developer.here.com/pricing) with an API KEY for the usage with [HERE lo]
+* At least a [HERE Developer Freemium plan](https://developer.here.com/pricing) with an API KEY for the usage of the [HERE Traffic API](https://developer.here.com/documentation/traffic/dev_guide/topics/what-is.html).
 
 #### Programms
 * IDE of your choice, e.g. IntelliJ IDEA
