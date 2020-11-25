@@ -8,7 +8,7 @@ Reference implementation of the [TomTom OpenLR standard](https://www.openlr-asso
 3. [Database setup](#database_setup)
 4. [Build](#build)
 5. [FAQs](#faqs)
-6. [Technologies] (#resources)
+6. [Technologies](#technologies)
 7. [License](#license)
 
 ### General Info
