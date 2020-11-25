@@ -3,6 +3,8 @@ package DataBase;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -14,6 +16,7 @@ import java.sql.SQLException;
 
 public class DatasourceConfig {
 
+
     /*
      * Change database url and login information depending on your database
      * */
@@ -22,6 +25,7 @@ public class DatasourceConfig {
     private static String password = "password";
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
+
 
     static {
         config.setJdbcUrl(dbUrl);
