@@ -63,8 +63,8 @@ After loading the OSM file to your databse it should look like this:
 ![LoadedOSMData](src/main/resources/Screenshots/osm2pgsql.png)
 
 1. Run one of the scripts in /src/main/resources/SQL in your database client to generate a routable OSM road network:
-* If you want to use *all of the OSM* data use the [SQL_Script.sql](src/main/resources/SQL/SQL_Script.sql)
-* if you want to *clip the data to an area* use the [SQL_Script_clip2bbox.sql](src/main/resources/SQL/SQL_Script.sql). The area for the cut must be in the database in the public schema. 
+* If you want to use **all of the OSM** data use the [SQL_Script.sql](src/main/resources/SQL/SQL_Script.sql)
+* if you want to **clip the data to an area** use the [SQL_Script_clip2bbox.sql](src/main/resources/SQL/SQL_Script.sql). The clipping area must be in the database in the public schema. The table containing the clipping area must be named **bbox**.
 * Before running set the information in the metadata table, example for Hamburg: 
 ```sql
 INSERT INTO openlr.metadata(map_name, map_owner) VALUES 
