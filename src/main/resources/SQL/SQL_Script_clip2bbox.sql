@@ -1,19 +1,3 @@
-
--- Terminal commands 
-createdb dbname;
-
--- Comands in database tool of your choice 
-CREATE EXTENSION postgis; 
-CREATE EXTENSION hstore; 
-CREATE EXTENSION pgrouting; 
-
--- Load osm file to db. Your terminal path should be set to the path of the .pbf file
-Osm2pgsql -d dbname -U username osmpbffilename.osm.pbf --hstore
-
--- FOR large osm.pbf files: 
---Osm2pgsql -d dbname -U username osmpbffile.osm.pbf --slim --hstore
-
-
 CREATE SCHEMA openlr; 
 
 -- Functional Road Class -- 
