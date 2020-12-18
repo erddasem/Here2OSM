@@ -32,6 +32,9 @@ import static org.jooq.sources.tables.Metadata.METADATA;
  * Loader for routable OSM data in a PostgreSQL database with PostGIS extension.
  * Database queries are constructed with the help of JOOQ.
  *
+ * Tables kanten, knoten, metadata are read here
+ * Tables incidents, affected are written here
+ *
  * @author Emily Kast
  *
  */
