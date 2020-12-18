@@ -33,6 +33,8 @@ import static org.jooq.sources.tables.Kanten.KANTEN;
 
 public class ApiRequest {
 
+    //your API key
+    private String hereApikey = "yourApi";
     private String answer;
 
     // Contains incident information for all requested bounding boxes
@@ -78,7 +80,7 @@ public class ApiRequest {
         String flow = "/traffic/6.2/";
         String resource = "incidents";
         String format = ".xml";
-        String apiKey = "?apiKey=qBXOVr1c_bOSy-NICB9WnOduxAUgxTIF7Tc9svGT1qI";
+        String apiKey = "?apiKey=" + hereApikey;
         //String criticality = "&criticality=minor";
         return new URL(baseUrl + incidents + resource + format + apiKey + bbox);
     }
