@@ -73,7 +73,7 @@ mvn clean install
 
 ### Databse tables 
 ***
-The database sould contain the following tables before running the programm: 
+The database should contain the following tables before running the programm: 
 + **form_of_way** : physical characteristics of a street. For more informationn check [TomTom OpenLR White Paper](https://www.openlr-association.com/fileadmin/user_upload/openlr-whitepaper_v1.5.pdf).
 + **functional_road_class**: indicates the importance of the road in the network. For more informationn check [TomTom OpenLR White Paper](https://www.openlr-association.com/fileadmin/user_upload/openlr-whitepaper_v1.5.pdf).
 + + **kanten**: lines in the road network. 
